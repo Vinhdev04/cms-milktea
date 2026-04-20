@@ -177,13 +177,45 @@ export function MenuManagement() {
           <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border transition-all cursor-pointer hover:bg-gray-50 flex-1 sm:flex-none"
             style={{ borderColor: '#F0DCC8', color: '#A0845C', fontWeight: 600, fontSize: '13.5px' }}>
             <Upload size={16} /> <span>Nhập File</span>
-            <input type="file" className="hidden" accept=".csv, .xlsx, .xls" onChange={(e) => {
-              if (e.target.files?.length) {
-                toast.loading('Đang xử lý dữ liệu...');
-                setTimeout(() => {
-                  toast.dismiss();
-                  toast.success(`Đã nhập thành công dữ liệu từ file ${e.target.files![0].name}`);
-                }, 1500);
+            <input type="file" className="hidden" accept=".csv" onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                toast.loading('Đang xử lý file CSV...');
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  try {
+                    const text = event.target?.result as string;
+                    const lines = text.split('\n').filter(l => l.trim() !== '');
+                    if (lines.length > 1) {
+                      for (let i = 1; i < lines.length; i++) {
+                        const cols = lines[i].split(',');
+                        if (cols.length >= 3) {
+                          products.unshift({
+                            id: 'SP' + Math.floor(1000 + Math.random() * 9000),
+                            name: cols[0].trim(),
+                            category: cols[1].trim() || 'Trà Sữa',
+                            price: parseInt(cols[2].trim()) || 45000,
+                            salePrice: null,
+                            status: 'active',
+                            badge: 'Mới',
+                            image: 'https://images.unsplash.com/photo-1541658016709-81450a1d4eb6?w=400&q=80',
+                          });
+                        }
+                      }
+                      setTimeout(() => {
+                        toast.dismiss();
+                        toast.success(`Đã nhập thành công ${lines.length - 1} sản phẩm!`);
+                        setSearch(s => s + ' '); setTimeout(() => setSearch(s => s.trim()), 10);
+                      }, 1000);
+                    } else {
+                      toast.dismiss(); toast.error('File CSV trống hoặc sai định dạng');
+                    }
+                  } catch (err) {
+                    toast.dismiss(); toast.error('Lỗi khi đọc file');
+                  }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
               }
             }} />
           </label>

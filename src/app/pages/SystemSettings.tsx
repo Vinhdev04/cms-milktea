@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Save, Bell, Shield, Store, CreditCard, Palette, Globe, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 
 const settingsSections = [
   { id: 'general', label: 'Thông tin chung', icon: Store },
@@ -226,7 +227,7 @@ export function SystemSettings() {
 
           {/* Save button */}
           <div className="flex justify-end">
-            <button className="flex items-center gap-2 px-6 py-2.5 rounded-xl"
+            <button onClick={() => toast.success('Đã lưu cấu hình thành công!')} className="flex items-center gap-2 px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
               style={{ background: '#F58220', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600, fontSize: '13.5px' }}>
               <Save size={15} /> Lưu thay đổi
             </button>
