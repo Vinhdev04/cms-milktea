@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { UploadCloud, Image as ImageIcon, Copy, Trash2, Search, Filter, FolderPlus, Download, CheckCircle2, X } from "lucide-react";
-import { products, toppings } from "../data/mockData";
+import { products, toppings } from "../../data/mockData";
 
 const initialMedia = [
   { id: '1', name: 'banner-summer-2026.jpg', type: 'banner', size: '2.4 MB', dimensions: '1920x1080', date: '20/04/2026', url: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=800&q=80' },

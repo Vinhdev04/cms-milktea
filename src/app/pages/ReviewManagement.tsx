@@ -3,7 +3,7 @@ import {
   Star, MessageSquare, User, Package, CheckCircle2, XCircle,
   Clock, Trash2, Filter, Search, Eye, ChevronDown, Loader2
 } from "lucide-react";
-import { reviews } from "../data/mockData";
+import { reviews } from "../../data/mockData";
 import { toast } from "sonner";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";

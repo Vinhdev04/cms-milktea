@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, Eye, Filter, X, Star, Package, Loader2, PackageX, List, Settings2, Upload, Box, ChevronDown, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { products, toppings } from "../data/mockData";
+import { products, toppings } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { useInfiniteScroll, usePagination } from "../hooks/useDataFetching";

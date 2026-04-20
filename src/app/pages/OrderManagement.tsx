@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer, PackageX } from "lucide-react";
 import { Logo } from "../components/Logo";
-import { orders } from "../data/mockData";
+import { orders } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";

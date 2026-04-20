@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, MapPin, Phone, Users, Star, Edit2, Trash2, X, CheckCircle2, AlertTriangle, Store } from "lucide-react";
 import { toast } from "sonner";
-import { branches } from "../data/mockData";
+import { branches } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";

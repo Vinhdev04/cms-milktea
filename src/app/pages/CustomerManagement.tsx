@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Eye, X, Award, ShoppingBag, TrendingUp, Users, Lock, Edit3 } from "lucide-react";
 import { toast } from "sonner";
-import { customers } from "../data/mockData";
+import { customers } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";

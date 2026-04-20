@@ -7,7 +7,7 @@ import {
   TrendingUp, ShoppingBag, Users, Store, ArrowUpRight, ArrowDownRight,
   Clock, CheckCircle2, AlertCircle, XCircle, Eye, MoreHorizontal
 } from "lucide-react";
-import { revenueData, weeklyData, categoryData, orders } from "../data/mockData";
+import { revenueData, weeklyData, categoryData, orders } from "../../data/mockData";
 
 const formatCurrency = (value: number) => {
   if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;

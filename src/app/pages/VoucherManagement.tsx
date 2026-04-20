@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Tag, Copy, X, CheckCircle2, Clock, AlertCircle, Loader2, Ticket, Upload } from "lucide-react";
 import { toast } from "sonner";
-import { vouchers } from "../data/mockData";
+import { vouchers } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { useInfiniteScroll } from "../hooks/useDataFetching";

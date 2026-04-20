@@ -1,6 +1,7 @@
-import { createBrowserRouter, Navigate } from "react-router";
+﻿import { createBrowserRouter, Navigate } from "react-router";
 import { Layout } from "./components/Layout";
 import { RequireAuth } from "./components/RequireAuth";
+import { RequireRole } from "./components/RequireRole";
 import { Dashboard } from "./pages/Dashboard";
 import { MenuManagement } from "./pages/MenuManagement";
 import { OrderManagement } from "./pages/OrderManagement";
@@ -15,23 +16,43 @@ import { Auth } from "./pages/Auth";
 import { MediaLibrary } from "./pages/MediaLibrary";
 import { ReviewManagement } from "./pages/ReviewManagement";
 import { Profile } from "./pages/Profile";
+import { UserLayout } from "./user/UserLayout";
+import { UserAuth } from "./user/pages/UserAuth";
+import { UserBranches } from "./user/pages/UserBranches";
+import { UserCart } from "./user/pages/UserCart";
+import { UserHome } from "./user/pages/UserHome";
+import { UserMenu } from "./user/pages/UserMenu";
+import { UserOffers } from "./user/pages/UserOffers";
+import { UserOrders } from "./user/pages/UserOrders";
+import { UserProfile } from "./user/pages/UserProfile";
+import { UserFavorites } from "./user/pages/UserFavorites";
+import { UserCheckout } from "./user/pages/UserCheckout";
+import { UserProductDetail } from "./user/pages/UserProductDetail";
 
-function ProtectedLayout() {
+function ProtectedAdminLayout() {
   return (
-    <RequireAuth>
-      <Layout />
-    </RequireAuth>
+    <RequireRole requiredRole="admin">
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    </RequireRole>
+  );
+}
+
+function ProtectedUserLayout() {
+  return (
+    <RequireRole requiredRole="member">
+      <UserLayout />
+    </RequireRole>
   );
 }
 
 export const router = createBrowserRouter([
+  { path: "/", element: <Navigate to="/auth" replace /> },
+  { path: "/auth", Component: Auth },
   {
-    path: "/auth",
-    Component: Auth,
-  },
-  {
-    path: "/",
-    Component: ProtectedLayout,
+    path: "/admin",
+    Component: ProtectedAdminLayout,
     children: [
       { index: true, Component: Dashboard },
       { path: "menu", Component: MenuManagement },
@@ -49,7 +70,22 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "*",
-    element: <Navigate to="/" replace />,
+    path: "/app",
+    Component: ProtectedUserLayout,
+    children: [
+      { index: true, Component: UserHome },
+      { path: "auth", Component: UserAuth },
+      { path: "menu", Component: UserMenu },
+      { path: "menu/:productId", Component: UserProductDetail },
+      { path: "cart", Component: UserCart },
+      { path: "checkout", Component: UserCheckout },
+      { path: "favorites", Component: UserFavorites },
+      { path: "orders", Component: UserOrders },
+      { path: "offers", Component: UserOffers },
+      { path: "branches", Component: UserBranches },
+      { path: "profile", Component: UserProfile },
+    ],
   },
+  { path: "/user", element: <Navigate to="/app" replace /> },
+  { path: "*", element: <Navigate to="/auth" replace /> },
 ]);
