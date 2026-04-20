@@ -1,5 +1,15 @@
 import { useState } from "react";
 import { Search, Filter, ShieldAlert, FileText, CheckCircle2, AlertTriangle, XCircle, Activity } from "lucide-react";
+import { Skeleton } from "../components/ui/skeleton";
+import { usePagination } from "../hooks/useDataFetching";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../components/ui/pagination";
 
 const mockLogs = [
   { id: 'LOG-001', user: 'Admin SMYOU', role: 'Super Admin', action: 'CREATE', target: 'Product', detail: 'Thêm sản phẩm "Trà Sữa Oolong Nướng"', time: '10:25:34 20/04/2026', ip: '192.168.1.45', status: 'success' },
@@ -34,6 +44,8 @@ export function AuditLog() {
     log.detail.toLowerCase().includes(search.toLowerCase()) ||
     log.action.toLowerCase().includes(search.toLowerCase())
   );
+
+  const { currentPage, setCurrentPage, totalPages, paginatedData, isLoading } = usePagination(filtered, 5);
 
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
@@ -81,47 +93,99 @@ export function AuditLog() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((log, i) => (
-                <tr key={log.id} className="border-b hover:bg-gray-50 transition-colors"
-                  style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
-                  <td className="px-5 py-3.5 whitespace-nowrap">
-                    <span style={{ fontSize: '12px', fontWeight: 500, color: '#6B9080' }}>{log.id}</span>
-                  </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap">
-                    <span style={{ fontSize: '12.5px', color: '#1A1A1A' }}>{log.time}</span>
-                  </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap">
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{log.user}</div>
-                    <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{log.role}</div>
-                  </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold"
-                      style={{ background: actionColors[log.action]?.bg || '#F3F4F6', color: actionColors[log.action]?.color || '#374151' }}>
-                      {log.action}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-start gap-1.5">
-                      <div className="mt-0.5">{statusIcons[log.status]}</div>
-                      <div>
-                        <div style={{ fontSize: '13px', color: '#1A1A1A', lineHeight: 1.4 }}>{log.detail}</div>
-                        <div style={{ fontSize: '11.5px', color: '#9CA3AF', marginTop: '2px' }}>Target: {log.target}</div>
+              {isLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                    <td className="px-5 py-3.5"><Skeleton className="h-4 w-16" /></td>
+                    <td className="px-5 py-3.5"><Skeleton className="h-4 w-32" /></td>
+                    <td className="px-5 py-3.5"><Skeleton className="h-4 w-24 mb-1" /><Skeleton className="h-3 w-16" /></td>
+                    <td className="px-5 py-3.5"><Skeleton className="h-6 w-20 rounded-md" /></td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-start gap-1.5">
+                        <Skeleton className="h-4 w-4 rounded-full mt-0.5 flex-shrink-0" />
+                        <div><Skeleton className="h-4 w-48 mb-1" /><Skeleton className="h-3 w-24" /></div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap">
-                    <span style={{ fontSize: '12.5px', color: '#6B9080', fontFamily: 'monospace' }}>{log.ip}</span>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-5 py-3.5"><Skeleton className="h-4 w-24" /></td>
+                  </tr>
+                ))
+              ) : (
+                paginatedData.map((log, i) => (
+                  <tr key={log.id} className="border-b hover:bg-gray-50 transition-colors"
+                    style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <span style={{ fontSize: '12px', fontWeight: 500, color: '#6B9080' }}>{log.id}</span>
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <span style={{ fontSize: '12.5px', color: '#1A1A1A' }}>{log.time}</span>
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{log.user}</div>
+                      <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{log.role}</div>
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold"
+                        style={{ background: actionColors[log.action]?.bg || '#F3F4F6', color: actionColors[log.action]?.color || '#374151' }}>
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-start gap-1.5">
+                        <div className="mt-0.5">{statusIcons[log.status]}</div>
+                        <div>
+                          <div style={{ fontSize: '13px', color: '#1A1A1A', lineHeight: 1.4 }}>{log.detail}</div>
+                          <div style={{ fontSize: '11.5px', color: '#9CA3AF', marginTop: '2px' }}>Target: {log.target}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <span style={{ fontSize: '12.5px', color: '#6B9080', fontFamily: 'monospace' }}>{log.ip}</span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-          {filtered.length === 0 && (
+          {(!isLoading && paginatedData.length === 0) && (
             <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
               Không tìm thấy log nào phù hợp.
             </div>
           )}
         </div>
+
+        {!isLoading && totalPages > 1 && (
+          <div className="px-5 py-4 border-t" style={{ borderColor: '#E0EDE6' }}>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                
+                {[...Array(totalPages)].map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink 
+                      onClick={() => setCurrentPage(i + 1)}
+                      isActive={currentPage === i + 1}
+                      className="cursor-pointer"
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );

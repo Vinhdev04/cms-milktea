@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, X, ChevronDown } from "lucide-react";
 import { toppings } from "../data/mockData";
+import { Skeleton } from "../components/ui/skeleton";
+import { usePagination } from "../hooks/useDataFetching";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../components/ui/pagination";
 
 type Topping = typeof toppings[0];
 
@@ -102,6 +112,8 @@ export function ToppingManagement() {
     t.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const { currentPage, setCurrentPage, totalPages, paginatedData, isLoading } = usePagination(filtered, 5);
+
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {showForm && <ToppingForm topping={editTopping} onClose={() => { setShowForm(false); setEditTopping(null); }} />}
@@ -158,62 +170,110 @@ export function ToppingManagement() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((t, i) => (
-              <tr key={t.id} className="border-b hover:bg-gray-50 transition-colors"
-                style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
-                <td className="px-5 py-3.5">
-                  <span style={{ fontSize: '12px', color: '#6B9080', fontWeight: 500 }}>{t.id}</span>
-                </td>
-                <td className="px-5 py-3.5">
-                  <div className="flex items-center gap-3">
-                    {t.image ? (
-                      <img src={t.image} alt={t.name} className="w-10 h-10 rounded-lg object-cover border" style={{ borderColor: '#E0EDE6' }} />
-                    ) : (
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center border flex-shrink-0" style={{ background: '#E8F5EC', borderColor: '#E0EDE6' }}>
-                        <span className="text-xs" style={{ color: '#A8D5BA' }}>Ảnh</span>
-                      </div>
-                    )}
-                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{t.name}</span>
-                  </div>
-                </td>
-                <td className="px-5 py-3.5">
-                  <span className="px-2.5 py-1 rounded-full text-xs"
-                    style={{ background: '#E8F5EC', color: '#2D6A4F', fontWeight: 500 }}>
-                    {t.category}
-                  </span>
-                </td>
-                <td className="px-5 py-3.5">
-                  <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#2D6A4F' }}>{formatVND(t.price)}</span>
-                </td>
-                <td className="px-5 py-3.5">
-                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-                    style={{
-                      background: t.status === 'active' ? '#DCFCE7' : '#F3F4F6',
-                      color: t.status === 'active' ? '#166534' : '#6B7280'
-                    }}>
-                    {t.status === 'active' ? 'Hoạt động' : 'Tạm ẩn'}
-                  </span>
-                </td>
-                <td className="px-5 py-3.5">
-                  <div className="flex gap-2">
-                    <button onClick={() => { setEditTopping(t); setShowForm(true); }}
-                      className="p-2 rounded-lg border transition-all hover:bg-gray-50"
-                      style={{ borderColor: '#E0EDE6' }}>
-                      <Edit2 size={14} style={{ color: '#2D6A4F' }} />
-                    </button>
-                    <button className="p-2 rounded-lg border transition-all hover:bg-pink-50"
-                      style={{ borderColor: '#FCBABD' }}>
-                      <Trash2 size={14} style={{ color: '#8B3A4A' }} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {isLoading ? (
+              [...Array(5)].map((_, i) => (
+                <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-12" /></td>
+                  <td className="px-5 py-3.5"><div className="flex items-center gap-3"><Skeleton className="w-10 h-10 rounded-lg" /><Skeleton className="h-4 w-32" /></div></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-6 w-20 rounded-full" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-20" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-6 w-24 rounded-full" /></td>
+                  <td className="px-5 py-3.5"><div className="flex gap-2"><Skeleton className="w-8 h-8 rounded-lg" /><Skeleton className="w-8 h-8 rounded-lg" /></div></td>
+                </tr>
+              ))
+            ) : (
+              paginatedData.map((t, i) => (
+                <tr key={t.id} className="border-b hover:bg-gray-50 transition-colors"
+                  style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                  <td className="px-5 py-3.5">
+                    <span style={{ fontSize: '12px', color: '#6B9080', fontWeight: 500 }}>{t.id}</span>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center gap-3">
+                      {t.image ? (
+                        <img src={t.image} alt={t.name} className="w-10 h-10 rounded-lg object-cover border" style={{ borderColor: '#E0EDE6' }} />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center border flex-shrink-0" style={{ background: '#E8F5EC', borderColor: '#E0EDE6' }}>
+                          <span className="text-xs" style={{ color: '#A8D5BA' }}>Ảnh</span>
+                        </div>
+                      )}
+                      <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{t.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <span className="px-2.5 py-1 rounded-full text-xs"
+                      style={{ background: '#E8F5EC', color: '#2D6A4F', fontWeight: 500 }}>
+                      {t.category}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#2D6A4F' }}>{formatVND(t.price)}</span>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                      style={{
+                        background: t.status === 'active' ? '#DCFCE7' : '#F3F4F6',
+                        color: t.status === 'active' ? '#166534' : '#6B7280'
+                      }}>
+                      {t.status === 'active' ? 'Hoạt động' : 'Tạm ẩn'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="flex gap-2">
+                      <button onClick={() => { setEditTopping(t); setShowForm(true); }}
+                        className="p-2 rounded-lg border transition-all hover:bg-gray-50"
+                        style={{ borderColor: '#E0EDE6' }}>
+                        <Edit2 size={14} style={{ color: '#2D6A4F' }} />
+                      </button>
+                      <button className="p-2 rounded-lg border transition-all hover:bg-pink-50"
+                        style={{ borderColor: '#FCBABD' }}>
+                        <Trash2 size={14} style={{ color: '#8B3A4A' }} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
-        {filtered.length === 0 && (
+        
+        {!isLoading && paginatedData.length === 0 && (
           <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
             Không tìm thấy topping nào
+          </div>
+        )}
+
+        {!isLoading && totalPages > 1 && (
+          <div className="px-5 py-4 border-t" style={{ borderColor: '#E0EDE6' }}>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                
+                {[...Array(totalPages)].map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink 
+                      onClick={() => setCurrentPage(i + 1)}
+                      isActive={currentPage === i + 1}
+                      className="cursor-pointer"
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </div>

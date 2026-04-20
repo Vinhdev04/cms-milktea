@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer } from "lucide-react";
 import { orders } from "../data/mockData";
+import { Skeleton } from "../components/ui/skeleton";
+import { usePagination } from "../hooks/useDataFetching";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../components/ui/pagination";
 
 type Order = typeof orders[0];
 
@@ -172,6 +182,8 @@ export function OrderManagement() {
     return matchStatus && matchSearch;
   });
 
+  const { currentPage, setCurrentPage, totalPages, paginatedData, isLoading } = usePagination(filtered, 5);
+
   const countByStatus = (s: string) => s === 'Tất cả' ? orders.length : orders.filter(o => o.status === statusMap[s]).length;
 
   return (
@@ -231,43 +243,94 @@ export function OrderManagement() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((order, i) => {
-                const st = statusConfig[order.status];
-                return (
-                  <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors"
-                    style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
-                    <td className="px-4 py-3.5">
-                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>{order.id}</span>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <div style={{ fontSize: '13px', fontWeight: 500, color: '#1A1A1A' }}>{order.customer}</div>
-                      <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{order.phone}</div>
-                    </td>
-                    <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#6B9080' }}>{order.branch}</span></td>
-                    <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#6B9080' }}>{order.time}</span></td>
-                    <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#1A1A1A' }}>{order.items}</span></td>
-                    <td className="px-4 py-3.5"><span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(order.total)}</span></td>
-                    <td className="px-4 py-3.5"><span style={{ fontSize: '12px', color: '#6B9080' }}>{order.payment}</span></td>
-                    <td className="px-4 py-3.5">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
-                        style={{ background: st.bg, color: st.color, fontSize: '11.5px', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                        {st.icon} {st.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <button onClick={() => setSelectedOrder(order)}
-                        className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                        <Eye size={15} style={{ color: '#2D6A4F' }} />
-                      </button>
-                    </td>
+              {isLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                    <td className="px-4 py-3.5"><Skeleton className="h-4 w-16" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-4 w-32 mb-1" /><Skeleton className="h-3 w-24" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-4 w-24" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-4 w-16" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-4 w-8" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-4 w-20" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-4 w-16" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-6 w-24 rounded-full" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-7 w-7 rounded-lg" /></td>
                   </tr>
-                );
-              })}
+                ))
+              ) : (
+                paginatedData.map((order, i) => {
+                  const st = statusConfig[order.status];
+                  return (
+                    <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors"
+                      style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                      <td className="px-4 py-3.5">
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>{order.id}</span>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div style={{ fontSize: '13px', fontWeight: 500, color: '#1A1A1A' }}>{order.customer}</div>
+                        <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{order.phone}</div>
+                      </td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#6B9080' }}>{order.branch}</span></td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#6B9080' }}>{order.time}</span></td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#1A1A1A' }}>{order.items}</span></td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(order.total)}</span></td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '12px', color: '#6B9080' }}>{order.payment}</span></td>
+                      <td className="px-4 py-3.5">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
+                          style={{ background: st.bg, color: st.color, fontSize: '11.5px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                          {st.icon} {st.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <button onClick={() => setSelectedOrder(order)}
+                          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                          <Eye size={15} style={{ color: '#2D6A4F' }} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
-          {filtered.length === 0 && (
+          
+          {!isLoading && paginatedData.length === 0 && (
             <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
               Không có đơn hàng nào
+            </div>
+          )}
+
+          {!isLoading && totalPages > 1 && (
+            <div className="px-5 py-4 border-t" style={{ borderColor: '#E0EDE6' }}>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  
+                  {[...Array(totalPages)].map((_, i) => (
+                    <PaginationItem key={i}>
+                      <PaginationLink 
+                        onClick={() => setCurrentPage(i + 1)}
+                        isActive={currentPage === i + 1}
+                        className="cursor-pointer"
+                      >
+                        {i + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </div>

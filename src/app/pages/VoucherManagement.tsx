@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Plus, Tag, Copy, X, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Plus, Tag, Copy, X, CheckCircle2, Clock, AlertCircle, Loader2 } from "lucide-react";
 import { vouchers } from "../data/mockData";
+import { Skeleton } from "../components/ui/skeleton";
+import { useInfiniteScroll } from "../hooks/useDataFetching";
 
 const formatVND = (v: number) => new Intl.NumberFormat('vi-VN').format(v) + 'đ';
 
@@ -117,6 +119,8 @@ export function VoucherManagement() {
   const [showForm, setShowForm] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
+  const { visibleData, isLoading, isLoadingMore, loadMore, hasMore } = useInfiniteScroll(vouchers, 6);
+
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
@@ -162,79 +166,119 @@ export function VoucherManagement() {
       </div>
 
       {/* Voucher Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {vouchers.map((v) => {
-          const usagePercent = Math.round((v.used / v.total) * 100);
-          const isExpired = v.status === 'expired';
-          return (
-            <div key={v.id} className="relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group"
-              style={{ background: 'white', border: '1px solid #E0EDE6', opacity: isExpired ? 0.75 : 1 }}>
-              
-              {/* Top section */}
-              <div className="p-5 relative overflow-hidden" 
-                   style={{ background: isExpired ? '#F3F4F6' : 'linear-gradient(135deg, #E8F5EC 0%, #A8D5BA 100%)' }}>
-                {!isExpired && (
-                  <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-white opacity-20 blur-xl pointer-events-none" />
-                )}
-                <div className="flex items-start justify-between relative z-10">
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={`skeleton-${i}`} className="rounded-2xl border" style={{ borderColor: '#E0EDE6', background: 'white' }}>
+              <div className="p-5">
+                <div className="flex justify-between items-start">
                   <div>
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '20px', fontWeight: 800, color: isExpired ? '#6B7280' : '#1B4332', letterSpacing: '0.05em' }}>{v.code}</div>
-                    <div style={{ fontSize: '13.5px', color: isExpired ? '#9CA3AF' : '#2D6A4F', marginTop: '4px', fontWeight: 500 }}>{v.name}</div>
+                    <Skeleton className="h-7 w-32 mb-2" />
+                    <Skeleton className="h-4 w-48" />
                   </div>
-                  <div className="text-right">
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '26px', fontWeight: 900, color: isExpired ? '#6B7280' : '#1B4332' }}>
-                      {v.type === 'percent' ? `${v.discount}%` : formatVND(v.discount)}
-                    </div>
-                    <div className="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider" 
-                         style={{ background: isExpired ? 'rgba(0,0,0,0.05)' : 'rgba(27,67,50,0.1)', color: isExpired ? '#6B7280' : '#1B4332' }}>
-                      Giảm giá
-                    </div>
-                  </div>
+                  <Skeleton className="h-8 w-20" />
                 </div>
-
-                {/* Copy button */}
-                <div className="relative z-10 mt-4 flex justify-end">
-                  <button onClick={() => copyCode(v.code)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                    style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontSize: '12px', color: isExpired ? '#6B7280' : '#2D6A4F', fontWeight: 600 }}>
-                    {copiedCode === v.code ? <CheckCircle2 size={14} style={{ color: '#166534' }} /> : <Copy size={14} />}
-                    {copiedCode === v.code ? 'Đã chép' : 'Sao chép mã'}
-                  </button>
-                </div>
+                <div className="flex justify-end mt-4"><Skeleton className="h-8 w-24 rounded-lg" /></div>
               </div>
-
-              {/* Dashed divider with ticket cutouts */}
-              <div className="relative flex items-center h-4 bg-white">
-                <div className="absolute left-[-8px] w-4 h-4 rounded-full" style={{ background: '#F5F5F5', borderRight: '1px solid #E0EDE6' }} />
-                <div className="w-full border-t-[2px] border-dashed" style={{ borderColor: '#E0EDE6' }} />
-                <div className="absolute right-[-8px] w-4 h-4 rounded-full" style={{ background: '#F5F5F5', borderLeft: '1px solid #E0EDE6' }} />
-              </div>
-
-              {/* Bottom section */}
-              <div className="px-5 pb-5 pt-2">
-                <div className="flex justify-between text-[13px] mb-3" style={{ color: '#6B9080' }}>
-                  <span className="flex items-center gap-1.5"><AlertCircle size={14} /> Tối thiểu: {formatVND(v.minOrder)}</span>
-                  <span className="flex items-center gap-1.5"><Clock size={14} /> HSD: {v.expiry}</span>
+              <div className="px-5 py-4 border-t" style={{ borderColor: '#E0EDE6' }}>
+                <div className="flex justify-between mb-3">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
                 </div>
-                
-                <div className="flex items-center justify-between mb-2">
-                  <span style={{ fontSize: '12px', color: '#1A1A1A', fontWeight: 600 }}>Đã dùng: {v.used}/{v.total}</span>
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider"
-                    style={{ background: isExpired ? '#F3F4F6' : '#DCFCE7', color: isExpired ? '#9CA3AF' : '#166534' }}>
-                    {isExpired ? 'Đã kết thúc' : 'Đang phát hành'}
-                  </span>
-                </div>
-                
-                {/* Progress */}
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-                  <div className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${usagePercent}%`, background: usagePercent >= 90 ? '#EF4444' : '#2D6A4F' }} />
-                </div>
+                <Skeleton className="h-2 w-full rounded-full" />
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {visibleData.map((v) => {
+              const usagePercent = Math.round((v.used / v.total) * 100);
+              const isExpired = v.status === 'expired';
+              return (
+                <div key={v.id} className="relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group"
+                  style={{ background: 'white', border: '1px solid #E0EDE6', opacity: isExpired ? 0.75 : 1 }}>
+                  
+                  {/* Top section */}
+                  <div className="p-5 relative overflow-hidden" 
+                       style={{ background: isExpired ? '#F3F4F6' : 'linear-gradient(135deg, #E8F5EC 0%, #A8D5BA 100%)' }}>
+                    {!isExpired && (
+                      <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-white opacity-20 blur-xl pointer-events-none" />
+                    )}
+                    <div className="flex items-start justify-between relative z-10">
+                      <div>
+                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '20px', fontWeight: 800, color: isExpired ? '#6B7280' : '#1B4332', letterSpacing: '0.05em' }}>{v.code}</div>
+                        <div style={{ fontSize: '13.5px', color: isExpired ? '#9CA3AF' : '#2D6A4F', marginTop: '4px', fontWeight: 500 }}>{v.name}</div>
+                      </div>
+                      <div className="text-right">
+                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '26px', fontWeight: 900, color: isExpired ? '#6B7280' : '#1B4332' }}>
+                          {v.type === 'percent' ? `${v.discount}%` : formatVND(v.discount)}
+                        </div>
+                        <div className="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider" 
+                             style={{ background: isExpired ? 'rgba(0,0,0,0.05)' : 'rgba(27,67,50,0.1)', color: isExpired ? '#6B7280' : '#1B4332' }}>
+                          Giảm giá
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Copy button */}
+                    <div className="relative z-10 mt-4 flex justify-end">
+                      <button onClick={() => copyCode(v.code)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                        style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontSize: '12px', color: isExpired ? '#6B7280' : '#2D6A4F', fontWeight: 600 }}>
+                        {copiedCode === v.code ? <CheckCircle2 size={14} style={{ color: '#166534' }} /> : <Copy size={14} />}
+                        {copiedCode === v.code ? 'Đã chép' : 'Sao chép mã'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Dashed divider with ticket cutouts */}
+                  <div className="relative flex items-center h-4 bg-white">
+                    <div className="absolute left-[-8px] w-4 h-4 rounded-full" style={{ background: '#F5F5F5', borderRight: '1px solid #E0EDE6' }} />
+                    <div className="w-full border-t-[2px] border-dashed" style={{ borderColor: '#E0EDE6' }} />
+                    <div className="absolute right-[-8px] w-4 h-4 rounded-full" style={{ background: '#F5F5F5', borderLeft: '1px solid #E0EDE6' }} />
+                  </div>
+
+                  {/* Bottom section */}
+                  <div className="px-5 pb-5 pt-2">
+                    <div className="flex justify-between text-[13px] mb-3" style={{ color: '#6B9080' }}>
+                      <span className="flex items-center gap-1.5"><AlertCircle size={14} /> Tối thiểu: {formatVND(v.minOrder)}</span>
+                      <span className="flex items-center gap-1.5"><Clock size={14} /> HSD: {v.expiry}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-2">
+                      <span style={{ fontSize: '12px', color: '#1A1A1A', fontWeight: 600 }}>Đã dùng: {v.used}/{v.total}</span>
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider"
+                        style={{ background: isExpired ? '#F3F4F6' : '#DCFCE7', color: isExpired ? '#9CA3AF' : '#166534' }}>
+                        {isExpired ? 'Đã kết thúc' : 'Đang phát hành'}
+                      </span>
+                    </div>
+                    
+                    {/* Progress */}
+                    <div className="h-2 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                      <div className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${usagePercent}%`, background: usagePercent >= 90 ? '#EF4444' : '#2D6A4F' }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Load More Button */}
+          {hasMore && (
+            <div className="flex justify-center mt-8">
+              <button onClick={loadMore} disabled={isLoadingMore}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border transition-all hover:bg-gray-50"
+                style={{ borderColor: '#E0EDE6', color: '#2D6A4F', fontWeight: 600, fontSize: '14px' }}>
+                {isLoadingMore ? <Loader2 size={16} className="animate-spin" /> : null}
+                {isLoadingMore ? 'Đang tải...' : 'Xem thêm'}
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, X, ChevronDown, Shield } from "lucide-react";
 import { staff } from "../data/mockData";
+import { Skeleton } from "../components/ui/skeleton";
+import { usePagination } from "../hooks/useDataFetching";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../components/ui/pagination";
 
 type Staff = typeof staff[0];
 
@@ -107,6 +117,8 @@ export function StaffManagement() {
     s.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const { currentPage, setCurrentPage, totalPages, paginatedData, isLoading } = usePagination(filtered, 5);
+
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {showForm && <StaffForm member={editStaff} onClose={() => { setShowForm(false); setEditStaff(null); }} />}
@@ -163,59 +175,113 @@ export function StaffManagement() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((s, i) => {
-              const roleCfg = roleColors[s.role] || { bg: '#F3F4F6', color: '#6B7280' };
-              return (
-                <tr key={s.id} className="border-b hover:bg-gray-50 transition-colors"
-                  style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: '#A8D5BA', color: '#1B4332', fontWeight: 700, fontSize: '13px' }}>
-                        {s.name[0]}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{s.name}</div>
-                        <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{s.id}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                      style={{ background: roleCfg.bg, color: roleCfg.color }}>
-                      {s.role}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5"><span style={{ fontSize: '13px', color: '#6B9080' }}>{s.branch}</span></td>
-                  <td className="px-5 py-3.5">
-                    <div style={{ fontSize: '13px', color: '#1A1A1A' }}>{s.phone}</div>
-                    <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{s.email}</div>
-                  </td>
-                  <td className="px-5 py-3.5"><span style={{ fontSize: '12px', color: '#6B9080' }}>{s.joinDate}</span></td>
-                  <td className="px-5 py-3.5">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-                      style={{ background: s.status === 'active' ? '#DCFCE7' : '#FEE2E2', color: s.status === 'active' ? '#166534' : '#991B1B' }}>
-                      {s.status === 'active' ? 'Hoạt động' : 'Nghỉ việc'}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <div className="flex gap-2">
-                      <button onClick={() => { setEditStaff(s); setShowForm(true); }}
-                        className="p-2 rounded-lg border hover:bg-gray-50 transition-colors"
-                        style={{ borderColor: '#E0EDE6' }}>
-                        <Edit2 size={13} style={{ color: '#2D6A4F' }} />
-                      </button>
-                      <button className="p-2 rounded-lg border hover:bg-pink-50 transition-colors"
-                        style={{ borderColor: '#FCBABD' }}>
-                        <Trash2 size={13} style={{ color: '#8B3A4A' }} />
-                      </button>
-                    </div>
-                  </td>
+            {isLoading ? (
+              [...Array(5)].map((_, i) => (
+                <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                  <td className="px-5 py-3.5"><div className="flex items-center gap-3"><Skeleton className="w-8 h-8 rounded-full" /><Skeleton className="h-4 w-24 mb-1" /></div></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-5 w-20 rounded-full" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-16" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-24 mb-1" /><Skeleton className="h-3 w-32" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-16" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-5 w-20 rounded-full" /></td>
+                  <td className="px-5 py-3.5"><div className="flex gap-2"><Skeleton className="h-7 w-7 rounded-lg" /><Skeleton className="h-7 w-7 rounded-lg" /></div></td>
                 </tr>
-              );
-            })}
+              ))
+            ) : (
+              paginatedData.map((s, i) => {
+                const roleCfg = roleColors[s.role] || { bg: '#F3F4F6', color: '#6B7280' };
+                return (
+                  <tr key={s.id} className="border-b hover:bg-gray-50 transition-colors"
+                    style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ background: '#A8D5BA', color: '#1B4332', fontWeight: 700, fontSize: '13px' }}>
+                          {s.name[0]}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{s.name}</div>
+                          <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{s.id}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold"
+                        style={{ background: roleCfg.bg, color: roleCfg.color }}>
+                        {s.role}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5"><span style={{ fontSize: '13px', color: '#6B9080' }}>{s.branch}</span></td>
+                    <td className="px-5 py-3.5">
+                      <div style={{ fontSize: '13px', color: '#1A1A1A' }}>{s.phone}</div>
+                      <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{s.email}</div>
+                    </td>
+                    <td className="px-5 py-3.5"><span style={{ fontSize: '12px', color: '#6B9080' }}>{s.joinDate}</span></td>
+                    <td className="px-5 py-3.5">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                        style={{ background: s.status === 'active' ? '#DCFCE7' : '#FEE2E2', color: s.status === 'active' ? '#166534' : '#991B1B' }}>
+                        {s.status === 'active' ? 'Hoạt động' : 'Nghỉ việc'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex gap-2">
+                        <button onClick={() => { setEditStaff(s); setShowForm(true); }}
+                          className="p-2 rounded-lg border hover:bg-gray-50 transition-colors"
+                          style={{ borderColor: '#E0EDE6' }}>
+                          <Edit2 size={13} style={{ color: '#2D6A4F' }} />
+                        </button>
+                        <button className="p-2 rounded-lg border hover:bg-pink-50 transition-colors"
+                          style={{ borderColor: '#FCBABD' }}>
+                          <Trash2 size={13} style={{ color: '#8B3A4A' }} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
+
+        {!isLoading && paginatedData.length === 0 && (
+          <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
+            Không tìm thấy nhân viên nào
+          </div>
+        )}
+
+        {!isLoading && totalPages > 1 && (
+          <div className="px-5 py-4 border-t" style={{ borderColor: '#E0EDE6' }}>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                
+                {[...Array(totalPages)].map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink 
+                      onClick={() => setCurrentPage(i + 1)}
+                      isActive={currentPage === i + 1}
+                      className="cursor-pointer"
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Search, Eye, X, Award, ShoppingBag, TrendingUp } from "lucide-react";
 import { customers } from "../data/mockData";
+import { Skeleton } from "../components/ui/skeleton";
+import { usePagination } from "../hooks/useDataFetching";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../components/ui/pagination";
 
 type Customer = typeof customers[0];
 
@@ -90,6 +100,8 @@ export function CustomerManagement() {
     (c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search))
   );
 
+  const { currentPage, setCurrentPage, totalPages, paginatedData, isLoading } = usePagination(filtered, 5);
+
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {selectedCustomer && <CustomerDetail customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} />}
@@ -159,53 +171,108 @@ export function CustomerManagement() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((c, i) => {
-              const tier = tierConfig[c.tier] || tierConfig.Member;
-              return (
-                <tr key={c.id} className="border-b hover:bg-gray-50 transition-colors"
-                  style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: '#A8D5BA', color: '#1B4332', fontWeight: 700, fontSize: '13px' }}>
-                        {c.name[0]}
-                      </div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{c.name}</div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <div style={{ fontSize: '13px', color: '#1A1A1A' }}>{c.phone}</div>
-                    <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{c.email}</div>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                      style={{ background: tier.bg, color: tier.color }}>
-                      {c.tier}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>{c.points.toLocaleString()}</span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span style={{ fontSize: '13px', color: '#1A1A1A' }}>{c.totalOrders}</span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(c.totalSpent)}</span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span style={{ fontSize: '12px', color: '#6B9080' }}>{c.joinDate}</span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <button onClick={() => setSelectedCustomer(c)}
-                      className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                      <Eye size={15} style={{ color: '#2D6A4F' }} />
-                    </button>
-                  </td>
+            {isLoading ? (
+              [...Array(5)].map((_, i) => (
+                <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                  <td className="px-5 py-3.5"><div className="flex items-center gap-3"><Skeleton className="w-8 h-8 rounded-full" /><Skeleton className="h-4 w-24" /></div></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-24 mb-1" /><Skeleton className="h-3 w-32" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-5 w-16 rounded-full" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-12" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-8" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-20" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-4 w-20" /></td>
+                  <td className="px-5 py-3.5"><Skeleton className="h-7 w-7 rounded-lg" /></td>
                 </tr>
-              );
-            })}
+              ))
+            ) : (
+              paginatedData.map((c, i) => {
+                const tier = tierConfig[c.tier] || tierConfig.Member;
+                return (
+                  <tr key={c.id} className="border-b hover:bg-gray-50 transition-colors"
+                    style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ background: '#A8D5BA', color: '#1B4332', fontWeight: 700, fontSize: '13px' }}>
+                          {c.name[0]}
+                        </div>
+                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{c.name}</div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <div style={{ fontSize: '13px', color: '#1A1A1A' }}>{c.phone}</div>
+                      <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{c.email}</div>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold"
+                        style={{ background: tier.bg, color: tier.color }}>
+                        {c.tier}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>{c.points.toLocaleString()}</span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span style={{ fontSize: '13px', color: '#1A1A1A' }}>{c.totalOrders}</span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(c.totalSpent)}</span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span style={{ fontSize: '12px', color: '#6B9080' }}>{c.joinDate}</span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <button onClick={() => setSelectedCustomer(c)}
+                        className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                        <Eye size={15} style={{ color: '#2D6A4F' }} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
+
+        {!isLoading && paginatedData.length === 0 && (
+          <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
+            Không tìm thấy khách hàng nào
+          </div>
+        )}
+
+        {!isLoading && totalPages > 1 && (
+          <div className="px-5 py-4 border-t" style={{ borderColor: '#E0EDE6' }}>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                
+                {[...Array(totalPages)].map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink 
+                      onClick={() => setCurrentPage(i + 1)}
+                      isActive={currentPage === i + 1}
+                      className="cursor-pointer"
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );
