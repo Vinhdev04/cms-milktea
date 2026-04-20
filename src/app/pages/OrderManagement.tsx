@@ -54,23 +54,7 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
 
   return (
     <>
-      <style>{`
-        @media print {
-          body * { visibility: hidden; }
-          #print-area, #print-area * { visibility: visible; }
-          #print-area {
-            position: absolute; left: 0; top: 0; width: 100%;
-          }
-          .invoice-page {
-            page-break-after: always;
-            min-height: 100vh;
-            padding: 20px;
-            background: white !important;
-          }
-          .no-print { display: none !important; }
-        }
-      `}</style>
-      <div className="fixed inset-0 z-50 flex items-center justify-end no-print" style={{ background: 'rgba(0,0,0,0.35)' }}>
+      <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }}>
         <div id="print-area" className="h-full w-full max-w-md flex flex-col invoice-page"
           style={{ background: 'white', boxShadow: '-8px 0 32px rgba(0,0,0,0.12)' }}>
           <div className="flex flex-col items-center py-6 border-b" style={{ borderColor: '#F0DCC8' }}>
@@ -237,13 +221,32 @@ export function OrderManagement() {
 
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          #print-area, #print-area * { visibility: visible; }
+          #print-area {
+            position: absolute !important; 
+            left: 0 !important; 
+            top: 0 !important; 
+            width: 100% !important;
+          }
+          .invoice-page {
+            page-break-after: always;
+            min-height: 100vh;
+            padding: 20px;
+            background: white !important;
+          }
+          .no-print { display: none !important; }
+        }
+      `}</style>
       {selectedOrder && <OrderDetail order={selectedOrder} onClose={() => setSelectedOrder(null)} />}
       
       {/* Bulk Print Area (Hidden unless printing) */}
       {isBulkPrinting && (
-        <div id="print-area" className="hidden">
+        <div id="print-area" className="hidden print:block">
           {orders.filter(o => selectedOrderIds.includes(o.id)).map(order => (
-            <div key={order.id} className="invoice-page bg-white p-8">
+            <div key={order.id} className="invoice-page bg-white p-8 max-w-md mx-auto border border-gray-200 my-4">
                <div className="flex flex-col items-center py-6 border-b" style={{ borderColor: '#F0DCC8' }}>
                   <Logo size={40} />
                   <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#5D2E0F' }}>SMYOU MILKTEA</h1>
