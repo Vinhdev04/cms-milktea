@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Plus, Tag, Copy, X, CheckCircle2, Clock, AlertCircle, Loader2 } from "lucide-react";
+import { Plus, Tag, Copy, X, CheckCircle2, Clock, AlertCircle, Loader2, Ticket } from "lucide-react";
 import { vouchers } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { useInfiniteScroll } from "../hooks/useDataFetching";
 
 const formatVND = (v: number) => new Intl.NumberFormat('vi-VN').format(v) + 'đ';
@@ -266,14 +267,25 @@ export function VoucherManagement() {
             })}
           </div>
 
+          {/* Empty State */}
+          {!isLoading && visibleData.length === 0 && (
+            <div className="mt-8">
+              <EmptyState 
+                icon={<Ticket size={28} />}
+                title="Chưa có voucher nào"
+                description="Hệ thống hiện tại chưa có voucher nào, hoặc voucher không khớp với điều kiện lọc."
+              />
+            </div>
+          )}
+
           {/* Load More Button */}
-          {hasMore && (
-            <div className="flex justify-center mt-8">
+          {hasMore && visibleData.length > 0 && (
+            <div className="flex justify-center mt-10 mb-4">
               <button onClick={loadMore} disabled={isLoadingMore}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border transition-all hover:bg-gray-50"
-                style={{ borderColor: '#E0EDE6', color: '#2D6A4F', fontWeight: 600, fontSize: '14px' }}>
-                {isLoadingMore ? <Loader2 size={16} className="animate-spin" /> : null}
-                {isLoadingMore ? 'Đang tải...' : 'Xem thêm'}
+                className="flex items-center gap-2 px-8 py-3 rounded-xl border transition-all hover:-translate-y-0.5"
+                style={{ background: 'white', borderColor: '#E0EDE6', color: '#2D6A4F', fontWeight: 600, fontSize: '14px', boxShadow: '0 4px 12px rgba(45, 106, 79, 0.08)' }}>
+                {isLoadingMore ? <Loader2 size={18} className="animate-spin" /> : null}
+                {isLoadingMore ? 'Đang tải thêm...' : 'Xem thêm Voucher'}
               </button>
             </div>
           )}

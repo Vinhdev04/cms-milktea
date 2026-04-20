@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Plus, MapPin, Phone, Users, Star, Edit2, Trash2, X, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Plus, MapPin, Phone, Users, Star, Edit2, Trash2, X, CheckCircle2, AlertTriangle, Store } from "lucide-react";
 import { branches } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
 import {
   Pagination,
@@ -200,6 +201,16 @@ export function BranchManagement() {
               );
             })}
           </div>
+
+          {!isLoading && paginatedData.length === 0 && (
+            <div className="mt-8">
+              <EmptyState 
+                icon={<Store size={28} />}
+                title="Không tìm thấy chi nhánh"
+                description="Không có chi nhánh nào khớp với điều kiện hiện tại."
+              />
+            </div>
+          )}
 
           {!isLoading && totalPages > 1 && (
             <div className="mt-6">

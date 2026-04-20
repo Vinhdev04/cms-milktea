@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Search, Filter, ShieldAlert, FileText, CheckCircle2, AlertTriangle, XCircle, Activity } from "lucide-react";
+import { Search, Filter, ShieldAlert, FileText, CheckCircle2, AlertTriangle, XCircle, Activity, SearchX } from "lucide-react";
 import { Skeleton } from "../components/ui/skeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
 import {
   Pagination,
@@ -147,8 +148,12 @@ export function AuditLog() {
             </tbody>
           </table>
           {(!isLoading && paginatedData.length === 0) && (
-            <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
-              Không tìm thấy log nào phù hợp.
+            <div className="py-10">
+              <EmptyState 
+                icon={<SearchX size={28} />}
+                title="Không tìm thấy nhật ký"
+                description="Không có bản ghi nhật ký nào khớp với điều kiện tìm kiếm hiện tại."
+              />
             </div>
           )}
         </div>

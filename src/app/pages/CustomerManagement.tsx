@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Search, Eye, X, Award, ShoppingBag, TrendingUp } from "lucide-react";
+import { Search, Eye, X, Award, ShoppingBag, TrendingUp, Users } from "lucide-react";
 import { customers } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
 import {
   Pagination,
@@ -235,9 +236,15 @@ export function CustomerManagement() {
         </table>
 
         {!isLoading && paginatedData.length === 0 && (
-          <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
-            Không tìm thấy khách hàng nào
-          </div>
+          <tr>
+            <td colSpan={8}>
+              <EmptyState 
+                icon={<Users size={28} />}
+                title="Không tìm thấy khách hàng"
+                description="Không có khách hàng nào khớp với điều kiện lọc hiện tại."
+              />
+            </td>
+          </tr>
         )}
 
         {!isLoading && totalPages > 1 && (

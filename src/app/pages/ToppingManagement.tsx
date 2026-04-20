@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Plus, Search, Edit2, Trash2, X, ChevronDown } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, X, ChevronDown, Box } from "lucide-react";
 import { toppings } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
 import {
   Pagination,
@@ -238,8 +239,12 @@ export function ToppingManagement() {
         </table>
         
         {!isLoading && paginatedData.length === 0 && (
-          <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
-            Không tìm thấy topping nào
+          <div className="py-10">
+            <EmptyState 
+              icon={<Box size={28} />}
+              title="Không tìm thấy Topping"
+              description="Không có Topping nào khớp với điều kiện lọc hoặc từ khóa tìm kiếm."
+            />
           </div>
         )}
 

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer } from "lucide-react";
+import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer, PackageX } from "lucide-react";
 import { orders } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
 import {
   Pagination,
@@ -295,9 +296,15 @@ export function OrderManagement() {
           </table>
           
           {!isLoading && paginatedData.length === 0 && (
-            <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
-              Không có đơn hàng nào
-            </div>
+            <tr>
+              <td colSpan={9}>
+                <EmptyState 
+                  icon={<PackageX size={28} />}
+                  title="Không tìm thấy đơn hàng"
+                  description="Không có đơn hàng nào khớp với điều kiện lọc hiện tại."
+                />
+              </td>
+            </tr>
           )}
 
           {!isLoading && totalPages > 1 && (

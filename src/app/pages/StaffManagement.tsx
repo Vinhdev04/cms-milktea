@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Plus, Search, Edit2, Trash2, X, ChevronDown, Shield } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, X, ChevronDown, Shield, Users } from "lucide-react";
 import { staff } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
 import {
   Pagination,
@@ -244,9 +245,15 @@ export function StaffManagement() {
         </table>
 
         {!isLoading && paginatedData.length === 0 && (
-          <div className="text-center py-12" style={{ color: '#9CA3AF', fontSize: '14px' }}>
-            Không tìm thấy nhân viên nào
-          </div>
+          <tr>
+            <td colSpan={7}>
+              <EmptyState 
+                icon={<Users size={28} />}
+                title="Không tìm thấy nhân viên"
+                description="Không có nhân viên nào khớp với điều kiện lọc hiện tại."
+              />
+            </td>
+          </tr>
         )}
 
         {!isLoading && totalPages > 1 && (
