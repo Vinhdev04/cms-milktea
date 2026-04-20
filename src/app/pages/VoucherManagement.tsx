@@ -172,7 +172,7 @@ export function VoucherManagement() {
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {showForm && <VoucherForm onClose={() => setShowForm(false)} />}
 
-      <div className="flex items-start justify-between mb-6">
+      <div className="section-enter mb-6 flex flex-col gap-4 rounded-[28px] border border-[#F0DCC8] bg-[linear-gradient(135deg,#FFF8F2_0%,#FFFFFF_68%)] p-4 shadow-[0_16px_40px_rgba(93,46,15,0.05)] lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
             Voucher & Ưu đãi
@@ -182,8 +182,8 @@ export function VoucherManagement() {
             Hiện có <strong>{vouchers.filter(v => v.status === 'active').length}</strong> voucher đang hoạt động.
           </p>
         </div>
-        <div className="flex gap-2">
-          <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border transition-all cursor-pointer hover:bg-gray-50"
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl border transition-all cursor-pointer hover:bg-gray-50"
             style={{ borderColor: '#F0DCC8', color: '#A0845C', fontWeight: 600, fontSize: '13.5px' }}>
             <Upload size={16} /> <span>Nhập File</span>
             <input type="file" className="hidden" accept=".csv" onChange={(e) => {
@@ -230,7 +230,7 @@ export function VoucherManagement() {
             }} />
           </label>
           <button onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl flex-shrink-0"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl flex-shrink-0 shadow-[0_14px_28px_rgba(245,130,32,0.22)]"
             style={{ background: '#F58220', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
             <Plus size={16} /> Tạo Voucher mới
           </button>
@@ -238,15 +238,15 @@ export function VoucherManagement() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+      <div className="stats-grid-compact mb-6">
         {[
           { label: 'Đang hoạt động', value: vouchers.filter(v => v.status === 'active').length, icon: <CheckCircle2 size={20} style={{ color: '#9A3412' }} />, bg: '#FFEDD5' },
           { label: 'Tổng lượt dùng', value: vouchers.reduce((a, v) => a + v.used, 0), icon: <Tag size={20} style={{ color: '#1E40AF' }} />, bg: '#EFF6FF' },
           { label: 'Đã hết hạn', value: vouchers.filter(v => v.status === 'expired').length, icon: <Clock size={20} style={{ color: '#92400E' }} />, bg: '#FEF3C7' },
         ].map((s, i) => (
-          <div key={i} className="rounded-xl p-3 md:p-4 flex flex-col xl:flex-row items-center xl:items-start gap-2 md:gap-3 text-center xl:text-left"
-            style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: s.bg }}>
+          <div key={i} className="compact-stat-card p-3 md:p-4 flex flex-col items-center gap-2 text-center"
+            style={{ boxShadow: '0 10px 24px rgba(93,46,15,0.05)' }}>
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: s.bg }}>
               {s.icon}
             </div>
             <div>

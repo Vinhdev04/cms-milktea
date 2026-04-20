@@ -3,7 +3,6 @@ import { Layout } from "./components/Layout";
 import { RequireAuth } from "./components/RequireAuth";
 import { Dashboard } from "./pages/Dashboard";
 import { MenuManagement } from "./pages/MenuManagement";
-import { ToppingManagement } from "./pages/ToppingManagement";
 import { OrderManagement } from "./pages/OrderManagement";
 import { CustomerManagement } from "./pages/CustomerManagement";
 import { VoucherManagement } from "./pages/VoucherManagement";
@@ -15,6 +14,7 @@ import { AuditLog } from "./pages/AuditLog";
 import { Auth } from "./pages/Auth";
 import { MediaLibrary } from "./pages/MediaLibrary";
 import { ReviewManagement } from "./pages/ReviewManagement";
+import { Profile } from "./pages/Profile";
 
 function ProtectedLayout() {
   return (
@@ -35,7 +35,6 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Dashboard },
       { path: "menu", Component: MenuManagement },
-      { path: "toppings", Component: ToppingManagement },
       { path: "orders", Component: OrderManagement },
       { path: "customers", Component: CustomerManagement },
       { path: "vouchers", Component: VoucherManagement },
@@ -44,6 +43,7 @@ export const router = createBrowserRouter([
       { path: "branches", Component: BranchManagement },
       { path: "staff", Component: StaffManagement },
       { path: "reviews", Component: ReviewManagement },
+      { path: "profile", Component: Profile },
       { path: "settings", Component: SystemSettings },
       { path: "audit-log", Component: AuditLog },
     ],

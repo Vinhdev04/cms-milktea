@@ -54,17 +54,18 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }}>
+      <div className="invoice-overlay fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }}>
         <div id="print-area" className="h-full w-full max-w-md flex flex-col invoice-page"
           style={{ background: 'white', boxShadow: '-8px 0 32px rgba(0,0,0,0.12)' }}>
-          <div className="flex flex-col items-center py-6 border-b" style={{ borderColor: '#F0DCC8' }}>
+          <div className="flex flex-col items-center pt-8 pb-4 border-b" style={{ borderColor: '#F0DCC8' }}>
             <div className="p-3 rounded-2xl bg-white mb-2" style={{ border: '1px solid #FAF0E6' }}>
-              <Logo size={40} />
+              <Logo size={50} />
             </div>
-            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#5D2E0F' }}>SMYOU MILKTEA</h1>
-            <p style={{ fontSize: '12px', color: '#A0845C', fontWeight: 500 }}>Sweet moments for you</p>
+            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '20px', fontWeight: 800, color: '#5D2E0F' }}>SMYOU MILKTEA</h1>
+            <p style={{ fontSize: '13px', color: '#A0845C', fontWeight: 500 }}>Sweet moments for you</p>
+            <div className="print-title">HÓA ĐƠN THANH TOÁN</div>
           </div>
-        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#F0DCC8' }}>
+        <div className="flex items-center justify-between px-5 py-4 border-b no-print" style={{ borderColor: '#F0DCC8' }}>
           <div>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>
               Chi tiết đơn hàng
@@ -79,7 +80,7 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
             <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100"><X size={18} style={{ color: '#A0845C' }} /></button>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+        <div className="invoice-scroll flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Status */}
           <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: st.bg }}>
             <span className="flex items-center gap-1.5 font-semibold text-sm" style={{ color: st.color }}>
@@ -115,7 +116,7 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
           </div>
 
           {/* Items */}
-          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #F0DCC8' }}>
+          <div className="rounded-xl overflow-hidden print:border-2" style={{ border: '1px solid #F0DCC8' }}>
             <div className="px-4 py-3 border-b" style={{ background: '#FFF3E6', borderColor: '#F0DCC8' }}>
               <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 600, color: '#F58220' }}>SẢN PHẨM ĐÃ ĐẶT</h3>
             </div>
@@ -130,15 +131,15 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
                 </div>
               </div>
             ))}
-            <div className="px-4 py-3 flex justify-between" style={{ background: '#FFFAF5' }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>Tổng cộng</span>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: '#F58220' }}>{formatVND(order.total)}</span>
+            <div className="px-4 py-4 flex justify-between border-t-2" style={{ background: '#FFFAF5', borderColor: '#F58220' }}>
+              <span className="text-base font-bold text-gray-900">TỔNG CỘNG THANH TOÁN</span>
+              <span className="text-xl font-extrabold" style={{ color: '#F58220' }}>{formatVND(order.total)}</span>
             </div>
           </div>
 
           {/* Timeline */}
-          <div className="rounded-xl p-4" style={{ border: '1px solid #F0DCC8' }}>
-            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 600, color: '#A0845C', marginBottom: '12px' }}>TRẠNG THÁI ĐƠN HÀNG</h3>
+          <div className="rounded-xl p-5 mb-8" style={{ border: '1px solid #F0DCC8' }}>
+            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '14px', fontWeight: 700, color: '#A0845C', marginBottom: '16px' }}>TRẠNG THÁI ĐƠN HÀNG</h3>
             <div className="space-y-3">
               {timeline.map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
@@ -223,22 +224,65 @@ export function OrderManagement() {
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
         @media print {
+          @page { margin: 10mm 0; }
+          body { margin: 0; padding: 0; background: white; }
           body * { visibility: hidden; }
           #print-area, #print-area * { visibility: visible; }
-          #print-area {
-            position: absolute !important; 
-            left: 0 !important; 
-            top: 0 !important; 
+
+          .invoice-overlay {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
             width: 100% !important;
+            height: auto !important;
+            background: white !important;
+            display: block !important;
+            z-index: 9999 !important;
+          }
+          #print-area {
+            position: relative !important;
+            width: 100% !important;
+            max-width: 800px !important;
+            margin: 0 auto !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            box-shadow: none !important;
+            display: block !important;
+            background: white !important;
+          }
+          #print-area .invoice-scroll {
+            overflow: visible !important;
+            height: auto !important;
+            max-height: none !important;
+            flex: none !important;
+            padding: 20px 40px !important;
+            margin: 0 !important;
           }
           .invoice-page {
-            page-break-after: always;
-            min-height: 100vh;
-            padding: 20px;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            page-break-after: auto;
             background: white !important;
           }
           .no-print { display: none !important; }
+          
+          /* Highlight for invoice text */
+          .print-title {
+            display: block !important;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: #F58220;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #F58220;
+            padding-bottom: 10px;
+          }
         }
+        .print-title { display: none; }
       `}</style>
       {selectedOrder && <OrderDetail order={selectedOrder} onClose={() => setSelectedOrder(null)} />}
       

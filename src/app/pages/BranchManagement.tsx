@@ -125,7 +125,7 @@ export function BranchManagement() {
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {showForm && <BranchForm branch={editBranch} onClose={() => { setShowForm(false); setEditBranch(null); }} />}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="section-enter mb-6 flex flex-col gap-4 rounded-[28px] border border-[#F0DCC8] bg-[linear-gradient(135deg,#FFF8F2_0%,#FFFFFF_68%)] p-4 shadow-[0_16px_40px_rgba(93,46,15,0.05)] sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
             Quản lý Chi nhánh
@@ -133,22 +133,22 @@ export function BranchManagement() {
           <p style={{ fontSize: '13.5px', color: '#A0845C' }}>{branches.length} chi nhánh · {branches.filter(b => b.status === 'open').length} đang hoạt động</p>
         </div>
         <button onClick={() => { setEditBranch(null); setShowForm(true); }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl shadow-[0_14px_28px_rgba(245,130,32,0.22)]"
           style={{ background: '#F58220', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
           <Plus size={16} /> Thêm chi nhánh
         </button>
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+      <div className="stats-grid-compact mb-6">
         {[
           { label: 'Đang mở cửa', value: branches.filter(b => b.status === 'open').length, bg: '#FFEDD5', color: '#9A3412' },
           { label: 'Đơn hàng hôm nay', value: branches.reduce((a, b) => a + b.todayOrders, 0), bg: '#EFF6FF', color: '#1E40AF' },
           { label: 'Tổng nhân viên', value: branches.reduce((a, b) => a + b.staff, 0), bg: '#FFF3E6', color: '#F58220' },
         ].map((s, i) => (
-          <div key={i} className="rounded-xl p-3 md:p-4 flex flex-col xl:flex-row items-center xl:items-start gap-2 md:gap-3 text-center xl:text-left"
-            style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          <div key={i} className="compact-stat-card p-3 md:p-4 flex flex-col items-center gap-2 text-center"
+            style={{ boxShadow: '0 10px 24px rgba(93,46,15,0.05)' }}>
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
               style={{ background: s.bg, color: s.color, fontSize: '18px', fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {s.value}
             </div>

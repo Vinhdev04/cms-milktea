@@ -77,7 +77,7 @@ export function Dashboard() {
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {/* Page header */}
-      <div className="mb-6">
+      <div className="section-enter mb-6 rounded-[28px] border border-[#F0DCC8] bg-[linear-gradient(135deg,#FFF8F2_0%,#FFFFFF_68%)] p-4 shadow-[0_16px_40px_rgba(93,46,15,0.05)] sm:p-5">
         <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1A1A1A', fontSize: '22px', fontWeight: 700, marginBottom: '4px' }}>
           Dashboard
         </h1>
@@ -85,12 +85,12 @@ export function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
         {statsCards.map((card, i) => (
-          <div key={i} className="rounded-xl p-5 transition-all"
-            style={{ background: '#FFFFFF', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <div key={i} className="compact-stat-card hover-lift p-4 sm:p-5"
+            style={{ boxShadow: '0 10px 24px rgba(93,46,15,0.05)' }}>
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: card.iconBg }}>
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: card.iconBg }}>
                 <card.icon size={20} style={{ color: card.iconColor }} />
               </div>
               <span className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
@@ -103,10 +103,10 @@ export function Dashboard() {
                 {card.sub.split(' ')[0]}
               </span>
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {card.value}
             </div>
-            <div style={{ fontSize: '12.5px', color: '#A0845C', marginTop: '2px' }}>{card.title}</div>
+            <div style={{ fontSize: '12px', color: '#A0845C', marginTop: '4px', lineHeight: 1.45 }}>{card.title}</div>
           </div>
         ))}
       </div>
