@@ -23,7 +23,7 @@ const mockLogs = [
 ];
 
 const actionColors: Record<string, { bg: string, color: string }> = {
-  'CREATE': { bg: '#DCFCE7', color: '#166534' },
+  'CREATE': { bg: '#FFEDD5', color: '#9A3412' },
   'UPDATE': { bg: '#EFF6FF', color: '#1E40AF' },
   'DELETE': { bg: '#FEE2E2', color: '#991B1B' },
   'EXPORT': { bg: '#FEF3C7', color: '#92400E' },
@@ -32,7 +32,7 @@ const actionColors: Record<string, { bg: string, color: string }> = {
 };
 
 const statusIcons: Record<string, JSX.Element> = {
-  'success': <CheckCircle2 size={14} style={{ color: '#166534' }} />,
+  'success': <CheckCircle2 size={14} style={{ color: '#9A3412' }} />,
   'warning': <AlertTriangle size={14} style={{ color: '#92400E' }} />,
   'error': <XCircle size={14} style={{ color: '#991B1B' }} />,
 };
@@ -52,101 +52,133 @@ export function AuditLog() {
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <div className="mb-6">
         <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }} className="flex items-center gap-2">
-          <Activity size={24} style={{ color: '#2D6A4F' }} /> Nhật ký Hệ thống (Audit Log)
+          <Activity size={24} style={{ color: '#F58220' }} /> Nhật ký Hệ thống (Audit Log)
         </h1>
-        <p style={{ fontSize: '13.5px', color: '#6B9080' }}>Theo dõi mọi hoạt động, thay đổi cấu hình và đăng nhập trên hệ thống.</p>
+        <p style={{ fontSize: '13.5px', color: '#A0845C' }}>Theo dõi mọi hoạt động, thay đổi cấu hình và đăng nhập trên hệ thống.</p>
       </div>
 
       <div className="rounded-xl overflow-hidden"
-        style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+        style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
         
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b" style={{ borderColor: '#F0DCC8' }}>
           <div className="relative flex-1 max-w-sm">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
             <input value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="Tìm theo user, hành động, mô tả..."
               className="w-full pl-9 pr-4 rounded-xl border outline-none"
-              style={{ height: '38px', borderColor: '#E0EDE6', fontSize: '13px', background: '#F8FAF9' }}
+              style={{ height: '38px', borderColor: '#F0DCC8', fontSize: '13px', background: '#FFFAF5' }}
             />
           </div>
           <button className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border text-sm transition-all hover:bg-gray-50"
-            style={{ borderColor: '#E0EDE6', color: '#6B9080', fontWeight: 500 }}>
+            style={{ borderColor: '#F0DCC8', color: '#A0845C', fontWeight: 500 }}>
             <Filter size={14} /> Lọc kết quả
           </button>
           <button className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border text-sm transition-all hover:bg-gray-50"
-            style={{ borderColor: '#E0EDE6', color: '#1A1A1A', fontWeight: 600 }}>
+            style={{ borderColor: '#F0DCC8', color: '#1A1A1A', fontWeight: 600 }}>
             <FileText size={14} /> Xuất CSV
           </button>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr style={{ background: '#E8F5EC' }}>
-                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F', whiteSpace: 'nowrap' }}>Mã log</th>
-                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F', whiteSpace: 'nowrap' }}>Thời gian</th>
-                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F', whiteSpace: 'nowrap' }}>Người dùng</th>
-                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F', whiteSpace: 'nowrap' }}>Hành động</th>
-                <th className="px-5 py-3 min-w-[280px]" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Chi tiết (Target)</th>
-                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F', whiteSpace: 'nowrap' }}>IP Address</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                [...Array(5)].map((_, i) => (
-                  <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
-                    <td className="px-5 py-3.5"><Skeleton className="h-4 w-16" /></td>
-                    <td className="px-5 py-3.5"><Skeleton className="h-4 w-32" /></td>
-                    <td className="px-5 py-3.5"><Skeleton className="h-4 w-24 mb-1" /><Skeleton className="h-3 w-16" /></td>
-                    <td className="px-5 py-3.5"><Skeleton className="h-6 w-20 rounded-md" /></td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-start gap-1.5">
-                        <Skeleton className="h-4 w-4 rounded-full mt-0.5 flex-shrink-0" />
-                        <div><Skeleton className="h-4 w-48 mb-1" /><Skeleton className="h-3 w-24" /></div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5"><Skeleton className="h-4 w-24" /></td>
-                  </tr>
-                ))
-              ) : (
-                paginatedData.map((log, i) => (
-                  <tr key={log.id} className="border-b hover:bg-gray-50 transition-colors"
-                    style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <span style={{ fontSize: '12px', fontWeight: 500, color: '#6B9080' }}>{log.id}</span>
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <span style={{ fontSize: '12.5px', color: '#1A1A1A' }}>{log.time}</span>
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{log.user}</div>
-                      <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{log.role}</div>
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold"
+        {/* Mobile Cards / Desktop Table */}
+        <div>
+          {/* Mobile Card View */}
+          <div className="md:hidden divide-y" style={{ borderColor: '#FAF0E6' }}>
+            {isLoading ? (
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="p-4 space-y-2">
+                  <div className="flex justify-between"><Skeleton className="h-4 w-24" /><Skeleton className="h-5 w-20 rounded-md" /></div>
+                  <Skeleton className="h-3 w-40" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-3 w-28" />
+                </div>
+              ))
+            ) : (
+              paginatedData.map((log) => (
+                <div key={log.id} className="p-4 space-y-2" style={{ background: 'white' }}>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <span style={{ fontSize: '11px', color: '#9CA3AF' }}>{log.id}</span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold"
                         style={{ background: actionColors[log.action]?.bg || '#F3F4F6', color: actionColors[log.action]?.color || '#374151' }}>
                         {log.action}
                       </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-start gap-1.5">
-                        <div className="mt-0.5">{statusIcons[log.status]}</div>
-                        <div>
-                          <div style={{ fontSize: '13px', color: '#1A1A1A', lineHeight: 1.4 }}>{log.detail}</div>
-                          <div style={{ fontSize: '11.5px', color: '#9CA3AF', marginTop: '2px' }}>Target: {log.target}</div>
+                    </div>
+                    <div>{statusIcons[log.status]}</div>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{log.user}</span>
+                    <span style={{ fontSize: '11px', color: '#9CA3AF' }}>· {log.role}</span>
+                  </div>
+                  <p style={{ fontSize: '12.5px', color: '#374151', lineHeight: 1.5 }}>{log.detail}</p>
+                  <div className="flex items-center gap-3 flex-wrap" style={{ fontSize: '11px', color: '#9CA3AF' }}>
+                    <span>{log.time}</span>
+                    <span style={{ fontFamily: 'monospace' }}>{log.ip}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr style={{ background: '#FFF3E6' }}>
+                  <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Mã log</th>
+                  <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Thời gian</th>
+                  <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Người dùng</th>
+                  <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Hành động</th>
+                  <th className="px-5 py-3 min-w-[280px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220' }}>Chi tiết</th>
+                  <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>IP Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  [...Array(5)].map((_, i) => (
+                    <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#FAF0E6' }}>
+                      <td className="px-5 py-3.5"><Skeleton className="h-4 w-16" /></td>
+                      <td className="px-5 py-3.5"><Skeleton className="h-4 w-32" /></td>
+                      <td className="px-5 py-3.5"><Skeleton className="h-4 w-24 mb-1" /><Skeleton className="h-3 w-16" /></td>
+                      <td className="px-5 py-3.5"><Skeleton className="h-6 w-20 rounded-md" /></td>
+                      <td className="px-5 py-3.5"><Skeleton className="h-4 w-48" /></td>
+                      <td className="px-5 py-3.5"><Skeleton className="h-4 w-24" /></td>
+                    </tr>
+                  ))
+                ) : (
+                  paginatedData.map((log, i) => (
+                    <tr key={log.id} className="border-b hover:bg-gray-50 transition-colors"
+                      style={{ borderColor: '#FAF0E6', background: i % 2 === 1 ? '#FFFCF8' : 'white' }}>
+                      <td className="px-5 py-3.5 whitespace-nowrap"><span style={{ fontSize: '12px', fontWeight: 500, color: '#A0845C' }}>{log.id}</span></td>
+                      <td className="px-5 py-3.5 whitespace-nowrap"><span style={{ fontSize: '12.5px', color: '#1A1A1A' }}>{log.time}</span></td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{log.user}</div>
+                        <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{log.role}</div>
+                      </td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold"
+                          style={{ background: actionColors[log.action]?.bg || '#F3F4F6', color: actionColors[log.action]?.color || '#374151' }}>
+                          {log.action}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-start gap-1.5">
+                          <div className="mt-0.5">{statusIcons[log.status]}</div>
+                          <div>
+                            <div style={{ fontSize: '13px', color: '#1A1A1A', lineHeight: 1.4 }}>{log.detail}</div>
+                            <div style={{ fontSize: '11.5px', color: '#9CA3AF', marginTop: '2px' }}>Target: {log.target}</div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 whitespace-nowrap">
-                      <span style={{ fontSize: '12.5px', color: '#6B9080', fontFamily: 'monospace' }}>{log.ip}</span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <span style={{ fontSize: '12.5px', color: '#A0845C', fontFamily: 'monospace' }}>{log.ip}</span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
           {(!isLoading && paginatedData.length === 0) && (
             <div className="py-10">
               <EmptyState 
@@ -159,7 +191,7 @@ export function AuditLog() {
         </div>
 
         {!isLoading && totalPages > 1 && (
-          <div className="px-5 py-4 border-t" style={{ borderColor: '#E0EDE6' }}>
+          <div className="px-5 py-4 border-t" style={{ borderColor: '#F0DCC8' }}>
             <Pagination>
               <PaginationContent>
                 <PaginationItem>

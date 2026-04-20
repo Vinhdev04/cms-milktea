@@ -20,9 +20,9 @@ const formatVND = (v: number) => new Intl.NumberFormat('vi-VN').format(v) + 'đ'
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; icon: JSX.Element }> = {
   pending: { label: 'Chờ xử lý', bg: '#FEF3C7', color: '#92400E', icon: <Clock size={12} /> },
-  processing: { label: 'Đang pha chế', bg: '#E8F5EC', color: '#2D6A4F', icon: <AlertCircle size={12} /> },
+  processing: { label: 'Đang pha chế', bg: '#FFF3E6', color: '#F58220', icon: <AlertCircle size={12} /> },
   ready: { label: 'Sẵn sàng', bg: '#EFF6FF', color: '#1E40AF', icon: <Package size={12} /> },
-  completed: { label: 'Hoàn thành', bg: '#DCFCE7', color: '#166534', icon: <CheckCircle2 size={12} /> },
+  completed: { label: 'Hoàn thành', bg: '#FFEDD5', color: '#9A3412', icon: <CheckCircle2 size={12} /> },
   cancelled: { label: 'Đã hủy', bg: '#FEE2E2', color: '#991B1B', icon: <XCircle size={12} /> },
 };
 
@@ -57,39 +57,42 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
       <style>{`
         @media print {
           body * { visibility: hidden; }
-          #invoice-content, #invoice-content * { visibility: visible; }
-          #invoice-content {
-            position: absolute; left: 0; top: 0; width: 100%; height: auto !important;
-            max-width: 100% !important; box-shadow: none !important;
+          #print-area, #print-area * { visibility: visible; }
+          #print-area {
+            position: absolute; left: 0; top: 0; width: 100%;
+          }
+          .invoice-page {
+            page-break-after: always;
+            min-height: 100vh;
+            padding: 20px;
+            background: white !important;
           }
           .no-print { display: none !important; }
-          /* Hide scrollbars for printing */
-          #invoice-content .overflow-y-auto { overflow: visible !important; }
         }
       `}</style>
-      <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }}>
-        <div id="invoice-content" className="h-full w-full max-w-md flex flex-col"
+      <div className="fixed inset-0 z-50 flex items-center justify-end no-print" style={{ background: 'rgba(0,0,0,0.35)' }}>
+        <div id="print-area" className="h-full w-full max-w-md flex flex-col invoice-page"
           style={{ background: 'white', boxShadow: '-8px 0 32px rgba(0,0,0,0.12)' }}>
-          <div className="flex flex-col items-center py-6 border-b" style={{ borderColor: '#E0EDE6' }}>
-            <div className="p-3 rounded-2xl bg-white mb-2" style={{ border: '1px solid #F0F7F3' }}>
+          <div className="flex flex-col items-center py-6 border-b" style={{ borderColor: '#F0DCC8' }}>
+            <div className="p-3 rounded-2xl bg-white mb-2" style={{ border: '1px solid #FAF0E6' }}>
               <Logo size={40} />
             </div>
-            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#1B4332' }}>SMYOU MILKTEA</h1>
-            <p style={{ fontSize: '12px', color: '#6B9080', fontWeight: 500 }}>Sweet moments for you</p>
+            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#5D2E0F' }}>SMYOU MILKTEA</h1>
+            <p style={{ fontSize: '12px', color: '#A0845C', fontWeight: 500 }}>Sweet moments for you</p>
           </div>
-        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
+        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#F0DCC8' }}>
           <div>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>
               Chi tiết đơn hàng
             </h2>
-            <p style={{ fontSize: '12px', color: '#6B9080' }}>{order.id}</p>
+            <p style={{ fontSize: '12px', color: '#A0845C' }}>{order.id}</p>
           </div>
           <div className="flex items-center gap-2 no-print">
-            <button onClick={() => window.print()} className="flex items-center gap-1.5 p-2 rounded-lg hover:bg-gray-50 transition-colors" style={{ color: '#2D6A4F' }}>
+            <button onClick={() => window.print()} className="flex items-center gap-1.5 p-2 rounded-lg hover:bg-gray-50 transition-colors" style={{ color: '#F58220' }}>
               <Printer size={16} />
               <span style={{ fontSize: '13px', fontWeight: 600 }}>In hóa đơn</span>
             </button>
-            <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100"><X size={18} style={{ color: '#6B9080' }} /></button>
+            <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100"><X size={18} style={{ color: '#A0845C' }} /></button>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
@@ -102,52 +105,62 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
           </div>
 
           {/* Customer Info */}
-          <div className="rounded-xl p-4 space-y-2.5" style={{ border: '1px solid #E0EDE6' }}>
-            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 600, color: '#6B9080', marginBottom: '8px' }}>THÔNG TIN KHÁCH HÀNG</h3>
+          <div className="rounded-xl p-4 space-y-2.5" style={{ border: '1px solid #F0DCC8' }}>
+            <div className="flex items-center justify-between mb-2">
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 600, color: '#A0845C' }}>THÔNG TIN KHÁCH HÀNG</h3>
+              {/* Customer type badge */}
+              <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+                style={order.customerType === 'member'
+                  ? { background: '#FFEDD5', color: '#9A3412' }
+                  : { background: '#F3F4F6', color: '#6B7280' }
+                }>
+                {order.customerType === 'member' ? '⭐ Thành viên' : '👤 Vãng lai'}
+              </span>
+            </div>
             {[
-              { label: 'Tên khách', value: order.customer },
-              { label: 'Điện thoại', value: order.phone },
+              { label: 'Tên khách', value: order.customer || 'Khách vãng lai' },
+              { label: 'Điện thoại', value: order.phone || '—' },
               { label: 'Chi nhánh', value: order.branch },
               { label: 'Thanh toán', value: order.payment },
             ].map(item => (
               <div key={item.label} className="flex justify-between">
-                <span style={{ fontSize: '13px', color: '#6B9080' }}>{item.label}</span>
+                <span style={{ fontSize: '13px', color: '#A0845C' }}>{item.label}</span>
                 <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{item.value}</span>
               </div>
             ))}
           </div>
 
           {/* Items */}
-          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #E0EDE6' }}>
-            <div className="px-4 py-3 border-b" style={{ background: '#E8F5EC', borderColor: '#E0EDE6' }}>
-              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>SẢN PHẨM ĐÃ ĐẶT</h3>
+          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #F0DCC8' }}>
+            <div className="px-4 py-3 border-b" style={{ background: '#FFF3E6', borderColor: '#F0DCC8' }}>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 600, color: '#F58220' }}>SẢN PHẨM ĐÃ ĐẶT</h3>
             </div>
             {fakeItems.map((item, i) => (
-              <div key={i} className="px-4 py-3 border-b last:border-0" style={{ borderColor: '#F0F7F3' }}>
+              <div key={i} className="px-4 py-3 border-b last:border-0" style={{ borderColor: '#FAF0E6' }}>
                 <div className="flex justify-between mb-1">
                   <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{item.name}</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#2D6A4F' }}>{formatVND(item.price)}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#F58220' }}>{formatVND(item.price)}</span>
                 </div>
                 <div style={{ fontSize: '12px', color: '#9CA3AF' }}>
                   Size {item.size} · Đường {item.sugar} · Đá {item.ice}{item.topping ? ` · ${item.topping}` : ''}
                 </div>
               </div>
             ))}
-            <div className="px-4 py-3 flex justify-between" style={{ background: '#F8FAF9' }}>
+            <div className="px-4 py-3 flex justify-between" style={{ background: '#FFFAF5' }}>
               <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>Tổng cộng</span>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: '#2D6A4F' }}>{formatVND(order.total)}</span>
+              <span style={{ fontSize: '15px', fontWeight: 700, color: '#F58220' }}>{formatVND(order.total)}</span>
             </div>
           </div>
 
           {/* Timeline */}
-          <div className="rounded-xl p-4" style={{ border: '1px solid #E0EDE6' }}>
-            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 600, color: '#6B9080', marginBottom: '12px' }}>TRẠNG THÁI ĐƠN HÀNG</h3>
+          <div className="rounded-xl p-4" style={{ border: '1px solid #F0DCC8' }}>
+            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 600, color: '#A0845C', marginBottom: '12px' }}>TRẠNG THÁI ĐƠN HÀNG</h3>
             <div className="space-y-3">
               {timeline.map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5"
-                    style={{ background: step.done ? '#A8D5BA' : '#F3F4F6' }}>
-                    {step.done && <CheckCircle2 size={12} style={{ color: '#2D6A4F' }} />}
+                    style={{ background: step.done ? '#F5C088' : '#F3F4F6' }}>
+                    {step.done && <CheckCircle2 size={12} style={{ color: '#F58220' }} />}
                   </div>
                   <div className="flex-1">
                     <div style={{ fontSize: '13px', fontWeight: step.done ? 600 : 400, color: step.done ? '#1A1A1A' : '#9CA3AF' }}>
@@ -162,13 +175,13 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
         </div>
         {/* Actions */}
         {order.status === 'pending' && (
-          <div className="px-5 py-4 border-t flex gap-3 no-print" style={{ borderColor: '#E0EDE6' }}>
+          <div className="px-5 py-4 border-t flex gap-3 no-print" style={{ borderColor: '#F0DCC8' }}>
             <button className="flex-1 py-2.5 rounded-xl border text-sm font-semibold"
               style={{ borderColor: '#FCBABD', color: '#8B3A4A', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
               Hủy đơn
             </button>
             <button className="flex-1 py-2.5 rounded-xl text-sm"
-              style={{ background: '#2D6A4F', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
+              style={{ background: '#F58220', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
               Xác nhận
             </button>
           </div>
@@ -180,10 +193,14 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
 }
 
 export function OrderManagement() {
+  // ── State declarations (must come before use) ──
   const [activeTab, setActiveTab] = useState('Tất cả');
   const [search, setSearch] = useState('');
+  const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isBulkPrinting, setIsBulkPrinting] = useState(false);
 
+  // Derived data (uses state values above)
   const filtered = orders.filter(o => {
     const matchStatus = activeTab === 'Tất cả' || o.status === statusMap[activeTab];
     const matchSearch = o.id.toLowerCase().includes(search.toLowerCase()) ||
@@ -195,15 +212,93 @@ export function OrderManagement() {
 
   const countByStatus = (s: string) => s === 'Tất cả' ? orders.length : orders.filter(o => o.status === statusMap[s]).length;
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedOrderIds(paginatedData.map(o => o.id));
+    } else {
+      setSelectedOrderIds([]);
+    }
+  };
+
+  const handleSelectOrder = (id: string) => {
+    setSelectedOrderIds(prev =>
+      prev.includes(id) ? prev.filter(oid => oid !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkPrint = () => {
+    if (selectedOrderIds.length === 0) return;
+    setIsBulkPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setIsBulkPrinting(false);
+    }, 500);
+  };
+
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {selectedOrder && <OrderDetail order={selectedOrder} onClose={() => setSelectedOrder(null)} />}
+      
+      {/* Bulk Print Area (Hidden unless printing) */}
+      {isBulkPrinting && (
+        <div id="print-area" className="hidden">
+          {orders.filter(o => selectedOrderIds.includes(o.id)).map(order => (
+            <div key={order.id} className="invoice-page bg-white p-8">
+               <div className="flex flex-col items-center py-6 border-b" style={{ borderColor: '#F0DCC8' }}>
+                  <Logo size={40} />
+                  <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#5D2E0F' }}>SMYOU MILKTEA</h1>
+                  <p style={{ fontSize: '12px', color: '#A0845C', fontWeight: 500 }}>Sweet moments for you</p>
+                </div>
+                <div className="py-4 border-b" style={{ borderColor: '#F0DCC8' }}>
+                  <h2 className="text-center font-bold text-lg">HÓA ĐƠN BÁN HÀNG</h2>
+                  <p className="text-center text-sm text-gray-500">{order.id}</p>
+                </div>
+                <div className="py-4 space-y-2">
+                  <div className="flex justify-between text-sm"><span>Khách hàng:</span><span className="font-bold">{order.customer}</span></div>
+                  <div className="flex justify-between text-sm"><span>Điện thoại:</span><span>{order.phone}</span></div>
+                  <div className="flex justify-between text-sm"><span>Thời gian:</span><span>{order.time} · {order.date}</span></div>
+                  <div className="flex justify-between text-sm"><span>Chi nhánh:</span><span>{order.branch}</span></div>
+                  <div className="flex justify-between text-sm"><span>Thanh toán:</span><span>{order.payment}</span></div>
+                </div>
+                <div className="py-4 border-t border-b border-gray-100">
+                   <table className="w-full text-sm">
+                     <thead>
+                       <tr className="text-left border-b border-gray-100">
+                         <th className="pb-2">Sản phẩm</th>
+                         <th className="pb-2 text-right">Giá</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {[...Array(order.items)].map((_, i) => (
+                         <tr key={i} className="border-b border-gray-50 last:border-0">
+                           <td className="py-2">
+                             <div className="font-medium">Sản phẩm mẫu #{i+1}</div>
+                             <div className="text-xs text-gray-400">Size M · 50% Đường · 50% Đá</div>
+                           </td>
+                           <td className="py-2 text-right font-bold">{formatVND(order.total / order.items)}</td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
+                </div>
+                <div className="py-4 flex justify-between font-bold text-lg">
+                  <span>Tổng cộng</span>
+                  <span>{formatVND(order.total)}</span>
+                </div>
+                <div className="pt-8 text-center text-xs text-gray-400">
+                   Cảm ơn quý khách đã ủng hộ SMYOU MILKTEA!<br/>
+                   Hẹn gặp lại quý khách lần sau.
+                </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="mb-6">
         <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
           Quản lý Đơn hàng
         </h1>
-        <p style={{ fontSize: '13.5px', color: '#6B9080' }}>{orders.length} đơn hàng hôm nay · 20/04/2026</p>
+        <p style={{ fontSize: '13.5px', color: '#A0845C' }}>{orders.length} đơn hàng hôm nay · 20/04/2026</p>
       </div>
 
       {/* Status Tabs */}
@@ -212,51 +307,122 @@ export function OrderManagement() {
           <button key={tab} onClick={() => setActiveTab(tab)}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm whitespace-nowrap transition-all"
             style={{
-              background: activeTab === tab ? '#2D6A4F' : 'white',
-              color: activeTab === tab ? 'white' : '#6B9080',
-              border: `1px solid ${activeTab === tab ? '#2D6A4F' : '#E0EDE6'}`,
+              background: activeTab === tab ? '#F58220' : 'white',
+              color: activeTab === tab ? 'white' : '#A0845C',
+              border: `1px solid ${activeTab === tab ? '#F58220' : '#F0DCC8'}`,
               fontWeight: activeTab === tab ? 600 : 400
             }}>
             {tab}
             <span className="px-1.5 py-0.5 rounded-full text-xs"
-              style={{ background: activeTab === tab ? 'rgba(255,255,255,0.2)' : '#E8F5EC', color: activeTab === tab ? 'white' : '#2D6A4F' }}>
+              style={{ background: activeTab === tab ? 'rgba(255,255,255,0.2)' : '#FFF3E6', color: activeTab === tab ? 'white' : '#F58220' }}>
               {countByStatus(tab)}
             </span>
           </button>
         ))}
       </div>
 
-      <div className="rounded-xl overflow-hidden"
-        style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-        <div className="flex items-center gap-3 px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
-          <div className="relative flex-1 max-w-sm">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
-            <input value={search} onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm theo mã đơn, tên khách..."
-              className="w-full pl-9 pr-4 rounded-xl border outline-none"
-              style={{ height: '38px', borderColor: '#E0EDE6', fontSize: '13px', background: '#F8FAF9' }}
-            />
-          </div>
-          <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-sm"
-            style={{ borderColor: '#E0EDE6', color: '#6B9080' }}>
+      {/* Search bar */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="relative flex-1">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
+          <input value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm theo mã đơn, tên khách..."
+            className="w-full pl-9 pr-4 rounded-xl border outline-none"
+            style={{ height: '38px', borderColor: '#F0DCC8', fontSize: '13px', background: 'white' }}
+          />
+        </div>
+        <div className="flex gap-2">
+          {selectedOrderIds.length > 0 && (
+            <button onClick={handleBulkPrint} className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: '#F58220', color: 'white' }}>
+              <Printer size={14} /> In ({selectedOrderIds.length})
+            </button>
+          )}
+          <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-sm flex-shrink-0"
+            style={{ borderColor: '#F0DCC8', color: '#A0845C', background: 'white' }}>
             <Filter size={14} /> Lọc
           </button>
         </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden rounded-xl overflow-hidden" style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+        {isLoading ? (
+          [...Array(5)].map((_, i) => (
+            <div key={i} className="p-4 border-b space-y-2" style={{ borderColor: '#FAF0E6' }}>
+              <div className="flex justify-between"><Skeleton className="h-4 w-24" /><Skeleton className="h-5 w-20 rounded-full" /></div>
+              <Skeleton className="h-4 w-40" />
+              <div className="flex justify-between"><Skeleton className="h-3 w-24" /><Skeleton className="h-4 w-20" /></div>
+            </div>
+          ))
+        ) : paginatedData.length === 0 ? (
+          <div className="py-10"><EmptyState icon={<PackageX size={28} />} title="Không tìm thấy đơn hàng" description="Không có đơn hàng nào khớp." /></div>
+        ) : (
+          paginatedData.map((order) => {
+            const st = statusConfig[order.status];
+            return (
+              <div key={order.id} className="p-4 border-b" style={{ borderColor: '#FAF0E6' }}
+                onClick={() => setSelectedOrder(order)}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#F58220] focus:ring-[#F58220]"
+                      checked={selectedOrderIds.includes(order.id)}
+                      onChange={(e) => { e.stopPropagation(); handleSelectOrder(order.id); }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#F58220' }}>{order.id}</span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
+                    style={{ background: st.bg, color: st.color, fontSize: '11px', fontWeight: 600 }}>
+                    {st.icon} {st.label}
+                  </span>
+                </div>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{order.customer}</div>
+                <div className="flex items-center gap-2 mt-1 flex-wrap" style={{ fontSize: '12px', color: '#A0845C' }}>
+                  <span>{order.branch}</span>
+                  <span>·</span>
+                  <span>{order.time}</span>
+                  <span>·</span>
+                  <span>{order.items} món</span>
+                  <span>·</span>
+                  <span>{order.payment}</span>
+                </div>
+                <div className="flex items-center justify-between mt-2">
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#F58220' }}>{formatVND(order.total)}</span>
+                  <Eye size={16} style={{ color: '#9CA3AF' }} />
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block rounded-xl overflow-hidden"
+        style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: '#E8F5EC' }}>
-                {['Mã đơn', 'Khách hàng', 'Chi nhánh', 'Thời gian', 'Món', 'Tổng tiền', 'Thanh toán', 'Trạng thái', ''].map(h => (
-                  <th key={h} className="text-left px-4 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F', whiteSpace: 'nowrap' }}>{h}</th>
+              <tr style={{ background: '#FFF3E6' }}>
+                <th className="px-4 py-3 w-10">
+                  <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#F58220] focus:ring-[#F58220]"
+                    onChange={handleSelectAll}
+                    checked={selectedOrderIds.length === paginatedData.length && paginatedData.length > 0}
+                  />
+                </th>
+                {['Mã đơn', 'Khách hàng', 'Loại', 'Chi nhánh', 'Thời gian', 'Món', 'Tổng tiền', 'Thanh toán', 'Trạng thái', ''].map(h => (
+                  <th key={h} className="text-left px-4 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 [...Array(5)].map((_, i) => (
-                  <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                  <tr key={`skeleton-${i}`} className="border-b" style={{ borderColor: '#FAF0E6', background: i % 2 === 1 ? '#FFFCF8' : 'white' }}>
+                    <td className="px-4 py-3.5"><Skeleton className="h-4 w-4 rounded" /></td>
                     <td className="px-4 py-3.5"><Skeleton className="h-4 w-16" /></td>
                     <td className="px-4 py-3.5"><Skeleton className="h-4 w-32 mb-1" /><Skeleton className="h-3 w-24" /></td>
+                    <td className="px-4 py-3.5"><Skeleton className="h-5 w-12 rounded-full" /></td>
                     <td className="px-4 py-3.5"><Skeleton className="h-4 w-24" /></td>
                     <td className="px-4 py-3.5"><Skeleton className="h-4 w-16" /></td>
                     <td className="px-4 py-3.5"><Skeleton className="h-4 w-8" /></td>
@@ -271,19 +437,32 @@ export function OrderManagement() {
                   const st = statusConfig[order.status];
                   return (
                     <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors"
-                      style={{ borderColor: '#F0F7F3', background: i % 2 === 1 ? '#FAFCFB' : 'white' }}>
+                      style={{ borderColor: '#FAF0E6', background: i % 2 === 1 ? '#FFFCF8' : 'white' }}>
                       <td className="px-4 py-3.5">
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>{order.id}</span>
+                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#F58220] focus:ring-[#F58220]"
+                          checked={selectedOrderIds.includes(order.id)}
+                          onChange={() => handleSelectOrder(order.id)}
+                        />
+                      </td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', fontWeight: 600, color: '#F58220' }}>{order.id}</span></td>
+                      <td className="px-4 py-3.5">
+                        <div style={{ fontSize: '13px', fontWeight: 500, color: '#1A1A1A' }}>{order.customer || 'Khách vãng lai'}</div>
+                        <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{order.phone || '—'}</div>
                       </td>
                       <td className="px-4 py-3.5">
-                        <div style={{ fontSize: '13px', fontWeight: 500, color: '#1A1A1A' }}>{order.customer}</div>
-                        <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{order.phone}</div>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                          style={order.customerType === 'member'
+                            ? { background: '#FFEDD5', color: '#9A3412' }
+                            : { background: '#F3F4F6', color: '#6B7280' }
+                          }>
+                          {order.customerType === 'member' ? '⭐ TV' : '👤 VL'}
+                        </span>
                       </td>
-                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#6B9080' }}>{order.branch}</span></td>
-                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#6B9080' }}>{order.time}</span></td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#A0845C' }}>{order.branch}</span></td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#A0845C' }}>{order.time}</span></td>
                       <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#1A1A1A' }}>{order.items}</span></td>
                       <td className="px-4 py-3.5"><span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(order.total)}</span></td>
-                      <td className="px-4 py-3.5"><span style={{ fontSize: '12px', color: '#6B9080' }}>{order.payment}</span></td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '12px', color: '#A0845C' }}>{order.payment}</span></td>
                       <td className="px-4 py-3.5">
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
                           style={{ background: st.bg, color: st.color, fontSize: '11.5px', fontWeight: 600, whiteSpace: 'nowrap' }}>
@@ -291,9 +470,8 @@ export function OrderManagement() {
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
-                        <button onClick={() => setSelectedOrder(order)}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                          <Eye size={15} style={{ color: '#2D6A4F' }} />
+                        <button onClick={() => setSelectedOrder(order)} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                          <Eye size={15} style={{ color: '#F58220' }} />
                         </button>
                       </td>
                     </tr>
@@ -302,54 +480,44 @@ export function OrderManagement() {
               )}
             </tbody>
           </table>
-          
           {!isLoading && paginatedData.length === 0 && (
-            <tr>
-              <td colSpan={9}>
-                <EmptyState 
-                  icon={<PackageX size={28} />}
-                  title="Không tìm thấy đơn hàng"
-                  description="Không có đơn hàng nào khớp với điều kiện lọc hiện tại."
-                />
-              </td>
-            </tr>
-          )}
-
-          {!isLoading && totalPages > 1 && (
-            <div className="px-5 py-4 border-t" style={{ borderColor: '#E0EDE6' }}>
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    />
-                  </PaginationItem>
-                  
-                  {[...Array(totalPages)].map((_, i) => (
-                    <PaginationItem key={i}>
-                      <PaginationLink 
-                        onClick={() => setCurrentPage(i + 1)}
-                        isActive={currentPage === i + 1}
-                        className="cursor-pointer"
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+            <div className="py-10"><EmptyState icon={<PackageX size={28} />} title="Không tìm thấy đơn hàng" description="Không có đơn hàng nào khớp với điều kiện lọc." /></div>
           )}
         </div>
       </div>
+
+      {/* Pagination (shared) */}
+      {!isLoading && totalPages > 1 && (
+        <div className="flex justify-center mt-4">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink 
+                    onClick={() => setCurrentPage(i + 1)}
+                    isActive={currentPage === i + 1}
+                    className="cursor-pointer"
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }

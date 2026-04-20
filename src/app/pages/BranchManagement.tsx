@@ -17,7 +17,7 @@ import {
 type Branch = typeof branches[0];
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; icon: JSX.Element }> = {
-  open: { label: 'Đang mở cửa', bg: '#DCFCE7', color: '#166534', icon: <CheckCircle2 size={13} /> },
+  open: { label: 'Đang mở cửa', bg: '#FFEDD5', color: '#9A3412', icon: <CheckCircle2 size={13} /> },
   maintenance: { label: 'Bảo trì', bg: '#FEF3C7', color: '#92400E', icon: <AlertTriangle size={13} /> },
   closed: { label: 'Đóng cửa', bg: '#FEE2E2', color: '#991B1B', icon: <X size={13} /> },
 };
@@ -43,11 +43,11 @@ function BranchForm({ branch, onClose }: BranchFormProps) {
       <div className="w-full max-w-md rounded-2xl overflow-hidden flex flex-col"
         style={{ background: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxHeight: '90vh' }}
         onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-5 py-4 border-b flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
+        <div className="flex items-center justify-between px-5 py-4 border-b flex-shrink-0" style={{ borderColor: '#F0DCC8' }}>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>
             {branch ? 'Chỉnh sửa Chi nhánh' : 'Thêm Chi nhánh mới'}
           </h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16} style={{ color: '#6B9080' }} /></button>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16} style={{ color: '#A0845C' }} /></button>
         </div>
         <div className="px-5 py-5 space-y-4 overflow-y-auto flex-1">
           {[
@@ -60,20 +60,20 @@ function BranchForm({ branch, onClose }: BranchFormProps) {
               <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>{f.label}</label>
               <input defaultValue={f.value} placeholder={f.placeholder}
                 className="w-full px-4 rounded-xl border outline-none transition-all"
-                style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px', fontFamily: "'Be Vietnam Pro', sans-serif" }}
-                onFocus={(e) => (e.target.style.borderColor = '#A8D5BA')}
-                onBlur={(e) => (e.target.style.borderColor = '#E0EDE6')}
+                style={{ height: '44px', borderColor: '#F0DCC8', fontSize: '13.5px', fontFamily: "'Be Vietnam Pro', sans-serif" }}
+                onFocus={(e) => (e.target.style.borderColor = '#F5C088')}
+                onBlur={(e) => (e.target.style.borderColor = '#F0DCC8')}
               />
             </div>
           ))}
           <div className="grid grid-cols-2 gap-3 mt-4">
             <div>
               <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Vĩ độ (Lat)</label>
-              <input placeholder="VD: 10.762622" className="w-full px-4 rounded-xl border outline-none transition-all" style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} />
+              <input placeholder="VD: 10.762622" className="w-full px-4 rounded-xl border outline-none transition-all" style={{ height: '44px', borderColor: '#F0DCC8', fontSize: '13.5px' }} />
             </div>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Kinh độ (Lng)</label>
-              <input placeholder="VD: 106.660172" className="w-full px-4 rounded-xl border outline-none transition-all" style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} />
+              <input placeholder="VD: 106.660172" className="w-full px-4 rounded-xl border outline-none transition-all" style={{ height: '44px', borderColor: '#F0DCC8', fontSize: '13.5px' }} />
             </div>
           </div>
           <div>
@@ -83,30 +83,30 @@ function BranchForm({ branch, onClose }: BranchFormProps) {
               onChange={(e) => setMapUrl(e.target.value)}
               placeholder="Dán thẻ <iframe> hoặc URL nhúng vào đây..." 
               className="w-full px-4 rounded-xl border outline-none transition-all" 
-              style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} 
+              style={{ height: '44px', borderColor: '#F0DCC8', fontSize: '13.5px' }} 
             />
           </div>
           {/* Map Preview */}
           {embedUrl ? (
-            <div className="w-full h-32 mt-2 rounded-xl overflow-hidden border" style={{ borderColor: '#E0EDE6' }}>
+            <div className="w-full h-32 mt-2 rounded-xl overflow-hidden border" style={{ borderColor: '#F0DCC8' }}>
               <iframe src={embedUrl} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
             </div>
           ) : (
-            <div className="w-full h-24 mt-2 rounded-xl border flex items-center justify-center bg-[#F8FAF9]" style={{ borderColor: '#E0EDE6' }}>
+            <div className="w-full h-24 mt-2 rounded-xl border flex items-center justify-center bg-[#FFFAF5]" style={{ borderColor: '#F0DCC8' }}>
               <span style={{ fontSize: '12px', color: '#9CA3AF' }} className="flex items-center gap-1"><MapPin size={14} /> Bản đồ hiển thị vị trí chi nhánh</span>
             </div>
           )}
         </div>
-        <div className="px-5 py-4 border-t flex gap-3 flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
+        <div className="px-5 py-4 border-t flex gap-3 flex-shrink-0" style={{ borderColor: '#F0DCC8' }}>
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border text-sm"
-            style={{ borderColor: '#E0EDE6', color: '#6B9080', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Hủy</button>
+            style={{ borderColor: '#F0DCC8', color: '#A0845C', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Hủy</button>
           <button 
             onClick={() => {
               toast.success(branch ? 'Cập nhật chi nhánh thành công!' : 'Đã thêm chi nhánh mới!');
               onClose();
             }}
             className="flex-1 py-2.5 rounded-xl text-sm"
-            style={{ background: '#2D6A4F', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
+            style={{ background: '#F58220', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
             {branch ? 'Lưu thay đổi' : 'Thêm chi nhánh'}
           </button>
         </div>
@@ -130,11 +130,11 @@ export function BranchManagement() {
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
             Quản lý Chi nhánh
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#6B9080' }}>{branches.length} chi nhánh · {branches.filter(b => b.status === 'open').length} đang hoạt động</p>
+          <p style={{ fontSize: '13.5px', color: '#A0845C' }}>{branches.length} chi nhánh · {branches.filter(b => b.status === 'open').length} đang hoạt động</p>
         </div>
         <button onClick={() => { setEditBranch(null); setShowForm(true); }}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
-          style={{ background: '#2D6A4F', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
+          style={{ background: '#F58220', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
           <Plus size={16} /> Thêm chi nhánh
         </button>
       </div>
@@ -142,17 +142,17 @@ export function BranchManagement() {
       {/* Summary */}
       <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
         {[
-          { label: 'Đang mở cửa', value: branches.filter(b => b.status === 'open').length, bg: '#DCFCE7', color: '#166534' },
+          { label: 'Đang mở cửa', value: branches.filter(b => b.status === 'open').length, bg: '#FFEDD5', color: '#9A3412' },
           { label: 'Đơn hàng hôm nay', value: branches.reduce((a, b) => a + b.todayOrders, 0), bg: '#EFF6FF', color: '#1E40AF' },
-          { label: 'Tổng nhân viên', value: branches.reduce((a, b) => a + b.staff, 0), bg: '#E8F5EC', color: '#2D6A4F' },
+          { label: 'Tổng nhân viên', value: branches.reduce((a, b) => a + b.staff, 0), bg: '#FFF3E6', color: '#F58220' },
         ].map((s, i) => (
           <div key={i} className="rounded-xl p-3 md:p-4 flex flex-col xl:flex-row items-center xl:items-start gap-2 md:gap-3 text-center xl:text-left"
-            style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{ background: s.bg, color: s.color, fontSize: '18px', fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {s.value}
             </div>
-            <div style={{ fontSize: '13px', color: '#6B9080' }}>{s.label}</div>
+            <div style={{ fontSize: '13px', color: '#A0845C' }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -161,8 +161,8 @@ export function BranchManagement() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={`skeleton-${i}`} className="rounded-xl border" style={{ borderColor: '#E0EDE6', background: 'white' }}>
-              <div className="px-4 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
+            <div key={`skeleton-${i}`} className="rounded-xl border" style={{ borderColor: '#F0DCC8', background: 'white' }}>
+              <div className="px-4 py-4 border-b" style={{ borderColor: '#F0DCC8' }}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <Skeleton className="h-5 w-3/4 mb-2" />
@@ -176,7 +176,7 @@ export function BranchManagement() {
                 <div className="flex items-center gap-2"><Skeleton className="h-4 w-4 rounded-full" /><Skeleton className="h-4 w-2/3" /></div>
                 <div className="flex items-center gap-2"><Skeleton className="h-4 w-4 rounded-full" /><Skeleton className="h-4 w-5/6" /></div>
               </div>
-              <div className="px-4 py-3 border-t flex items-center justify-between" style={{ borderColor: '#F0F7F3' }}>
+              <div className="px-4 py-3 border-t flex items-center justify-between" style={{ borderColor: '#FAF0E6' }}>
                 <div className="text-center"><Skeleton className="h-6 w-8 mx-auto mb-1" /><Skeleton className="h-3 w-16" /></div>
                 <div className="flex items-center gap-1"><Skeleton className="h-4 w-4 rounded-full" /><Skeleton className="h-6 w-8" /></div>
               </div>
@@ -190,9 +190,9 @@ export function BranchManagement() {
               const st = statusConfig[b.status] || statusConfig.closed;
               return (
                 <div key={b.id} className="rounded-xl overflow-hidden transition-all hover:-translate-y-0.5"
-                  style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                  style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                   {/* Header */}
-                  <div className="px-4 py-4 border-b" style={{ borderColor: '#E0EDE6', background: '#F8FAF9' }}>
+                  <div className="px-4 py-4 border-b" style={{ borderColor: '#F0DCC8', background: '#FFFAF5' }}>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '14px', fontWeight: 700, color: '#1A1A1A' }}>{b.name}</div>
@@ -204,8 +204,8 @@ export function BranchManagement() {
                       <div className="flex gap-1.5 ml-2">
                         <button onClick={() => { setEditBranch(b); setShowForm(true); }}
                           className="p-1.5 rounded-lg border hover:bg-white transition-colors"
-                          style={{ borderColor: '#E0EDE6' }}>
-                          <Edit2 size={13} style={{ color: '#2D6A4F' }} />
+                          style={{ borderColor: '#F0DCC8' }}>
+                          <Edit2 size={13} style={{ color: '#F58220' }} />
                         </button>
                         <button className="p-1.5 rounded-lg border hover:bg-pink-50 transition-colors"
                           style={{ borderColor: '#FCBABD' }}>
@@ -218,26 +218,26 @@ export function BranchManagement() {
                   {/* Info */}
                   <div className="px-4 py-4 space-y-2.5">
                     <div className="flex items-start gap-2">
-                      <MapPin size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#A8D5BA' }} />
-                      <span style={{ fontSize: '12.5px', color: '#6B9080', lineHeight: 1.4 }}>{b.address}</span>
+                      <MapPin size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#F5C088' }} />
+                      <span style={{ fontSize: '12.5px', color: '#A0845C', lineHeight: 1.4 }}>{b.address}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Phone size={14} style={{ color: '#A8D5BA' }} />
-                      <span style={{ fontSize: '12.5px', color: '#6B9080' }}>{b.phone}</span>
+                      <Phone size={14} style={{ color: '#F5C088' }} />
+                      <span style={{ fontSize: '12.5px', color: '#A0845C' }}>{b.phone}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Users size={14} style={{ color: '#A8D5BA' }} />
-                      <span style={{ fontSize: '12.5px', color: '#6B9080' }}>Quản lý: <strong style={{ color: '#1A1A1A' }}>{b.manager}</strong> · {b.staff} nhân viên</span>
+                      <Users size={14} style={{ color: '#F5C088' }} />
+                      <span style={{ fontSize: '12.5px', color: '#A0845C' }}>Quản lý: <strong style={{ color: '#1A1A1A' }}>{b.manager}</strong> · {b.staff} nhân viên</span>
                     </div>
                   </div>
 
                   {/* Stats */}
-                  <div className="px-4 py-3 border-t flex items-center justify-between" style={{ borderColor: '#F0F7F3', background: '#F8FAF9' }}>
+                  <div className="px-4 py-3 border-t flex items-center justify-between" style={{ borderColor: '#FAF0E6', background: '#FFFAF5' }}>
                     <div className="text-center">
-                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#2D6A4F', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{b.todayOrders}</div>
+                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#F58220', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{b.todayOrders}</div>
                       <div style={{ fontSize: '11px', color: '#9CA3AF' }}>Đơn hôm nay</div>
                     </div>
-                    <div className="h-8 w-px" style={{ background: '#E0EDE6' }} />
+                    <div className="h-8 w-px" style={{ background: '#F0DCC8' }} />
                     <div className="flex items-center gap-1">
                       <Star size={13} fill="#F59E0B" style={{ color: '#F59E0B' }} />
                       <div style={{ fontSize: '16px', fontWeight: 700, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{b.rating}</div>

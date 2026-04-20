@@ -26,11 +26,11 @@ export const weeklyData = [
 ];
 
 export const categoryData = [
-  { name: 'Trà sữa', value: 42, color: '#A8D5BA' },
-  { name: 'Trà trái cây', value: 23, color: '#2D6A4F' },
+  { name: 'Trà sữa', value: 42, color: '#F5C088' },
+  { name: 'Trà trái cây', value: 23, color: '#F58220' },
   { name: 'Cà phê', value: 15, color: '#FCBABD' },
   { name: 'Đá xay', value: 12, color: '#FEF3C7' },
-  { name: 'Topping', value: 8, color: '#E8F5EC' },
+  { name: 'Topping', value: 8, color: '#FFF3E6' },
 ];
 
 export const products = [
@@ -58,14 +58,20 @@ export const toppings = [
 ];
 
 export const orders = [
-  { id: 'ORD-2412001', customer: 'Nguyễn Thị Lan', phone: '0901234567', branch: 'Quận 1', items: 3, total: 175000, status: 'completed', time: '10:25', date: '20/04/2026', payment: 'Chuyển khoản' },
-  { id: 'ORD-2412002', customer: 'Trần Văn Minh', phone: '0912345678', branch: 'Quận 3', items: 2, total: 118000, status: 'processing', time: '10:42', date: '20/04/2026', payment: 'COD' },
-  { id: 'ORD-2412003', customer: 'Phạm Thu Hà', phone: '0923456789', branch: 'Quận 7', items: 4, total: 243000, status: 'pending', time: '10:58', date: '20/04/2026', payment: 'Momo' },
-  { id: 'ORD-2412004', customer: 'Lê Quang Hùng', phone: '0934567890', branch: 'Quận 1', items: 1, total: 65000, status: 'ready', time: '11:05', date: '20/04/2026', payment: 'Chuyển khoản' },
-  { id: 'ORD-2412005', customer: 'Võ Thị Mai', phone: '0945678901', branch: 'Bình Thạnh', items: 5, total: 312000, status: 'completed', time: '11:18', date: '20/04/2026', payment: 'COD' },
-  { id: 'ORD-2412006', customer: 'Hoàng Văn Long', phone: '0956789012', branch: 'Quận 3', items: 2, total: 125000, status: 'cancelled', time: '11:30', date: '20/04/2026', payment: 'Momo' },
-  { id: 'ORD-2412007', customer: 'Ngô Thị Bích', phone: '0967890123', branch: 'Quận 7', items: 3, total: 189000, status: 'processing', time: '11:45', date: '20/04/2026', payment: 'COD' },
-  { id: 'ORD-2412008', customer: 'Đặng Quốc Tuấn', phone: '0978901234', branch: 'Bình Thạnh', items: 2, total: 134000, status: 'pending', time: '12:00', date: '20/04/2026', payment: 'Chuyển khoản' },
+  { id: 'ORD-2412001', customer: 'Nguyễn Thị Lan', phone: '0901234567', branch: 'Quận 1', items: 3, total: 175000, status: 'completed', time: '10:25', date: '20/04/2026', payment: 'Chuyển khoản', customerType: 'member', customerId: 'C001' },
+  { id: 'ORD-2412002', customer: 'Trần Văn Minh', phone: '0912345678', branch: 'Quận 3', items: 2, total: 118000, status: 'processing', time: '10:42', date: '20/04/2026', payment: 'COD', customerType: 'member', customerId: 'C002' },
+  { id: 'ORD-2412003', customer: 'Phạm Thu Hà', phone: '0923456789', branch: 'Quận 7', items: 4, total: 243000, status: 'pending', time: '10:58', date: '20/04/2026', payment: 'Momo', customerType: 'member', customerId: 'C003' },
+  { id: 'ORD-2412004', customer: 'Lê Quang Hùng', phone: '0934567890', branch: 'Quận 1', items: 1, total: 65000, status: 'ready', time: '11:05', date: '20/04/2026', payment: 'Chuyển khoản', customerType: 'member', customerId: 'C004' },
+  { id: 'ORD-2412005', customer: 'Võ Thị Mai', phone: '0945678901', branch: 'Bình Thạnh', items: 5, total: 312000, status: 'completed', time: '11:18', date: '20/04/2026', payment: 'COD', customerType: 'member', customerId: 'C005' },
+  { id: 'ORD-2412006', customer: 'Hoàng Văn Long', phone: '0956789012', branch: 'Quận 3', items: 2, total: 125000, status: 'cancelled', time: '11:30', date: '20/04/2026', payment: 'Momo', customerType: 'member', customerId: 'C006' },
+  { id: 'ORD-2412007', customer: 'Ngô Thị Bích', phone: '0967890123', branch: 'Quận 7', items: 3, total: 189000, status: 'processing', time: '11:45', date: '20/04/2026', payment: 'COD', customerType: 'member', customerId: 'C007' },
+  { id: 'ORD-2412008', customer: 'Đặng Quốc Tuấn', phone: '0978901234', branch: 'Bình Thạnh', items: 2, total: 134000, status: 'pending', time: '12:00', date: '20/04/2026', payment: 'Chuyển khoản', customerType: 'member', customerId: 'C008' },
+  // Walk-in (Vãng lai) customers
+  { id: 'ORD-2412009', customer: 'Khách vãng lai', phone: '', branch: 'Quận 1', items: 2, total: 115000, status: 'completed', time: '12:15', date: '20/04/2026', payment: 'Tiền mặt', customerType: 'walkin', customerId: null },
+  { id: 'ORD-2412010', customer: 'Khách vãng lai', phone: '', branch: 'Quận 3', items: 1, total: 55000, status: 'completed', time: '12:32', date: '20/04/2026', payment: 'Tiền mặt', customerType: 'walkin', customerId: null },
+  { id: 'ORD-2412011', customer: 'Lê Bảo Châu', phone: '0989012345', branch: 'Thủ Đức', items: 3, total: 198000, status: 'ready', time: '12:48', date: '20/04/2026', payment: 'Momo', customerType: 'walkin', customerId: null },
+  { id: 'ORD-2412012', customer: 'Khách vãng lai', phone: '', branch: 'Quận 7', items: 4, total: 267000, status: 'pending', time: '13:05', date: '20/04/2026', payment: 'Tiền mặt', customerType: 'walkin', customerId: null },
+  { id: 'ORD-2412013', customer: 'Phan Thị Dung', phone: '0971234567', branch: 'Quận 1', items: 2, total: 142000, status: 'processing', time: '13:20', date: '20/04/2026', payment: 'VNPay', customerType: 'walkin', customerId: null },
 ];
 
 export const customers = [

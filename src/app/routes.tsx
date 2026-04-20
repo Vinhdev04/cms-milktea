@@ -1,5 +1,6 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import { Layout } from "./components/Layout";
+import { RequireAuth } from "./components/RequireAuth";
 import { Dashboard } from "./pages/Dashboard";
 import { MenuManagement } from "./pages/MenuManagement";
 import { ToppingManagement } from "./pages/ToppingManagement";
@@ -15,6 +16,14 @@ import { Auth } from "./pages/Auth";
 import { MediaLibrary } from "./pages/MediaLibrary";
 import { ReviewManagement } from "./pages/ReviewManagement";
 
+function ProtectedLayout() {
+  return (
+    <RequireAuth>
+      <Layout />
+    </RequireAuth>
+  );
+}
+
 export const router = createBrowserRouter([
   {
     path: "/auth",
@@ -22,7 +31,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    Component: Layout,
+    Component: ProtectedLayout,
     children: [
       { index: true, Component: Dashboard },
       { path: "menu", Component: MenuManagement },
@@ -38,5 +47,9 @@ export const router = createBrowserRouter([
       { path: "settings", Component: SystemSettings },
       { path: "audit-log", Component: AuditLog },
     ],
+  },
+  {
+    path: "*",
+    element: <Navigate to="/" replace />,
   },
 ]);

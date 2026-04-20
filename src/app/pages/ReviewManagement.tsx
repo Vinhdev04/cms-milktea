@@ -15,7 +15,7 @@ import {
 } from "../components/ui/pagination";
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; icon: JSX.Element }> = {
-  approved: { label: 'Đã duyệt', bg: '#DCFCE7', color: '#166534', icon: <CheckCircle2 size={13} /> },
+  approved: { label: 'Đã duyệt', bg: '#FFEDD5', color: '#9A3412', icon: <CheckCircle2 size={13} /> },
   pending: { label: 'Chờ duyệt', bg: '#FEF3C7', color: '#92400E', icon: <Clock size={13} /> },
   rejected: { label: 'Đã ẩn', bg: '#FEE2E2', color: '#991B1B', icon: <XCircle size={13} /> },
 };
@@ -51,12 +51,12 @@ export function ReviewManagement() {
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
             Đánh giá & Phản hồi
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#6B9080' }}>Quản lý nhận xét từ khách hàng về sản phẩm và nhân viên</p>
+          <p style={{ fontSize: '13.5px', color: '#A0845C' }}>Quản lý nhận xét từ khách hàng về sản phẩm và nhân viên</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b" style={{ borderColor: '#E0EDE6' }}>
+      <div className="flex gap-2 mb-6 border-b" style={{ borderColor: '#F0DCC8' }}>
         {[
           { id: 'all', label: 'Tất cả', icon: <MessageSquare size={16} /> },
           { id: 'product', label: 'Sản phẩm', icon: <Package size={16} /> },
@@ -67,13 +67,13 @@ export function ReviewManagement() {
             onClick={() => setActiveTab(tab.id as any)}
             className="flex items-center gap-2 px-4 py-3 text-sm font-semibold transition-all relative"
             style={{
-              color: activeTab === tab.id ? '#2D6A4F' : '#6B9080',
+              color: activeTab === tab.id ? '#F58220' : '#A0845C',
             }}
           >
             {tab.icon}
             {tab.label}
             {activeTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: '#2D6A4F' }}></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: '#F58220' }}></div>
             )}
           </button>
         ))}
@@ -89,7 +89,7 @@ export function ReviewManagement() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border outline-none transition-all"
-            style={{ borderColor: '#E0EDE6', fontSize: '14px', background: 'white' }}
+            style={{ borderColor: '#F0DCC8', fontSize: '14px', background: 'white' }}
           />
         </div>
         <div className="flex gap-3">
@@ -99,7 +99,7 @@ export function ReviewManagement() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="pl-10 pr-8 py-2.5 rounded-xl border outline-none appearance-none transition-all"
-              style={{ borderColor: '#E0EDE6', fontSize: '14px', background: 'white', minWidth: '160px' }}
+              style={{ borderColor: '#F0DCC8', fontSize: '14px', background: 'white', minWidth: '160px' }}
             >
               <option value="all">Tất cả trạng thái</option>
               <option value="pending">Chờ duyệt</option>
@@ -114,7 +114,7 @@ export function ReviewManagement() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="rounded-2xl p-5 border" style={{ borderColor: '#E0EDE6', background: 'white' }}>
+            <div key={i} className="rounded-2xl p-5 border" style={{ borderColor: '#F0DCC8', background: 'white' }}>
               <div className="flex justify-between mb-4">
                 <Skeleton className="h-5 w-32" />
                 <Skeleton className="h-5 w-20 rounded-full" />
@@ -136,10 +136,10 @@ export function ReviewManagement() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
             {paginatedData.map((review) => (
               <div key={review.id} className="rounded-2xl p-5 border transition-all hover:shadow-md" 
-                style={{ borderColor: '#E0EDE6', background: 'white' }}>
+                style={{ borderColor: '#F0DCC8', background: 'white' }}>
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg" 
-                    style={{ background: review.type === 'product' ? '#E8F5EC' : '#F0F7FF', color: review.type === 'product' ? '#2D6A4F' : '#0284C7' }}>
+                    style={{ background: review.type === 'product' ? '#FFF3E6' : '#F0F7FF', color: review.type === 'product' ? '#F58220' : '#0284C7' }}>
                     {review.type === 'product' ? <Package size={14} /> : <User size={14} />}
                     <span style={{ fontSize: '12px', fontWeight: 600 }}>{review.target}</span>
                   </div>
@@ -160,7 +160,7 @@ export function ReviewManagement() {
                   "{review.comment}"
                 </p>
 
-                <div className="flex justify-between items-end border-t pt-4" style={{ borderColor: '#F0F7F3' }}>
+                <div className="flex justify-between items-end border-t pt-4" style={{ borderColor: '#FAF0E6' }}>
                   <div>
                     <div style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{review.customer}</div>
                     <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{review.date}</div>
@@ -170,10 +170,10 @@ export function ReviewManagement() {
                       <button 
                         onClick={() => handleStatusChange(review.id, 'approved')}
                         className="p-2 rounded-lg border transition-all hover:bg-green-50"
-                        style={{ borderColor: '#DCFCE7' }}
+                        style={{ borderColor: '#FFEDD5' }}
                         title="Duyệt đánh giá"
                       >
-                        <CheckCircle2 size={16} style={{ color: '#166534' }} />
+                        <CheckCircle2 size={16} style={{ color: '#9A3412' }} />
                       </button>
                     )}
                     {review.status !== 'rejected' && (
@@ -233,7 +233,7 @@ export function ReviewManagement() {
           )}
         </>
       ) : (
-        <div className="py-12 bg-white rounded-2xl border" style={{ borderColor: '#E0EDE6' }}>
+        <div className="py-12 bg-white rounded-2xl border" style={{ borderColor: '#F0DCC8' }}>
           <EmptyState
             icon={<Star size={40} />}
             title="Chưa có đánh giá nào"
