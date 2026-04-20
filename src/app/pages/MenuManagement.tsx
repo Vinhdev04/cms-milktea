@@ -389,6 +389,8 @@ export function MenuManagement() {
           )}
         </>
       )}
+      </>
+      )}
     </div>
   );
 }
