@@ -167,49 +167,66 @@ export function VoucherManagement() {
           const usagePercent = Math.round((v.used / v.total) * 100);
           const isExpired = v.status === 'expired';
           return (
-            <div key={v.id} className="rounded-xl overflow-hidden transition-all"
-              style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', opacity: isExpired ? 0.7 : 1 }}>
+            <div key={v.id} className="relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group"
+              style={{ background: 'white', border: '1px solid #E0EDE6', opacity: isExpired ? 0.75 : 1 }}>
+              
               {/* Top section */}
-              <div className="p-4 relative" style={{ background: isExpired ? '#F8FAF9' : '#E8F5EC' }}>
-                <div className="flex items-start justify-between">
+              <div className="p-5 relative overflow-hidden" 
+                   style={{ background: isExpired ? '#F3F4F6' : 'linear-gradient(135deg, #E8F5EC 0%, #A8D5BA 100%)' }}>
+                {!isExpired && (
+                  <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-white opacity-20 blur-xl pointer-events-none" />
+                )}
+                <div className="flex items-start justify-between relative z-10">
                   <div>
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#2D6A4F', letterSpacing: '0.05em' }}>{v.code}</div>
-                    <div style={{ fontSize: '13px', color: '#6B9080', marginTop: '2px' }}>{v.name}</div>
+                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '20px', fontWeight: 800, color: isExpired ? '#6B7280' : '#1B4332', letterSpacing: '0.05em' }}>{v.code}</div>
+                    <div style={{ fontSize: '13.5px', color: isExpired ? '#9CA3AF' : '#2D6A4F', marginTop: '4px', fontWeight: 500 }}>{v.name}</div>
                   </div>
                   <div className="text-right">
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 800, color: '#2D6A4F' }}>
+                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '26px', fontWeight: 900, color: isExpired ? '#6B7280' : '#1B4332' }}>
                       {v.type === 'percent' ? `${v.discount}%` : formatVND(v.discount)}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#6B9080' }}>giảm giá</div>
+                    <div className="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider" 
+                         style={{ background: isExpired ? 'rgba(0,0,0,0.05)' : 'rgba(27,67,50,0.1)', color: isExpired ? '#6B7280' : '#1B4332' }}>
+                      Giảm giá
+                    </div>
                   </div>
                 </div>
+
                 {/* Copy button */}
                 <button onClick={() => copyCode(v.code)}
-                  className="absolute bottom-3 right-4 flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all"
-                  style={{ background: 'white', border: '1px solid #E0EDE6', fontSize: '11.5px', color: '#2D6A4F', fontWeight: 600 }}>
-                  {copiedCode === v.code ? <CheckCircle2 size={12} style={{ color: '#166534' }} /> : <Copy size={12} />}
-                  {copiedCode === v.code ? 'Đã sao chép' : 'Sao chép'}
+                  className="absolute bottom-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                  style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontSize: '12px', color: isExpired ? '#6B7280' : '#2D6A4F', fontWeight: 600 }}>
+                  {copiedCode === v.code ? <CheckCircle2 size={14} style={{ color: '#166534' }} /> : <Copy size={14} />}
+                  {copiedCode === v.code ? 'Đã chép' : 'Sao chép mã'}
                 </button>
               </div>
-              {/* Dashed divider */}
-              <div className="relative py-0" style={{ borderTop: '1.5px dashed #E0EDE6' }} />
+
+              {/* Dashed divider with ticket cutouts */}
+              <div className="relative flex items-center h-4 bg-white">
+                <div className="absolute left-[-8px] w-4 h-4 rounded-full" style={{ background: '#F5F5F5', borderRight: '1px solid #E0EDE6' }} />
+                <div className="w-full border-t-[2px] border-dashed" style={{ borderColor: '#E0EDE6' }} />
+                <div className="absolute right-[-8px] w-4 h-4 rounded-full" style={{ background: '#F5F5F5', borderLeft: '1px solid #E0EDE6' }} />
+              </div>
+
               {/* Bottom section */}
-              <div className="px-4 py-3">
-                <div className="flex justify-between text-xs mb-2" style={{ color: '#6B9080' }}>
-                  <span>Đơn tối thiểu: {formatVND(v.minOrder)}</span>
-                  <span>HSD: {v.expiry}</span>
+              <div className="px-5 pb-5 pt-2">
+                <div className="flex justify-between text-[13px] mb-3" style={{ color: '#6B9080' }}>
+                  <span className="flex items-center gap-1.5"><AlertCircle size={14} /> Tối thiểu: {formatVND(v.minOrder)}</span>
+                  <span className="flex items-center gap-1.5"><Clock size={14} /> HSD: {v.expiry}</span>
                 </div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span style={{ fontSize: '12px', color: '#6B9080' }}>Đã dùng: {v.used}/{v.total}</span>
-                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
-                    style={{ background: isExpired ? '#F3F4F6' : '#DCFCE7', color: isExpired ? '#6B7280' : '#166534' }}>
-                    {isExpired ? 'Hết hạn' : 'Đang chạy'}
+                
+                <div className="flex items-center justify-between mb-2">
+                  <span style={{ fontSize: '12px', color: '#1A1A1A', fontWeight: 600 }}>Đã dùng: {v.used}/{v.total}</span>
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider"
+                    style={{ background: isExpired ? '#F3F4F6' : '#DCFCE7', color: isExpired ? '#9CA3AF' : '#166534' }}>
+                    {isExpired ? 'Đã kết thúc' : 'Đang phát hành'}
                   </span>
                 </div>
+                
                 {/* Progress */}
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-                  <div className="h-full rounded-full transition-all"
-                    style={{ width: `${usagePercent}%`, background: usagePercent >= 90 ? '#EF4444' : '#A8D5BA' }} />
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                  <div className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${usagePercent}%`, background: usagePercent >= 90 ? '#EF4444' : '#2D6A4F' }} />
                 </div>
               </div>
             </div>
