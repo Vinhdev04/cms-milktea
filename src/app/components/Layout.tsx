@@ -59,7 +59,7 @@ export function Layout() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2 no-scrollbar">
+        <nav className="flex-1 overflow-y-hidden py-3 px-2">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
