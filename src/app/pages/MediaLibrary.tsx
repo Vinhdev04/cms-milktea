@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { UploadCloud, Image as ImageIcon, Copy, Trash2, Search, Filter, FolderPlus, Download, CheckCircle2 } from "lucide-react";
+import { products, toppings } from "../data/mockData";
 
 // Mock Data for Media
 const initialMedia = [
@@ -12,10 +13,59 @@ const initialMedia = [
 ];
 
 export function MediaLibrary() {
+  // Generate dynamic media from mock data
+  const dynamicMedia = [
+    ...products.filter(p => p.image).map(p => ({
+      id: `p-${p.id}`,
+      name: `${p.name.replace(/\s+/g, '-').toLowerCase()}.jpg`,
+      type: 'product',
+      size: '1.2 MB',
+      dimensions: '800x800',
+      date: '20/04/2026',
+      url: p.image
+    })),
+    ...toppings.filter(t => t.image).map(t => ({
+      id: `t-${t.id}`,
+      name: `${t.name.replace(/\s+/g, '-').toLowerCase()}.jpg`,
+      type: 'product',
+      size: '800 KB',
+      dimensions: '400x400',
+      date: '20/04/2026',
+      url: t.image
+    }))
+  ];
+
+  const [mediaList, setMediaList] = useState([...dynamicMedia, ...initialMedia]);
   const [activeTab, setActiveTab] = useState('all');
   const [search, setSearch] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+    e.preventDefault();
+    setIsUploading(false);
+    let files: FileList | null = null;
+
+    if ('dataTransfer' in e) {
+      files = e.dataTransfer.files;
+    } else if ('target' in e && (e.target as HTMLInputElement).files) {
+      files = (e.target as HTMLInputElement).files;
+    }
+
+    if (files && files.length > 0) {
+      const newItems = Array.from(files).map(file => ({
+        id: `upload-${Date.now()}-${Math.random()}`,
+        name: file.name,
+        type: file.type.includes('image') ? 'product' : 'banner', // Simplification
+        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        dimensions: 'Tùy chỉnh',
+        date: new Date().toLocaleDateString('vi-VN'),
+        url: URL.createObjectURL(file)
+      }));
+      setMediaList(prev => [...newItems, ...prev]);
+    }
+  };
 
   const tabs = [
     { id: 'all', label: 'Tất cả file' },
@@ -24,7 +74,7 @@ export function MediaLibrary() {
     { id: 'icon', label: 'Icon & Graphic' },
   ];
 
-  const filteredMedia = initialMedia.filter(m => 
+  const filteredMedia = mediaList.filter(m => 
     (activeTab === 'all' || m.type === activeTab) &&
     m.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -49,10 +99,11 @@ export function MediaLibrary() {
             style={{ borderColor: '#E0EDE6', color: '#1A1A1A', fontWeight: 600, fontSize: '13.5px' }}>
             <FolderPlus size={16} /> Thêm thư mục
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all"
+          <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all"
             style={{ background: '#2D6A4F', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
             <UploadCloud size={16} /> Tải lên File
           </button>
+          <input type="file" multiple className="hidden" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" />
         </div>
       </div>
 
@@ -62,9 +113,10 @@ export function MediaLibrary() {
           {/* Upload Dropzone */}
           <div className="border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer"
             style={{ borderColor: isUploading ? '#2D6A4F' : '#A8D5BA', background: isUploading ? '#E8F5EC' : '#F8FAF9' }}
+            onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setIsUploading(true); }}
             onDragLeave={() => setIsUploading(false)}
-            onDrop={(e) => { e.preventDefault(); setIsUploading(false); }}
+            onDrop={handleFileUpload}
           >
             <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3"
               style={{ background: '#E8F5EC', color: '#2D6A4F' }}>
@@ -153,7 +205,8 @@ export function MediaLibrary() {
                           title="Tải xuống">
                           <Download size={16} style={{ color: '#1A1A1A' }} />
                         </button>
-                        <button className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform"
+                        <button onClick={() => setMediaList(prev => prev.filter(item => item.id !== m.id))}
+                          className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform"
                           title="Xóa">
                           <Trash2 size={16} style={{ color: '#991B1B' }} />
                         </button>

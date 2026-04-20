@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, MapPin, Phone, Users, Star, Edit2, Trash2, X, CheckCircle2, AlertTriangle, Store } from "lucide-react";
+import { toast } from "sonner";
 import { branches } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -27,17 +28,28 @@ interface BranchFormProps {
 }
 
 function BranchForm({ branch, onClose }: BranchFormProps) {
+  const [mapUrl, setMapUrl] = useState('');
+
+  let embedUrl = mapUrl;
+  if (mapUrl.includes('<iframe')) {
+    const match = mapUrl.match(/src="([^"]+)"/);
+    if (match) {
+      embedUrl = match[1];
+    }
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.35)' }}>
-      <div className="w-full max-w-md rounded-2xl overflow-hidden"
-        style={{ background: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.35)' }} onClick={onClose}>
+      <div className="w-full max-w-md rounded-2xl overflow-hidden flex flex-col"
+        style={{ background: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxHeight: '90vh' }}
+        onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>
             {branch ? 'Chỉnh sửa Chi nhánh' : 'Thêm Chi nhánh mới'}
           </h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16} style={{ color: '#6B9080' }} /></button>
         </div>
-        <div className="px-5 py-5 space-y-4">
+        <div className="px-5 py-5 space-y-4 overflow-y-auto flex-1">
           {[
             { label: 'Tên chi nhánh', placeholder: 'VD: SMYOU Quận 1', value: branch?.name || '' },
             { label: 'Địa chỉ', placeholder: 'Địa chỉ đầy đủ', value: branch?.address || '' },
@@ -64,15 +76,36 @@ function BranchForm({ branch, onClose }: BranchFormProps) {
               <input placeholder="VD: 106.660172" className="w-full px-4 rounded-xl border outline-none transition-all" style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} />
             </div>
           </div>
-          {/* Map Preview Placeholder */}
-          <div className="w-full h-24 mt-2 rounded-xl border flex items-center justify-center bg-[#F8FAF9]" style={{ borderColor: '#E0EDE6' }}>
-            <span style={{ fontSize: '12px', color: '#9CA3AF' }} className="flex items-center gap-1"><MapPin size={14} /> Bản đồ hiển thị vị trí chi nhánh</span>
+          <div>
+            <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Link bản đồ (Google Maps)</label>
+            <input 
+              value={mapUrl}
+              onChange={(e) => setMapUrl(e.target.value)}
+              placeholder="Dán thẻ <iframe> hoặc URL nhúng vào đây..." 
+              className="w-full px-4 rounded-xl border outline-none transition-all" 
+              style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} 
+            />
           </div>
+          {/* Map Preview */}
+          {embedUrl ? (
+            <div className="w-full h-32 mt-2 rounded-xl overflow-hidden border" style={{ borderColor: '#E0EDE6' }}>
+              <iframe src={embedUrl} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+          ) : (
+            <div className="w-full h-24 mt-2 rounded-xl border flex items-center justify-center bg-[#F8FAF9]" style={{ borderColor: '#E0EDE6' }}>
+              <span style={{ fontSize: '12px', color: '#9CA3AF' }} className="flex items-center gap-1"><MapPin size={14} /> Bản đồ hiển thị vị trí chi nhánh</span>
+            </div>
+          )}
         </div>
-        <div className="px-5 py-4 border-t flex gap-3" style={{ borderColor: '#E0EDE6' }}>
+        <div className="px-5 py-4 border-t flex gap-3 flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border text-sm"
             style={{ borderColor: '#E0EDE6', color: '#6B9080', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Hủy</button>
-          <button className="flex-1 py-2.5 rounded-xl text-sm"
+          <button 
+            onClick={() => {
+              toast.success(branch ? 'Cập nhật chi nhánh thành công!' : 'Đã thêm chi nhánh mới!');
+              onClose();
+            }}
+            className="flex-1 py-2.5 rounded-xl text-sm"
             style={{ background: '#2D6A4F', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
             {branch ? 'Lưu thay đổi' : 'Thêm chi nhánh'}
           </button>

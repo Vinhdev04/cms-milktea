@@ -77,6 +77,7 @@ export const customers = [
   { id: 'C006', name: 'Hoàng Văn Long', phone: '0956789012', email: 'long.hoang@email.com', tier: 'Gold', points: 4210, totalOrders: 72, totalSpent: 5890000, joinDate: '25/02/2024', lastOrder: '19/04/2026' },
   { id: 'C007', name: 'Ngô Thị Bích', phone: '0967890123', email: 'bich.ngo@email.com', tier: 'Member', points: 280, totalOrders: 5, totalSpent: 325000, joinDate: '05/02/2026', lastOrder: '20/04/2026' },
   { id: 'C008', name: 'Đặng Quốc Tuấn', phone: '0978901234', email: 'tuan.dang@email.com', tier: 'Silver', points: 890, totalOrders: 17, totalSpent: 1120000, joinDate: '18/08/2024', lastOrder: '17/04/2026' },
+  { id: 'C009', name: 'Lê Đình Sơn', phone: '0989012345', email: 'son.le@email.com', tier: 'Blacklist', points: 0, totalOrders: 3, totalSpent: 150000, joinDate: '12/01/2026', lastOrder: '25/02/2026' },
 ];
 
 export const vouchers = [
@@ -104,4 +105,13 @@ export const staff = [
   { id: 'S006', name: 'Vũ Minh Tuấn', role: 'Pha chế viên', branch: 'Quận 1', phone: '0906666666', email: 'tuan.vu@smyou.vn', status: 'active', joinDate: '15/01/2024' },
   { id: 'S007', name: 'Đỗ Thị Hương', role: 'Thu ngân', branch: 'Quận 3', phone: '0907777777', email: 'huong.do@smyou.vn', status: 'inactive', joinDate: '01/03/2024' },
   { id: 'S008', name: 'Bùi Văn Nam', role: 'Giao hàng', branch: 'Quận 7', phone: '0908888888', email: 'nam.bui@smyou.vn', status: 'active', joinDate: '20/04/2024' },
+];
+
+export const reviews = [
+  { id: 'R001', type: 'product', target: 'Trà Sữa Trân Châu Hoàng Kim', customer: 'Nguyễn Thị Lan', rating: 5, comment: 'Trà sữa ngon, trân châu rất dai và thơm.', date: '20/04/2026', status: 'approved' },
+  { id: 'R002', type: 'staff', target: 'Trần Thị Ngọc', customer: 'Trần Văn Minh', rating: 5, comment: 'Quản lý rất nhiệt tình, hỗ trợ khách hàng nhanh chóng.', date: '19/04/2026', status: 'approved' },
+  { id: 'R003', type: 'product', target: 'Cà Phê Muối Kem Béo', customer: 'Phạm Thu Hà', rating: 4, comment: 'Cà phê hơi ngọt so với khẩu vị của mình, nhưng kem muối rất ngon.', date: '18/04/2026', status: 'pending' },
+  { id: 'R004', type: 'staff', target: 'Vũ Minh Tuấn', customer: 'Lê Quang Hùng', rating: 3, comment: 'Pha chế hơi chậm, mình phải đợi khá lâu.', date: '17/04/2026', status: 'approved' },
+  { id: 'R005', type: 'product', target: 'Matcha Đào Kem Cheese', customer: 'Võ Thị Mai', rating: 5, comment: 'Vị matcha đậm đà, kem cheese béo ngậy rất thích.', date: '16/04/2026', status: 'approved' },
+  { id: 'R006', type: 'staff', target: 'Đỗ Thị Hương', customer: 'Hoàng Văn Long', rating: 2, comment: 'Thái độ thu ngân không được tốt lắm.', date: '15/04/2026', status: 'rejected' },
 ];

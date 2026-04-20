@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer, PackageX } from "lucide-react";
+import { Logo } from "../components/Logo";
 import { orders } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -69,6 +70,13 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
       <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }}>
         <div id="invoice-content" className="h-full w-full max-w-md flex flex-col"
           style={{ background: 'white', boxShadow: '-8px 0 32px rgba(0,0,0,0.12)' }}>
+          <div className="flex flex-col items-center py-6 border-b" style={{ borderColor: '#E0EDE6' }}>
+            <div className="p-3 rounded-2xl bg-white mb-2" style={{ border: '1px solid #F0F7F3' }}>
+              <Logo size={40} />
+            </div>
+            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#1B4332' }}>SMYOU MILKTEA</h1>
+            <p style={{ fontSize: '12px', color: '#6B9080', fontWeight: 500 }}>Sweet moments for you</p>
+          </div>
         <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
           <div>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>

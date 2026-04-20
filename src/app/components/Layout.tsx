@@ -3,8 +3,10 @@ import { NavLink, Outlet, useNavigate } from "react-router";
 import {
   LayoutDashboard, ShoppingBag, Layers, ClipboardList, Users,
   Tag, BarChart3, MapPin, UserCheck, Settings, Menu, X, Bell,
-  ChevronDown, LogOut, Search, Coffee, ShieldAlert, Image
+  ChevronDown, LogOut, Search, Coffee, ShieldAlert, Image, MessageSquare
 } from "lucide-react";
+import { Toaster } from "sonner";
+import { Logo } from "./Logo";
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -17,6 +19,7 @@ const navItems = [
   { path: "/media", label: "Thư viện Media", icon: Image },
   { path: "/branches", label: "Chi nhánh", icon: MapPin },
   { path: "/staff", label: "Nhân viên", icon: UserCheck },
+  { path: "/reviews", label: "Đánh giá & Phản hồi", icon: MessageSquare },
   { path: "/audit-log", label: "Audit Log", icon: ShieldAlert },
   { path: "/settings", label: "Cấu hình hệ thống", icon: Settings },
 ];
@@ -28,6 +31,7 @@ export function Layout() {
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#F5F5F5', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+      <Toaster position="top-right" richColors />
       {/* Mobile Overlay */}
       <div 
         className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
@@ -46,8 +50,8 @@ export function Layout() {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 py-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-          <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#A8D5BA' }}>
-            <Coffee size={20} style={{ color: '#1B4332' }} />
+          <div className="flex-shrink-0 w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center bg-white">
+            <Logo size={28} />
           </div>
           {sidebarOpen && (
             <div>
@@ -60,7 +64,7 @@ export function Layout() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-hidden py-3 px-2">
+        <nav className="flex-1 overflow-y-auto py-3 px-2">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
@@ -104,18 +108,6 @@ export function Layout() {
 
         {/* User at bottom */}
         <div className="p-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-          <div className="flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer"
-            style={{ background: 'rgba(168,213,186,0.1)' }}>
-            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#A8D5BA', color: '#1B4332', fontWeight: 700, fontSize: '13px' }}>
-              A
-            </div>
-            {sidebarOpen && (
-              <div className="flex-1 min-w-0">
-                <div style={{ color: '#FFFFFF', fontSize: '13px', fontWeight: 600 }} className="truncate">Admin SMYOU</div>
-                <div style={{ color: '#6B9080', fontSize: '11px' }}>Super Admin</div>
-              </div>
-            )}
-          </div>
         </div>
       </aside>
 

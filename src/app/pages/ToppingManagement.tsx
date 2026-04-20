@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, X, ChevronDown, Box } from "lucide-react";
+import { toast } from "sonner";
 import { toppings } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -25,16 +26,17 @@ interface ToppingFormProps {
 
 function ToppingForm({ topping, onClose }: ToppingFormProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.35)' }}>
-      <div className="w-full max-w-sm rounded-2xl overflow-hidden"
-        style={{ background: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.35)' }} onClick={onClose}>
+      <div className="w-full max-w-sm rounded-2xl overflow-hidden flex flex-col"
+        style={{ background: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxHeight: '90vh' }}
+        onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>
             {topping ? 'Chỉnh sửa Topping' : 'Thêm Topping mới'}
           </h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16} style={{ color: '#6B9080' }} /></button>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"><X size={16} style={{ color: '#6B9080' }} /></button>
         </div>
-        <div className="px-5 py-5 space-y-4">
+        <div className="px-5 py-5 space-y-4 overflow-y-auto flex-1">
           {[
             { label: 'Tên topping', key: 'name', placeholder: 'VD: Trân Châu Đen', value: topping?.name || '' },
             { label: 'Giá bán', key: 'price', placeholder: 'VD: 10000', value: topping?.price?.toString() || '' },
@@ -89,10 +91,15 @@ function ToppingForm({ topping, onClose }: ToppingFormProps) {
             />
           </div>
         </div>
-        <div className="px-5 py-4 border-t flex gap-3" style={{ borderColor: '#E0EDE6' }}>
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border text-sm"
+        <div className="px-5 py-4 border-t flex gap-3 flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border transition-all text-sm"
             style={{ borderColor: '#E0EDE6', color: '#6B9080', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Hủy</button>
-          <button className="flex-1 py-2.5 rounded-xl text-sm"
+          <button 
+            onClick={() => {
+              toast.success(topping ? 'Cập nhật topping thành công!' : 'Đã thêm topping mới!');
+              onClose();
+            }}
+            className="flex-1 py-2.5 rounded-xl text-sm transition-all"
             style={{ background: '#2D6A4F', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
             {topping ? 'Lưu thay đổi' : 'Thêm topping'}
           </button>

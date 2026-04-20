@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, Eye, Filter, X, Star, Package, Loader2, PackageX, List, Settings2 } from "lucide-react";
+import { toast } from "sonner";
 import { products } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -24,9 +25,10 @@ interface ProductFormProps {
 function ProductForm({ product, onClose }: ProductFormProps) {
   const isEdit = !!product;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }} onClick={onClose}>
       <div className="h-full w-full max-w-md flex flex-col"
-        style={{ background: 'white', boxShadow: '-8px 0 32px rgba(0,0,0,0.12)' }}>
+        style={{ background: 'white', boxShadow: '-8px 0 32px rgba(0,0,0,0.12)' }}
+        onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>
             {isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}
@@ -132,7 +134,12 @@ function ProductForm({ product, onClose }: ProductFormProps) {
             style={{ borderColor: '#E0EDE6', color: '#6B9080', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
             Hủy
           </button>
-          <button className="flex-1 py-2.5 rounded-xl transition-all text-sm"
+          <button 
+            onClick={() => {
+              toast.success(isEdit ? 'Cập nhật sản phẩm thành công!' : 'Đã thêm sản phẩm mới!');
+              onClose();
+            }}
+            className="flex-1 py-2.5 rounded-xl transition-all text-sm"
             style={{ background: '#2D6A4F', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
             {isEdit ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
           </button>

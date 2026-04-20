@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, Eye, X, Award, ShoppingBag, TrendingUp, Users, Lock, Edit3 } from "lucide-react";
+import { toast } from "sonner";
 import { customers } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -21,6 +22,7 @@ const tierConfig: Record<string, { bg: string; color: string }> = {
   Gold: { bg: '#FEF9C3', color: '#854D0E' },
   Silver: { bg: '#F3F4F6', color: '#374151' },
   Member: { bg: '#E8F5EC', color: '#2D6A4F' },
+  Blacklist: { bg: '#FEE2E2', color: '#991B1B' },
 };
 
 interface CustomerDetailProps {
@@ -32,9 +34,9 @@ function CustomerDetail({ customer, onClose }: CustomerDetailProps) {
   const [activeTab, setActiveTab] = useState<'info' | 'history'>('info');
   const tier = tierConfig[customer.tier] || tierConfig.Member;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }}>
-      <div className="h-full w-full max-w-md flex flex-col" style={{ background: 'white', boxShadow: '-8px 0 32px rgba(0,0,0,0.12)' }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }} onClick={onClose}>
+      <div className="h-full w-full max-w-md flex flex-col" style={{ background: 'white', boxShadow: '-8px 0 32px rgba(0,0,0,0.12)' }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>
             Hồ sơ khách hàng
           </h2>
@@ -51,7 +53,7 @@ function CustomerDetail({ customer, onClose }: CustomerDetailProps) {
             <div style={{ fontSize: '13px', color: '#6B9080', marginTop: '2px' }}>{customer.phone}</div>
             <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold"
               style={{ background: tier.bg, color: tier.color }}>
-              ⭐ {customer.tier} Member
+              {customer.tier === 'Blacklist' ? '🚫 Blacklist' : `⭐ ${customer.tier} Member`}
             </span>
           </div>
 
@@ -103,11 +105,20 @@ function CustomerDetail({ customer, onClose }: CustomerDetailProps) {
               <div>
                 <h3 style={{ fontSize: '12px', fontWeight: 600, color: '#6B9080', letterSpacing: '0.05em', marginBottom: '12px' }}>THAO TÁC</h3>
                 <div className="space-y-3">
-                  <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all hover:bg-gray-50"
+                  <button 
+                    onClick={() => {
+                      toast.success(`Đã cập nhật điểm cho khách hàng ${customer.name}`);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all hover:bg-gray-50"
                     style={{ borderColor: '#E0EDE6', color: '#1A1A1A', fontSize: '13.5px', fontWeight: 600 }}>
                     <Edit3 size={16} style={{ color: '#2D6A4F' }} /> Điều chỉnh điểm thủ công
                   </button>
-                  <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all hover:bg-pink-50"
+                  <button 
+                    onClick={() => {
+                      toast.error(`Đã khóa tài khoản ${customer.name}`);
+                      onClose();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all hover:bg-pink-50"
                     style={{ borderColor: '#FCBABD', color: '#8B3A4A', fontSize: '13.5px', fontWeight: 600 }}>
                     <Lock size={16} /> Khóa tài khoản
                   </button>
@@ -144,7 +155,7 @@ export function CustomerManagement() {
   const [activeTier, setActiveTier] = useState('Tất cả');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
-  const tiers = ['Tất cả', 'Gold', 'Silver', 'Member'];
+  const tiers = ['Tất cả', 'Gold', 'Silver', 'Member', 'Blacklist'];
   const filtered = customers.filter(c =>
     (activeTier === 'Tất cả' || c.tier === activeTier) &&
     (c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search))
@@ -164,11 +175,12 @@ export function CustomerManagement() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6">
         {[
           { label: 'Gold Member', count: customers.filter(c => c.tier === 'Gold').length, bg: '#FEF9C3', color: '#854D0E' },
           { label: 'Silver Member', count: customers.filter(c => c.tier === 'Silver').length, bg: '#F3F4F6', color: '#374151' },
           { label: 'Member', count: customers.filter(c => c.tier === 'Member').length, bg: '#E8F5EC', color: '#2D6A4F' },
+          { label: 'Blacklist', count: customers.filter(c => c.tier === 'Blacklist').length, bg: '#FEE2E2', color: '#991B1B' },
         ].map((card) => (
           <div key={card.label} className="rounded-xl p-3 md:p-4 flex flex-col xl:flex-row items-center xl:items-start gap-2 md:gap-3 text-center xl:text-left"
             style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>

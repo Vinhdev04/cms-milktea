@@ -13,6 +13,7 @@ import { SystemSettings } from "./pages/SystemSettings";
 import { AuditLog } from "./pages/AuditLog";
 import { Auth } from "./pages/Auth";
 import { MediaLibrary } from "./pages/MediaLibrary";
+import { ReviewManagement } from "./pages/ReviewManagement";
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
       { path: "media", Component: MediaLibrary },
       { path: "branches", Component: BranchManagement },
       { path: "staff", Component: StaffManagement },
+      { path: "reviews", Component: ReviewManagement },
       { path: "settings", Component: SystemSettings },
       { path: "audit-log", Component: AuditLog },
     ],

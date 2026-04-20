@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Tag, Copy, X, CheckCircle2, Clock, AlertCircle, Loader2, Ticket } from "lucide-react";
+import { toast } from "sonner";
 import { vouchers } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -15,26 +16,34 @@ function VoucherForm({ onClose }: VoucherFormProps) {
   const [discountType, setDiscountType] = useState<'percent' | 'fixed'>('percent');
   const [isBatch, setIsBatch] = useState(false);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.35)' }}>
-      <div className="w-full max-w-md rounded-2xl overflow-hidden"
-        style={{ background: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxHeight: '90vh', overflowY: 'auto' }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.35)' }} onClick={onClose}>
+      <div className="w-full max-w-md rounded-2xl overflow-hidden flex flex-col"
+        style={{ background: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxHeight: '90vh' }}
+        onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>
             Tạo Voucher mới
           </h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16} style={{ color: '#6B9080' }} /></button>
         </div>
-        <div className="px-5 py-5 space-y-4">
+        <div className="px-5 py-5 space-y-4 overflow-y-auto flex-1">
           {/* Batch toggle */}
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" checked={!isBatch} onChange={() => setIsBatch(false)} className="accent-[#2D6A4F]" />
-              <span style={{ fontSize: '13px', color: '#1A1A1A' }}>Tạo 1 mã cụ thể</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" checked={isBatch} onChange={() => setIsBatch(true)} className="accent-[#2D6A4F]" />
-              <span style={{ fontSize: '13px', color: '#1A1A1A' }}>Tạo hàng loạt (Batch)</span>
-            </label>
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" checked={!isBatch} onChange={() => setIsBatch(false)} className="accent-[#2D6A4F]" />
+                <span style={{ fontSize: '13px', color: '#1A1A1A', fontWeight: 500 }}>Tạo 1 mã cụ thể</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" checked={isBatch} onChange={() => setIsBatch(true)} className="accent-[#2D6A4F]" />
+                <span style={{ fontSize: '13px', color: '#1A1A1A', fontWeight: 500 }}>Tạo hàng loạt (Batch)</span>
+              </label>
+            </div>
+            <p style={{ fontSize: '11.5px', color: '#6B9080', lineHeight: 1.4, marginBottom: '8px' }}>
+              {isBatch 
+                ? "Tạo nhiều mã ngẫu nhiên có cùng Tiền tố (VD: SUM-A1B2, SUM-X9Y8). Thích hợp để in thẻ cào, phát cho từng khách hàng cụ thể để họ chỉ dùng 1 lần." 
+                : "Tạo 1 mã duy nhất (VD: SUMMER2026). Thích hợp cho các chiến dịch public, ai cũng có thể nhập mã này để dùng."}
+            </p>
           </div>
 
           {/* Code */}
@@ -129,10 +138,15 @@ function VoucherForm({ onClose }: VoucherFormProps) {
             </div>
           </div>
         </div>
-        <div className="px-5 py-4 border-t flex gap-3" style={{ borderColor: '#E0EDE6' }}>
+        <div className="px-5 py-4 border-t flex gap-3 flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border text-sm"
             style={{ borderColor: '#E0EDE6', color: '#6B9080', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Hủy</button>
-          <button className="flex-1 py-2.5 rounded-xl text-sm"
+          <button 
+            onClick={() => {
+              toast.success('Đã tạo Voucher thành công!');
+              onClose();
+            }}
+            className="flex-1 py-2.5 rounded-xl text-sm transition-all hover:opacity-90"
             style={{ background: '#2D6A4F', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
             Tạo Voucher
           </button>
@@ -158,17 +172,20 @@ export function VoucherManagement() {
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {showForm && <VoucherForm onClose={() => setShowForm(false)} />}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-start justify-between mb-6">
         <div>
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
             Voucher & Ưu đãi
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#6B9080' }}>{vouchers.filter(v => v.status === 'active').length} voucher đang hoạt động</p>
+          <p style={{ fontSize: '13.5px', color: '#6B9080', marginTop: '4px' }}>
+            Quản lý các mã giảm giá cho khách hàng. Hệ thống tự động áp dụng ưu đãi khi khách nhập mã lúc thanh toán.
+            Hiện có <strong>{vouchers.filter(v => v.status === 'active').length}</strong> voucher đang hoạt động.
+          </p>
         </div>
         <button onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl flex-shrink-0"
           style={{ background: '#2D6A4F', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
-          <Plus size={16} /> Tạo Voucher
+          <Plus size={16} /> Tạo Voucher mới
         </button>
       </div>
 
