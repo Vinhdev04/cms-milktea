@@ -193,12 +193,14 @@ export function VoucherManagement() {
                 </div>
 
                 {/* Copy button */}
-                <button onClick={() => copyCode(v.code)}
-                  className="absolute bottom-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                  style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontSize: '12px', color: isExpired ? '#6B7280' : '#2D6A4F', fontWeight: 600 }}>
-                  {copiedCode === v.code ? <CheckCircle2 size={14} style={{ color: '#166534' }} /> : <Copy size={14} />}
-                  {copiedCode === v.code ? 'Đã chép' : 'Sao chép mã'}
-                </button>
+                <div className="relative z-10 mt-4 flex justify-end">
+                  <button onClick={() => copyCode(v.code)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                    style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontSize: '12px', color: isExpired ? '#6B7280' : '#2D6A4F', fontWeight: 600 }}>
+                    {copiedCode === v.code ? <CheckCircle2 size={14} style={{ color: '#166534' }} /> : <Copy size={14} />}
+                    {copiedCode === v.code ? 'Đã chép' : 'Sao chép mã'}
+                  </button>
+                </div>
               </div>
 
               {/* Dashed divider with ticket cutouts */}
