@@ -13,6 +13,7 @@ interface VoucherFormProps {
 
 function VoucherForm({ onClose }: VoucherFormProps) {
   const [discountType, setDiscountType] = useState<'percent' | 'fixed'>('percent');
+  const [isBatch, setIsBatch] = useState(false);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.35)' }}>
       <div className="w-full max-w-md rounded-2xl overflow-hidden"
@@ -24,17 +25,42 @@ function VoucherForm({ onClose }: VoucherFormProps) {
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16} style={{ color: '#6B9080' }} /></button>
         </div>
         <div className="px-5 py-5 space-y-4">
-          {/* Code */}
-          <div>
-            <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
-              Mã voucher *
+          {/* Batch toggle */}
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="radio" checked={!isBatch} onChange={() => setIsBatch(false)} className="accent-[#2D6A4F]" />
+              <span style={{ fontSize: '13px', color: '#1A1A1A' }}>Tạo 1 mã cụ thể</span>
             </label>
-            <input placeholder="VD: SUMMER2026" className="w-full px-4 rounded-xl border outline-none transition-all uppercase"
-              style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px', fontFamily: "'Be Vietnam Pro', sans-serif", letterSpacing: '0.05em' }}
-              onFocus={(e) => { e.target.style.borderColor = '#A8D5BA'; }}
-              onBlur={(e) => { e.target.style.borderColor = '#E0EDE6'; }}
-            />
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="radio" checked={isBatch} onChange={() => setIsBatch(true)} className="accent-[#2D6A4F]" />
+              <span style={{ fontSize: '13px', color: '#1A1A1A' }}>Tạo hàng loạt (Batch)</span>
+            </label>
           </div>
+
+          {/* Code */}
+          {!isBatch ? (
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+                Mã voucher *
+              </label>
+              <input placeholder="VD: SUMMER2026" className="w-full px-4 rounded-xl border outline-none transition-all uppercase"
+                style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px', fontFamily: "'Be Vietnam Pro', sans-serif", letterSpacing: '0.05em' }}
+                onFocus={(e) => { e.target.style.borderColor = '#A8D5BA'; }}
+                onBlur={(e) => { e.target.style.borderColor = '#E0EDE6'; }}
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Tiền tố mã (Prefix)</label>
+                <input placeholder="VD: SUM" className="w-full px-4 rounded-xl border outline-none uppercase" style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Số lượng mã</label>
+                <input placeholder="100" type="number" className="w-full px-4 rounded-xl border outline-none" style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} />
+              </div>
+            </div>
+          )}
           {/* Name */}
           <div>
             <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>

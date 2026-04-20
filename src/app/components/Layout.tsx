@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router";
 import {
   LayoutDashboard, ShoppingBag, Layers, ClipboardList, Users,
   Tag, BarChart3, MapPin, UserCheck, Settings, Menu, X, Bell,
-  ChevronDown, LogOut, Search, Coffee, ShieldAlert
+  ChevronDown, LogOut, Search, Coffee, ShieldAlert, Image
 } from "lucide-react";
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { path: "/customers", label: "Khách hàng", icon: Users },
   { path: "/vouchers", label: "Voucher & Ưu đãi", icon: Tag },
   { path: "/reports", label: "Báo cáo", icon: BarChart3 },
+  { path: "/media", label: "Thư viện Media", icon: Image },
   { path: "/branches", label: "Chi nhánh", icon: MapPin },
   { path: "/staff", label: "Nhân viên", icon: UserCheck },
   { path: "/audit-log", label: "Audit Log", icon: ShieldAlert },

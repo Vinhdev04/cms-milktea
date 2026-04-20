@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Edit2, Trash2, Eye, Filter, X, Star, Package, Loader2, PackageX } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Eye, Filter, X, Star, Package, Loader2, PackageX, List, Settings2 } from "lucide-react";
 import { products } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -39,8 +39,6 @@ function ProductForm({ product, onClose }: ProductFormProps) {
           {[
             { label: 'Tên sản phẩm', placeholder: 'VD: Trà Sữa Trân Châu Hoàng Kim', defaultValue: product?.name || '' },
             { label: 'Danh mục', placeholder: 'Chọn danh mục', defaultValue: product?.category || '' },
-            { label: 'Giá bán', placeholder: 'VD: 55000', defaultValue: product?.price?.toString() || '' },
-            { label: 'Giá khuyến mãi', placeholder: 'Để trống nếu không có', defaultValue: product?.salePrice?.toString() || '' },
           ].map((field) => (
             <div key={field.label}>
               <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
@@ -54,6 +52,37 @@ function ProductForm({ product, onClose }: ProductFormProps) {
               />
             </div>
           ))}
+
+          {/* Size Pricing */}
+          <div>
+            <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+              Mức giá theo Size (đ)
+            </label>
+            <div className="space-y-2">
+              {['S', 'M', 'L'].map((size, idx) => (
+                <div key={size} className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold flex-shrink-0" 
+                    style={{ background: '#F8FAF9', border: '1px solid #E0EDE6', color: '#2D6A4F', fontSize: '14px' }}>
+                    {size}
+                  </div>
+                  <input placeholder={`Giá bán`} 
+                    defaultValue={idx === 1 ? product?.price?.toString() : ''}
+                    className="flex-1 px-3 rounded-xl border outline-none transition-all"
+                    style={{ height: '40px', borderColor: '#E0EDE6', fontSize: '13px' }}
+                    onFocus={(e) => e.target.style.borderColor = '#A8D5BA'}
+                    onBlur={(e) => e.target.style.borderColor = '#E0EDE6'}
+                  />
+                  <input placeholder={`Khuyến mãi`} 
+                    defaultValue={idx === 1 ? product?.salePrice?.toString() : ''}
+                    className="flex-1 px-3 rounded-xl border outline-none transition-all"
+                    style={{ height: '40px', borderColor: '#E0EDE6', fontSize: '13px' }}
+                    onFocus={(e) => e.target.style.borderColor = '#A8D5BA'}
+                    onBlur={(e) => e.target.style.borderColor = '#E0EDE6'}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
           <div>
             <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
               Badge / Nhãn
@@ -130,21 +159,116 @@ export function MenuManagement() {
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {showForm && <ProductForm product={editProduct} onClose={() => { setShowForm(false); setEditProduct(null); }} />}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
             Quản lý Menu
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#6B9080' }}>{products.length} sản phẩm trong thực đơn</p>
+          <p style={{ fontSize: '13.5px', color: '#6B9080' }}>Thiết lập sản phẩm, danh mục và thuộc tính</p>
         </div>
         <button onClick={() => { setEditProduct(null); setShowForm(true); }}
           className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all w-full sm:w-auto"
           style={{ background: '#2D6A4F', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
-          <Plus size={16} /> Thêm sản phẩm
+          <Plus size={16} /> Thêm mới
         </button>
       </div>
 
-      {/* Filters */}
+      {/* Main Tabs */}
+      <div className="flex gap-6 mb-6 border-b" style={{ borderColor: '#E0EDE6' }}>
+        {[
+          { id: 'Tất cả', label: 'Sản phẩm', icon: <Package size={16} /> },
+          { id: 'categories', label: 'Danh mục', icon: <List size={16} /> },
+          { id: 'attributes', label: 'Thuộc tính', icon: <Settings2 size={16} /> },
+        ].map(t => (
+          <button key={t.id} onClick={() => setActiveCategory(t.id)}
+            className="flex items-center gap-2 pb-3 transition-all relative"
+            style={{ 
+              color: (activeCategory === t.id || (activeCategory !== 'categories' && activeCategory !== 'attributes' && t.id === 'Tất cả')) ? '#2D6A4F' : '#6B9080',
+              fontWeight: (activeCategory === t.id || (activeCategory !== 'categories' && activeCategory !== 'attributes' && t.id === 'Tất cả')) ? 600 : 500,
+              fontSize: '14px' 
+            }}>
+            {t.icon} {t.label}
+            {(activeCategory === t.id || (activeCategory !== 'categories' && activeCategory !== 'attributes' && t.id === 'Tất cả')) && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full bg-[#2D6A4F]" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Categories View */}
+      {activeCategory === 'categories' && (
+        <div className="rounded-xl overflow-hidden border bg-white" style={{ borderColor: '#E0EDE6' }}>
+          <table className="w-full text-left">
+            <thead>
+              <tr style={{ background: '#E8F5EC' }}>
+                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Tên Danh mục</th>
+                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Số lượng SP</th>
+                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Trạng thái</th>
+                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.filter(c => c !== 'Tất cả').map((c, i) => (
+                <tr key={i} className="border-b" style={{ borderColor: '#F0F7F3' }}>
+                  <td className="px-5 py-3.5" style={{ fontSize: '14px', fontWeight: 600, color: '#1A1A1A' }}>{c}</td>
+                  <td className="px-5 py-3.5" style={{ fontSize: '13px', color: '#6B9080' }}>
+                    {products.filter(p => p.category === c).length} sản phẩm
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#DCFCE7] text-[#166534]">Hiển thị</span>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <button className="p-1.5 rounded-lg border hover:bg-gray-50 mr-2" style={{ borderColor: '#E0EDE6' }}><Edit2 size={14} style={{ color: '#2D6A4F' }} /></button>
+                    <button className="p-1.5 rounded-lg border hover:bg-pink-50" style={{ borderColor: '#FCBABD' }}><Trash2 size={14} style={{ color: '#8B3A4A' }} /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Attributes View */}
+      {activeCategory === 'attributes' && (
+        <div className="rounded-xl overflow-hidden border bg-white" style={{ borderColor: '#E0EDE6' }}>
+          <table className="w-full text-left">
+            <thead>
+              <tr style={{ background: '#E8F5EC' }}>
+                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Tên Thuộc tính</th>
+                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Các lựa chọn</th>
+                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Bắt buộc</th>
+                <th className="px-5 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { name: 'Mức đường', options: ['0%', '30%', '50%', '70%', '100%'], required: true },
+                { name: 'Mức đá', options: ['Không đá', 'Đá riêng', 'Ít đá', 'Đá bình thường'], required: true },
+                { name: 'Kích cỡ', options: ['Size S', 'Size M', 'Size L'], required: true },
+              ].map((a, i) => (
+                <tr key={i} className="border-b" style={{ borderColor: '#F0F7F3' }}>
+                  <td className="px-5 py-3.5" style={{ fontSize: '14px', fontWeight: 600, color: '#1A1A1A' }}>{a.name}</td>
+                  <td className="px-5 py-3.5 flex flex-wrap gap-1.5">
+                    {a.options.map(o => <span key={o} className="px-2 py-0.5 rounded border text-xs" style={{ borderColor: '#E0EDE6', color: '#6B9080' }}>{o}</span>)}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#DCFCE7] text-[#166534]">Có</span>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <button className="p-1.5 rounded-lg border hover:bg-gray-50 mr-2" style={{ borderColor: '#E0EDE6' }}><Edit2 size={14} style={{ color: '#2D6A4F' }} /></button>
+                    <button className="p-1.5 rounded-lg border hover:bg-pink-50" style={{ borderColor: '#FCBABD' }}><Trash2 size={14} style={{ color: '#8B3A4A' }} /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Products View */}
+      {activeCategory !== 'categories' && activeCategory !== 'attributes' && (
+        <>
+          {/* Filters */}
       <div className="flex items-center gap-3 mb-5 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />

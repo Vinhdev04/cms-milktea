@@ -1,189 +1,118 @@
 import { useState } from "react";
-import {
-  AreaChart, Area, BarChart, Bar, LineChart, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
-} from "recharts";
-import { TrendingUp, ShoppingBag, Users, ArrowUpRight } from "lucide-react";
-import { revenueData, weeklyData } from "../data/mockData";
-
-const formatVND = (v: number) => new Intl.NumberFormat('vi-VN').format(v) + 'đ';
-const formatShort = (v: number) => {
-  if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`;
-  if (v >= 1000) return `${(v / 1000).toFixed(0)}K`;
-  return v.toString();
-};
-
-const topProducts = [
-  { name: 'Trà Sữa Trân Châu Hoàng Kim', sold: 1248, revenue: 68640000, trend: '+12%' },
-  { name: 'Ô Long Trân Châu Nướng', sold: 897, revenue: 51129000, trend: '+8%' },
-  { name: 'Matcha Đào Kem Cheese', sold: 986, revenue: 51272000, trend: '+21%' },
-  { name: 'Cà Phê Muối Kem Béo', sold: 623, revenue: 36757000, trend: '+5%' },
-  { name: 'Hồng Trà Vải Thiều', sold: 754, revenue: 37700000, trend: '-2%' },
-];
-
-const branchRevenue = [
-  { branch: 'Q.1', revenue: 28500000, orders: 213 },
-  { branch: 'Q.3', revenue: 21000000, orders: 157 },
-  { branch: 'Q.7', revenue: 24300000, orders: 182 },
-  { branch: 'B.Thạnh', revenue: 18700000, orders: 140 },
-  { branch: 'T.Đức', revenue: 32000000, orders: 240 },
-];
-
-const periods = ['Tuần này', 'Tháng này', 'Quý 1/2026', 'Năm 2025'];
+import { Download, Calendar, TrendingUp, ShoppingBag, Users, ChevronDown, DollarSign } from "lucide-react";
 
 export function Reports() {
-  const [period, setPeriod] = useState('Tháng này');
-
-  const kpis = [
-    { label: 'Tổng doanh thu', value: '726.500.000đ', change: '+18.4%', up: true, icon: TrendingUp, bg: '#E8F5EC', iconBg: '#A8D5BA', iconColor: '#2D6A4F' },
-    { label: 'Tổng đơn hàng', value: '5.421', change: '+11.2%', up: true, icon: ShoppingBag, bg: '#EFF6FF', iconBg: '#BFDBFE', iconColor: '#1E40AF' },
-    { label: 'Khách hàng mới', value: '312', change: '+6.8%', up: true, icon: Users, bg: '#FEF9C3', iconBg: '#FDE68A', iconColor: '#92400E' },
-    { label: 'Giá trị TB/đơn', value: '134.000đ', change: '+2.1%', up: true, icon: ArrowUpRight, bg: '#FFF0F3', iconBg: '#FCBABD', iconColor: '#8B3A4A' },
-  ];
+  const [timeRange, setTimeRange] = useState('Tháng này');
 
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
             Báo cáo & Thống kê
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#6B9080' }}>Phân tích kinh doanh SMYOU MilkTea</p>
+          <p style={{ fontSize: '13.5px', color: '#6B9080' }}>Phân tích hiệu quả kinh doanh của hệ thống</p>
         </div>
-        <div className="flex rounded-xl overflow-x-auto border w-full md:w-auto hide-scrollbar" style={{ borderColor: '#E0EDE6' }}>
-          {periods.map((p) => (
-            <button key={p} onClick={() => setPeriod(p)}
-              className="px-3.5 py-2 text-sm transition-all whitespace-nowrap flex-1 md:flex-none"
-              style={{
-                background: period === p ? '#2D6A4F' : 'white',
-                color: period === p ? 'white' : '#6B9080',
-                fontFamily: "'Be Vietnam Pro', sans-serif",
-                fontWeight: period === p ? 600 : 400,
-                borderRight: '1px solid #E0EDE6'
-              }}>
-              {p}
-            </button>
-          ))}
+        <div className="flex gap-3">
+          {/* Time Filter */}
+          <div className="relative">
+            <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)}
+              className="appearance-none pl-10 pr-8 py-2.5 rounded-xl border outline-none font-medium"
+              style={{ background: 'white', borderColor: '#E0EDE6', color: '#1A1A1A', fontSize: '13.5px' }}>
+              {['Hôm nay', 'Tuần này', 'Tháng này', 'Năm nay'].map(t => <option key={t}>{t}</option>)}
+            </select>
+            <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#6B9080' }} />
+            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#6B9080' }} />
+          </div>
+
+          {/* Export Button */}
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all"
+            style={{ background: '#2D6A4F', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
+            <Download size={16} /> Xuất File
+          </button>
         </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {kpis.map((k, i) => (
-          <div key={i} className="rounded-xl p-5"
-            style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: k.iconBg }}>
-                <k.icon size={20} style={{ color: k.iconColor }} />
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {[
+          { label: 'Doanh thu tổng', value: '124.500.000đ', diff: '+15.2%', isUp: true, icon: DollarSign, bg: '#DCFCE7', color: '#166534' },
+          { label: 'Số đơn hàng', value: '1,420', diff: '+5.4%', isUp: true, icon: ShoppingBag, bg: '#EFF6FF', color: '#1E40AF' },
+          { label: 'Khách hàng mới', value: '384', diff: '-2.1%', isUp: false, icon: Users, bg: '#FEF3C7', color: '#92400E' },
+          { label: 'Tỉ lệ chuyển đổi', value: '4.2%', diff: '+1.2%', isUp: true, icon: TrendingUp, bg: '#F3E8FF', color: '#6B21A8' },
+        ].map((card, i) => (
+          <div key={i} className="rounded-xl p-5" style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: card.bg, color: card.color }}>
+                <card.icon size={20} />
               </div>
-              <span className="text-xs px-2 py-1 rounded-full"
-                style={{ background: '#DCFCE7', color: '#166534', fontSize: '11px', fontWeight: 600 }}>
-                {k.change}
+              <span className="px-2 py-1 rounded-md text-xs font-bold"
+                style={{ background: card.isUp ? '#DCFCE7' : '#FEE2E2', color: card.isUp ? '#166534' : '#991B1B' }}>
+                {card.diff}
               </span>
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{k.value}</div>
-            <div style={{ fontSize: '12.5px', color: '#6B9080', marginTop: '2px' }}>{k.label}</div>
+            <div style={{ fontSize: '13px', color: '#6B9080', marginBottom: '4px' }}>{card.label}</div>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '24px', fontWeight: 800, color: '#1A1A1A' }}>
+              {card.value}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Charts Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        {/* Monthly Revenue */}
-        <div className="rounded-xl p-5"
-          style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 600, color: '#1A1A1A', marginBottom: '4px' }}>
-            Doanh thu theo tháng
-          </h2>
-          <p style={{ fontSize: '12px', color: '#6B9080', marginBottom: '16px' }}>Năm 2025 — 2026</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={revenueData}>
-              <defs>
-                <linearGradient id="revGrad2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#A8D5BA" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#A8D5BA" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9CA3AF', fontFamily: "'Be Vietnam Pro'" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#9CA3AF', fontFamily: "'Be Vietnam Pro'" }} axisLine={false} tickLine={false} tickFormatter={formatShort} width={38} />
-              <Tooltip contentStyle={{ borderRadius: '10px', border: '1px solid #E0EDE6', fontSize: '12px', fontFamily: "'Be Vietnam Pro'" }}
-                formatter={(v: number) => [formatVND(v), 'Doanh thu']} />
-              <Area type="monotone" dataKey="revenue" stroke="#2D6A4F" strokeWidth={2} fill="url(#revGrad2)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Weekly Orders Bar */}
-        <div className="rounded-xl p-5"
-          style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 600, color: '#1A1A1A', marginBottom: '4px' }}>
-            Đơn hàng theo ngày trong tuần
-          </h2>
-          <p style={{ fontSize: '12px', color: '#6B9080', marginBottom: '16px' }}>Tuần 17 tháng 04/2026</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={weeklyData} barSize={28}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" vertical={false} />
-              <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#9CA3AF', fontFamily: "'Be Vietnam Pro'" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#9CA3AF', fontFamily: "'Be Vietnam Pro'" }} axisLine={false} tickLine={false} width={30} />
-              <Tooltip contentStyle={{ borderRadius: '10px', border: '1px solid #E0EDE6', fontSize: '12px', fontFamily: "'Be Vietnam Pro'" }}
-                formatter={(v: number) => [v, 'Đơn hàng']} />
-              <Bar dataKey="orders" fill="#A8D5BA" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Branch Revenue + Top Products */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Branch */}
-        <div className="rounded-xl p-5"
-          style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 600, color: '#1A1A1A', marginBottom: '16px' }}>
-            Doanh thu theo chi nhánh
-          </h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={branchRevenue} layout="vertical" barSize={16}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={formatShort} />
-              <YAxis type="category" dataKey="branch" tick={{ fontSize: 12, fill: '#6B9080', fontFamily: "'Be Vietnam Pro'" }} axisLine={false} tickLine={false} width={50} />
-              <Tooltip contentStyle={{ borderRadius: '10px', border: '1px solid #E0EDE6', fontSize: '12px', fontFamily: "'Be Vietnam Pro'" }}
-                formatter={(v: number) => [formatVND(v), 'Doanh thu']} />
-              <Bar dataKey="revenue" fill="#2D6A4F" radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Top Products */}
-        <div className="rounded-xl overflow-hidden"
-          style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <div className="px-5 py-4 border-b" style={{ borderColor: '#E0EDE6' }}>
-            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 600, color: '#1A1A1A' }}>
-              Top sản phẩm bán chạy
-            </h2>
+      {/* Main Charts & Lists Area */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Left Column (Revenue Chart Placeholder) */}
+        <div className="lg:col-span-2 rounded-xl p-6" style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A' }}>Biểu đồ Doanh thu</h2>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#2D6A4F]"></div><span style={{ fontSize: '12px', color: '#6B9080' }}>Doanh thu</span></div>
+              <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#A8D5BA]"></div><span style={{ fontSize: '12px', color: '#6B9080' }}>Chi phí</span></div>
+            </div>
           </div>
-          <div className="divide-y" style={{ borderColor: '#F0F7F3' }}>
-            {topProducts.map((p, i) => (
-              <div key={i} className="flex items-center px-5 py-3.5 gap-3 hover:bg-gray-50 transition-colors">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: i < 3 ? '#A8D5BA' : '#F3F4F6', color: i < 3 ? '#1B4332' : '#6B7280', fontSize: '12px', fontWeight: 700 }}>
-                  {i + 1}
+          
+          {/* Mock Chart Area */}
+          <div className="h-[300px] flex items-end justify-between gap-2 border-b border-l pb-2 pl-2" style={{ borderColor: '#E0EDE6' }}>
+            {[30, 45, 25, 60, 75, 40, 85, 55, 90, 65, 80, 100].map((val, i) => (
+              <div key={i} className="flex-1 flex flex-col justify-end items-center gap-1 group relative">
+                <div className="w-full bg-[#2D6A4F] rounded-t-sm transition-all duration-300 hover:opacity-80" style={{ height: `${val}%` }}></div>
+                <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-[10px] px-2 py-1 rounded">
+                  {val}M
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }} className="truncate">{p.name}</div>
-                  <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{p.sold.toLocaleString()} đã bán · {formatVND(p.revenue)}</div>
-                </div>
-                <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                  style={{
-                    background: p.trend.startsWith('+') ? '#DCFCE7' : '#FEE2E2',
-                    color: p.trend.startsWith('+') ? '#166534' : '#991B1B'
-                  }}>
-                  {p.trend}
-                </span>
+                <span style={{ fontSize: '10px', color: '#9CA3AF' }}>T{i+1}</span>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Right Column (Top Products) */}
+        <div className="rounded-xl p-6" style={{ background: 'white', border: '0.5px solid #E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '16px', fontWeight: 700, color: '#1A1A1A', mb: '16px' }} className="mb-6">Sản phẩm bán chạy</h2>
+          <div className="space-y-5">
+            {[
+              { name: 'Trà Sữa Trân Châu', sold: 450, total: '22.5M', percent: 85 },
+              { name: 'Trà Đào Cam Sả', sold: 320, total: '14.4M', percent: 65 },
+              { name: 'Cà Phê Sữa Đá', sold: 280, total: '8.4M', percent: 55 },
+              { name: 'Trà Oolong Macchiato', sold: 210, total: '11.5M', percent: 45 },
+              { name: 'Hồng Trà Sữa', sold: 150, total: '6.0M', percent: 30 },
+            ].map((p, i) => (
+              <div key={i}>
+                <div className="flex justify-between items-center mb-2">
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#1A1A1A' }}>{p.name}</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#2D6A4F' }}>{p.total}</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-2 rounded-full" style={{ background: '#F3F4F6' }}>
+                    <div className="h-full rounded-full" style={{ background: '#2D6A4F', width: `${p.percent}%` }}></div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#6B9080', minWidth: '50px', textAlign: 'right' }}>{p.sold} ly</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );

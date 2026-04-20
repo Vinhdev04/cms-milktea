@@ -1,0 +1,182 @@
+import { useState } from "react";
+import { UploadCloud, Image as ImageIcon, Copy, Trash2, Search, Filter, FolderPlus, Download, CheckCircle2 } from "lucide-react";
+
+// Mock Data for Media
+const initialMedia = [
+  { id: '1', name: 'banner-summer-2026.jpg', type: 'banner', size: '2.4 MB', dimensions: '1920x1080', date: '20/04/2026', url: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=800&q=80' },
+  { id: '2', name: 'tra-sua-tran-chau.png', type: 'product', size: '1.2 MB', dimensions: '800x800', date: '19/04/2026', url: 'https://images.unsplash.com/photo-1558857563-b371034e78b1?w=400&q=80' },
+  { id: '3', name: 'tra-trai-cay-nhiet-doi.png', type: 'product', size: '1.5 MB', dimensions: '800x800', date: '19/04/2026', url: 'https://images.unsplash.com/photo-1582285150550-9f5e3d7f45c8?w=400&q=80' },
+  { id: '4', name: 'icon-sale.svg', type: 'icon', size: '45 KB', dimensions: '128x128', date: '18/04/2026', url: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&q=80' },
+  { id: '5', name: 'banner-khai-truong.jpg', type: 'banner', size: '3.1 MB', dimensions: '1920x1080', date: '15/04/2026', url: 'https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?w=800&q=80' },
+  { id: '6', name: 'ca-phe-sua-da.jpg', type: 'product', size: '1.8 MB', dimensions: '800x800', date: '10/04/2026', url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400&q=80' },
+];
+
+export function MediaLibrary() {
+  const [activeTab, setActiveTab] = useState('all');
+  const [search, setSearch] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const tabs = [
+    { id: 'all', label: 'Tất cả file' },
+    { id: 'product', label: 'Thức uống' },
+    { id: 'banner', label: 'Banner & Poster' },
+    { id: 'icon', label: 'Icon & Graphic' },
+  ];
+
+  const filteredMedia = initialMedia.filter(m => 
+    (activeTab === 'all' || m.type === activeTab) &&
+    m.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const copyUrl = (id: string, url: string) => {
+    navigator.clipboard.writeText(url);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  return (
+    <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }} className="flex flex-col h-full">
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
+        <div>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
+            Thư viện Media
+          </h1>
+          <p style={{ fontSize: '13.5px', color: '#6B9080' }}>Quản lý hình ảnh, video và tài liệu của hệ thống</p>
+        </div>
+        <div className="flex gap-3">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all hover:bg-gray-50"
+            style={{ borderColor: '#E0EDE6', color: '#1A1A1A', fontWeight: 600, fontSize: '13.5px' }}>
+            <FolderPlus size={16} /> Thêm thư mục
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all"
+            style={{ background: '#2D6A4F', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
+            <UploadCloud size={16} /> Tải lên File
+          </button>
+        </div>
+      </div>
+
+      <div className="flex gap-6 h-full min-h-0">
+        {/* Left Sidebar (Folders/Filters) */}
+        <div className="w-64 flex-shrink-0 flex flex-col gap-6">
+          {/* Upload Dropzone */}
+          <div className="border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer"
+            style={{ borderColor: isUploading ? '#2D6A4F' : '#A8D5BA', background: isUploading ? '#E8F5EC' : '#F8FAF9' }}
+            onDragOver={(e) => { e.preventDefault(); setIsUploading(true); }}
+            onDragLeave={() => setIsUploading(false)}
+            onDrop={(e) => { e.preventDefault(); setIsUploading(false); }}
+          >
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+              style={{ background: '#E8F5EC', color: '#2D6A4F' }}>
+              <UploadCloud size={24} />
+            </div>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A1A1A', marginBottom: '4px' }}>
+              Kéo thả file vào đây
+            </div>
+            <div style={{ fontSize: '12px', color: '#6B9080' }}>
+              hoặc click để chọn file (Max 5MB)
+            </div>
+          </div>
+
+          {/* Categories */}
+          <div>
+            <h3 style={{ fontSize: '12px', fontWeight: 700, color: '#6B9080', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+              Phân loại
+            </h3>
+            <div className="space-y-1">
+              {tabs.map(tab => (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all"
+                  style={{ 
+                    background: activeTab === tab.id ? '#E8F5EC' : 'transparent',
+                    color: activeTab === tab.id ? '#2D6A4F' : '#6B9080'
+                  }}>
+                  <div className="flex items-center gap-2">
+                    <ImageIcon size={16} />
+                    <span style={{ fontSize: '13.5px', fontWeight: activeTab === tab.id ? 600 : 500 }}>{tab.label}</span>
+                  </div>
+                  {activeTab === tab.id && <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#2D6A4F' }} />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Content (Gallery) */}
+        <div className="flex-1 flex flex-col bg-white rounded-2xl border overflow-hidden" style={{ borderColor: '#E0EDE6', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          {/* Toolbar */}
+          <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: '#E0EDE6' }}>
+            <div className="relative w-72">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
+              <input value={search} onChange={(e) => setSearch(e.target.value)}
+                placeholder="Tìm kiếm file..."
+                className="w-full pl-9 pr-4 rounded-xl border outline-none transition-all"
+                style={{ height: '40px', borderColor: '#E0EDE6', fontSize: '13.5px', background: '#F8FAF9' }}
+                onFocus={(e) => e.target.style.borderColor = '#A8D5BA'}
+                onBlur={(e) => e.target.style.borderColor = '#E0EDE6'}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span style={{ fontSize: '13px', color: '#6B9080' }}>Hiển thị {filteredMedia.length} file</span>
+              <button className="p-2 rounded-lg border hover:bg-gray-50 transition-colors" style={{ borderColor: '#E0EDE6', color: '#6B9080' }}>
+                <Filter size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Grid */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {filteredMedia.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: '#F8FAF9', color: '#9CA3AF' }}>
+                  <ImageIcon size={32} />
+                </div>
+                <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1A1A1A', marginBottom: '8px' }}>Trống</h3>
+                <p style={{ fontSize: '13.5px', color: '#6B9080' }}>Không tìm thấy file nào phù hợp.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {filteredMedia.map(m => (
+                  <div key={m.id} className="group relative rounded-xl overflow-hidden border transition-all hover:shadow-md" style={{ borderColor: '#E0EDE6' }}>
+                    {/* Image Thumbnail */}
+                    <div className="aspect-square bg-gray-100 relative overflow-hidden">
+                      <img src={m.url} alt={m.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                      
+                      {/* Overlay Actions */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button onClick={() => copyUrl(m.id, m.url)}
+                          className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform"
+                          title="Copy Link">
+                          {copiedId === m.id ? <CheckCircle2 size={16} style={{ color: '#166534' }} /> : <Copy size={16} style={{ color: '#1A1A1A' }} />}
+                        </button>
+                        <button className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform"
+                          title="Tải xuống">
+                          <Download size={16} style={{ color: '#1A1A1A' }} />
+                        </button>
+                        <button className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform"
+                          title="Xóa">
+                          <Trash2 size={16} style={{ color: '#991B1B' }} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Meta Info */}
+                    <div className="p-3 bg-white">
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#1A1A1A' }} className="truncate mb-1" title={m.name}>
+                        {m.name}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span style={{ fontSize: '11px', color: '#6B9080' }}>{m.size}</span>
+                        <span style={{ fontSize: '10px', color: '#9CA3AF' }}>{m.dimensions}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

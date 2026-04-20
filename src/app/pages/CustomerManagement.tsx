@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Eye, X, Award, ShoppingBag, TrendingUp, Users } from "lucide-react";
+import { Search, Eye, X, Award, ShoppingBag, TrendingUp, Users, Lock, Edit3 } from "lucide-react";
 import { customers } from "../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -29,6 +29,7 @@ interface CustomerDetailProps {
 }
 
 function CustomerDetail({ customer, onClose }: CustomerDetailProps) {
+  const [activeTab, setActiveTab] = useState<'info' | 'history'>('info');
   const tier = tierConfig[customer.tier] || tierConfig.Member;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.35)' }}>
@@ -69,21 +70,69 @@ function CustomerDetail({ customer, onClose }: CustomerDetailProps) {
             ))}
           </div>
 
-          {/* Info */}
-          <div className="px-5 py-4 space-y-3">
-            <h3 style={{ fontSize: '12px', fontWeight: 600, color: '#6B9080', letterSpacing: '0.05em' }}>THÔNG TIN TÀI KHOẢN</h3>
-            {[
-              { label: 'Email', value: customer.email },
-              { label: 'Ngày tham gia', value: customer.joinDate },
-              { label: 'Đơn hàng gần nhất', value: customer.lastOrder },
-              { label: 'Hạng thành viên', value: customer.tier },
-            ].map(item => (
-              <div key={item.label} className="flex justify-between py-2 border-b" style={{ borderColor: '#F0F7F3' }}>
-                <span style={{ fontSize: '13px', color: '#6B9080' }}>{item.label}</span>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{item.value}</span>
-              </div>
-            ))}
+          {/* Tabs */}
+          <div className="flex px-5 border-b mt-2" style={{ borderColor: '#E0EDE6' }}>
+            <button onClick={() => setActiveTab('info')} className={`py-3 mr-6 font-semibold text-[13px] relative ${activeTab === 'info' ? 'text-[#2D6A4F]' : 'text-[#6B9080]'}`}>
+              Thông tin chung
+              {activeTab === 'info' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2D6A4F]" />}
+            </button>
+            <button onClick={() => setActiveTab('history')} className={`py-3 font-semibold text-[13px] relative ${activeTab === 'history' ? 'text-[#2D6A4F]' : 'text-[#6B9080]'}`}>
+              Lịch sử đơn hàng
+              {activeTab === 'history' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2D6A4F]" />}
+            </button>
           </div>
+
+          {/* Info Tab */}
+          {activeTab === 'info' && (
+            <div className="px-5 py-4 space-y-6">
+              <div>
+                <h3 style={{ fontSize: '12px', fontWeight: 600, color: '#6B9080', letterSpacing: '0.05em', marginBottom: '12px' }}>THÔNG TIN TÀI KHOẢN</h3>
+                {[
+                  { label: 'Email', value: customer.email },
+                  { label: 'Ngày tham gia', value: customer.joinDate },
+                  { label: 'Đơn hàng gần nhất', value: customer.lastOrder },
+                  { label: 'Hạng thành viên', value: customer.tier },
+                ].map(item => (
+                  <div key={item.label} className="flex justify-between py-2 border-b" style={{ borderColor: '#F0F7F3' }}>
+                    <span style={{ fontSize: '13px', color: '#6B9080' }}>{item.label}</span>
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <h3 style={{ fontSize: '12px', fontWeight: 600, color: '#6B9080', letterSpacing: '0.05em', marginBottom: '12px' }}>THAO TÁC</h3>
+                <div className="space-y-3">
+                  <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all hover:bg-gray-50"
+                    style={{ borderColor: '#E0EDE6', color: '#1A1A1A', fontSize: '13.5px', fontWeight: 600 }}>
+                    <Edit3 size={16} style={{ color: '#2D6A4F' }} /> Điều chỉnh điểm thủ công
+                  </button>
+                  <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all hover:bg-pink-50"
+                    style={{ borderColor: '#FCBABD', color: '#8B3A4A', fontSize: '13.5px', fontWeight: 600 }}>
+                    <Lock size={16} /> Khóa tài khoản
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* History Tab */}
+          {activeTab === 'history' && (
+            <div className="px-5 py-4 space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="p-4 rounded-xl border" style={{ borderColor: '#E0EDE6', background: '#F8FAF9' }}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#1A1A1A' }}>#ORD-2412{i}00</span>
+                    <span style={{ fontSize: '12px', color: '#6B9080' }}>20/04/2026</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span style={{ fontSize: '13px', color: '#6B9080' }}>2 sản phẩm</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#2D6A4F' }}>125.000đ</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

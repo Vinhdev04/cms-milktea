@@ -12,6 +12,7 @@ import { StaffManagement } from "./pages/StaffManagement";
 import { SystemSettings } from "./pages/SystemSettings";
 import { AuditLog } from "./pages/AuditLog";
 import { Auth } from "./pages/Auth";
+import { MediaLibrary } from "./pages/MediaLibrary";
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { path: "customers", Component: CustomerManagement },
       { path: "vouchers", Component: VoucherManagement },
       { path: "reports", Component: Reports },
+      { path: "media", Component: MediaLibrary },
       { path: "branches", Component: BranchManagement },
       { path: "staff", Component: StaffManagement },
       { path: "settings", Component: SystemSettings },

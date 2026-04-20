@@ -54,6 +54,20 @@ function BranchForm({ branch, onClose }: BranchFormProps) {
               />
             </div>
           ))}
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Vĩ độ (Lat)</label>
+              <input placeholder="VD: 10.762622" className="w-full px-4 rounded-xl border outline-none transition-all" style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: '6px', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Kinh độ (Lng)</label>
+              <input placeholder="VD: 106.660172" className="w-full px-4 rounded-xl border outline-none transition-all" style={{ height: '44px', borderColor: '#E0EDE6', fontSize: '13.5px' }} />
+            </div>
+          </div>
+          {/* Map Preview Placeholder */}
+          <div className="w-full h-24 mt-2 rounded-xl border flex items-center justify-center bg-[#F8FAF9]" style={{ borderColor: '#E0EDE6' }}>
+            <span style={{ fontSize: '12px', color: '#9CA3AF' }} className="flex items-center gap-1"><MapPin size={14} /> Bản đồ hiển thị vị trí chi nhánh</span>
+          </div>
         </div>
         <div className="px-5 py-4 border-t flex gap-3" style={{ borderColor: '#E0EDE6' }}>
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border text-sm"
