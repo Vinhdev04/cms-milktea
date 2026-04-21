@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer, PackageX } from "lucide-react";
+import { showToast } from "../utils/toast";
 import { Logo } from "../components/Logo";
-import { orders } from "../data/mockData";
+import { orders } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
@@ -20,15 +21,16 @@ const formatVND = (v: number) => new Intl.NumberFormat('vi-VN').format(v) + 'đ'
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; icon: JSX.Element }> = {
   pending: { label: 'Chờ xử lý', bg: '#FEF3C7', color: '#92400E', icon: <Clock size={12} /> },
-  processing: { label: 'Đang pha chế', bg: '#FFF3E6', color: '#F58220', icon: <AlertCircle size={12} /> },
-  ready: { label: 'Sẵn sàng', bg: '#EFF6FF', color: '#1E40AF', icon: <Package size={12} /> },
+  confirmed: { label: 'Đã xác nhận', bg: '#EFF6FF', color: '#1E40AF', icon: <CheckCircle2 size={12} /> },
+  preparing: { label: 'Đang pha chế', bg: '#FFF3E6', color: '#F58220', icon: <AlertCircle size={12} /> },
+  ready: { label: 'Sẵn sàng', bg: '#E8F5E9', color: '#2E7D32', icon: <Package size={12} /> },
   completed: { label: 'Hoàn thành', bg: '#FFEDD5', color: '#9A3412', icon: <CheckCircle2 size={12} /> },
   cancelled: { label: 'Đã hủy', bg: '#FEE2E2', color: '#991B1B', icon: <XCircle size={12} /> },
 };
 
 const statusTabs = ['Tất cả', 'Chờ xử lý', 'Đang pha chế', 'Sẵn sàng', 'Hoàn thành', 'Đã hủy'];
 const statusMap: Record<string, string> = {
-  'Chờ xử lý': 'pending', 'Đang pha chế': 'processing', 'Sẵn sàng': 'ready',
+  'Chờ xử lý': 'pending', 'Đang pha chế': 'preparing', 'Sẵn sàng': 'ready',
   'Hoàn thành': 'completed', 'Đã hủy': 'cancelled'
 };
 
@@ -39,15 +41,21 @@ interface OrderDetailProps {
 
 function OrderDetail({ order, onClose }: OrderDetailProps) {
   const st = statusConfig[order.status];
-  const fakeItems = [
-    { name: 'Trà Sữa Trân Châu Hoàng Kim', size: 'L', sugar: '70%', ice: '50%', topping: 'Trân Châu Đen', qty: 1, price: 55000 },
-    { name: 'Matcha Đào Kem Cheese', size: 'M', sugar: '100%', ice: '100%', topping: 'Kem Cheese', qty: 1, price: 65000 },
-    { name: 'Hồng Trà Vải Thiều', size: 'L', sugar: '50%', ice: '0%', topping: '', qty: 1, price: 50000 },
-  ].slice(0, order.items);
+  const fakeItems = order.items.length > 0 ? order.items.map(item => ({
+    name: item.productName,
+    size: 'M',
+    sugar: '70%',
+    ice: '50%',
+    topping: '',
+    qty: item.quantity,
+    price: item.price,
+  })) : [
+    { name: 'Sản phẩm mẫu', size: 'M', sugar: '70%', ice: '50%', topping: '', qty: 1, price: order.total },
+  ];
 
   const timeline = [
     { label: 'Đặt hàng thành công', time: order.time, done: true },
-    { label: 'Xác nhận đơn hàng', time: `${parseInt(order.time.split(':')[0])}:${String(parseInt(order.time.split(':')[1]) + 3).padStart(2, '0')}`, done: ['processing', 'ready', 'completed'].includes(order.status) },
+    { label: 'Xác nhận đơn hàng', time: `${parseInt(order.time.split(':')[0])}:${String(parseInt(order.time.split(':')[1]) + 3).padStart(2, '0')}`, done: ['preparing', 'ready', 'completed'].includes(order.status) },
     { label: 'Đang pha chế', time: '', done: ['ready', 'completed'].includes(order.status) },
     { label: 'Hoàn thành', time: '', done: order.status === 'completed' },
   ];
@@ -61,7 +69,7 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
             <div className="p-3 rounded-2xl bg-white mb-2" style={{ border: '1px solid #FAF0E6' }}>
               <Logo size={50} />
             </div>
-            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '20px', fontWeight: 800, color: '#5D2E0F' }}>SMYOU MILKTEA</h1>
+            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '20px', fontWeight: 800, color: '#5D2E0F' }}>CHIPS MILKTEA</h1>
             <p style={{ fontSize: '13px', color: '#A0845C', fontWeight: 500 }}>Sweet moments for you</p>
             <div className="print-title">HÓA ĐƠN THANH TOÁN</div>
           </div>
@@ -161,11 +169,21 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
         {/* Actions */}
         {order.status === 'pending' && (
           <div className="px-5 py-4 border-t flex gap-3 no-print" style={{ borderColor: '#F0DCC8' }}>
-            <button className="flex-1 py-2.5 rounded-xl border text-sm font-semibold"
+            <button 
+              onClick={() => {
+                showToast.error(`Đã hủy đơn hàng ${order.id}`);
+                onClose();
+              }}
+              className="flex-1 py-2.5 rounded-xl border text-sm font-semibold"
               style={{ borderColor: '#FCBABD', color: '#8B3A4A', fontFamily: "'Be Vietnam Pro', sans-serif" }}>
               Hủy đơn
             </button>
-            <button className="flex-1 py-2.5 rounded-xl text-sm"
+            <button 
+              onClick={() => {
+                showToast.success(`Xác nhận đơn hàng ${order.id} thành công!`);
+                onClose();
+              }}
+              className="flex-1 py-2.5 rounded-xl text-sm"
               style={{ background: '#F58220', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
               Xác nhận
             </button>
@@ -214,10 +232,13 @@ export function OrderManagement() {
   const handleBulkPrint = () => {
     if (selectedOrderIds.length === 0) return;
     setIsBulkPrinting(true);
+    showToast.loading('Đang chuẩn bị in hàng loạt...');
     setTimeout(() => {
+      showToast.dismiss();
       window.print();
       setIsBulkPrinting(false);
-    }, 500);
+      showToast.success('Đã gửi lệnh in thành công!');
+    }, 1000);
   };
 
   return (
@@ -293,7 +314,7 @@ export function OrderManagement() {
             <div key={order.id} className="invoice-page bg-white p-8 max-w-md mx-auto border border-gray-200 my-4">
                <div className="flex flex-col items-center py-6 border-b" style={{ borderColor: '#F0DCC8' }}>
                   <Logo size={40} />
-                  <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#5D2E0F' }}>SMYOU MILKTEA</h1>
+                  <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '18px', fontWeight: 800, color: '#5D2E0F' }}>CHIPS MILKTEA</h1>
                   <p style={{ fontSize: '12px', color: '#A0845C', fontWeight: 500 }}>Sweet moments for you</p>
                 </div>
                 <div className="py-4 border-b" style={{ borderColor: '#F0DCC8' }}>
@@ -316,15 +337,15 @@ export function OrderManagement() {
                        </tr>
                      </thead>
                      <tbody>
-                       {[...Array(order.items)].map((_, i) => (
-                         <tr key={i} className="border-b border-gray-50 last:border-0">
-                           <td className="py-2">
-                             <div className="font-medium">Sản phẩm mẫu #{i+1}</div>
-                             <div className="text-xs text-gray-400">Size M · 50% Đường · 50% Đá</div>
-                           </td>
-                           <td className="py-2 text-right font-bold">{formatVND(order.total / order.items)}</td>
-                         </tr>
-                       ))}
+                        {order.items.map((item, i) => (
+                          <tr key={i} className="border-b border-gray-50 last:border-0">
+                            <td className="py-2">
+                              <div className="font-medium">{item.productName}</div>
+                              <div className="text-xs text-gray-400">x{item.quantity}</div>
+                            </td>
+                            <td className="py-2 text-right font-bold">{formatVND(item.price)}</td>
+                          </tr>
+                        ))}
                      </tbody>
                    </table>
                 </div>
@@ -333,7 +354,7 @@ export function OrderManagement() {
                   <span>{formatVND(order.total)}</span>
                 </div>
                 <div className="pt-8 text-center text-xs text-gray-400">
-                   Cảm ơn quý khách đã ủng hộ SMYOU MILKTEA!<br/>
+                   Cảm ơn quý khách đã ủng hộ CHIPS MILKTEA!<br/>
                    Hẹn gặp lại quý khách lần sau.
                 </div>
             </div>
@@ -368,26 +389,25 @@ export function OrderManagement() {
         ))}
       </div>
 
-      {/* Search bar */}
-      <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Tìm theo mã đơn, tên khách..."
-            className="w-full pl-9 pr-4 rounded-xl border outline-none"
-            style={{ height: '38px', borderColor: '#F0DCC8', fontSize: '13px', background: 'white' }}
+            className="w-full pl-9 pr-4 rounded-xl border outline-none shadow-sm"
+            style={{ height: '40px', borderColor: '#F0DCC8', fontSize: '13px', background: 'white' }}
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full sm:w-auto">
           {selectedOrderIds.length > 0 && (
-            <button onClick={handleBulkPrint} className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all"
+            <button onClick={handleBulkPrint} className="flex flex-1 items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm sm:flex-none"
               style={{ background: '#F58220', color: 'white' }}>
-              <Printer size={14} /> In ({selectedOrderIds.length})
+              <Printer size={14} /> <span className="whitespace-nowrap">In ({selectedOrderIds.length})</span>
             </button>
           )}
-          <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-sm flex-shrink-0"
+          <button className="flex flex-1 items-center justify-center gap-1.5 px-4 py-2 rounded-xl border text-sm transition-all hover:bg-gray-50 sm:flex-none"
             style={{ borderColor: '#F0DCC8', color: '#A0845C', background: 'white' }}>
-            <Filter size={14} /> Lọc
+            <Filter size={14} /> <span className="whitespace-nowrap">Lọc</span>
           </button>
         </div>
       </div>
@@ -430,7 +450,7 @@ export function OrderManagement() {
                   <span>·</span>
                   <span>{order.time}</span>
                   <span>·</span>
-                  <span>{order.items} món</span>
+                  <span>{Array.isArray(order.items) ? order.items.length : order.items} món</span>
                   <span>·</span>
                   <span>{order.payment}</span>
                 </div>
@@ -507,7 +527,7 @@ export function OrderManagement() {
                       </td>
                       <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#A0845C' }}>{order.branch}</span></td>
                       <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#A0845C' }}>{order.time}</span></td>
-                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#1A1A1A' }}>{order.items}</span></td>
+                      <td className="px-4 py-3.5"><span style={{ fontSize: '13px', color: '#A0845C' }}>{Array.isArray(order.items) ? order.items.length : order.items}</span></td>
                       <td className="px-4 py-3.5"><span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(order.total)}</span></td>
                       <td className="px-4 py-3.5"><span style={{ fontSize: '12px', color: '#A0845C' }}>{order.payment}</span></td>
                       <td className="px-4 py-3.5">

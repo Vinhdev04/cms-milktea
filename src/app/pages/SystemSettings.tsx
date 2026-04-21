@@ -44,7 +44,7 @@ export function SystemSettings() {
         <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
           Cấu hình hệ thống
         </h1>
-        <p style={{ fontSize: '13.5px', color: '#A0845C' }}>Quản lý và tùy chỉnh hệ thống SMYOU MilkTea CMS</p>
+        <p style={{ fontSize: '13.5px', color: '#A0845C' }}>Quản lý và tùy chỉnh hệ thống Chips MilkTea CMS</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -79,7 +79,7 @@ export function SystemSettings() {
                 </h2>
                 <div className="space-y-4">
                   {[
-                    { label: 'Tên thương hiệu', value: 'SMYOU MilkTea' },
+                    { label: 'Tên thương hiệu', value: 'Chips MilkTea' },
                     { label: 'Địa chỉ trụ sở', value: '123 Nguyễn Huệ, Q.1, TP.HCM' },
                     { label: 'Hotline', value: '1900 xxxx' },
                     { label: 'Email liên hệ', value: 'contact@smyou.vn' },

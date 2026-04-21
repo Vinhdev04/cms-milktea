@@ -1,15 +1,15 @@
 {
-  "name": "SMYOU MilkTea CMS",
-  "short_name": "MilkTea CMS",
+  "name": "Chips MilkTea CMS",
+  "short_name": "Chips CMS",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1B4332",
-  "theme_color": "#1B4332",
+  "background_color": "#FFFAF5",
+  "theme_color": "#F58220",
   "icons": [
     {
-      "src": "/logo.svg",
+      "src": "/chips-log.png",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }

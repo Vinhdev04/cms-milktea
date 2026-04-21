@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
 import {
   TrendingUp, ShoppingBag, Users, Store, ArrowUpRight, ArrowDownRight,
-  Clock, CheckCircle2, AlertCircle, XCircle, Eye, MoreHorizontal
+  Clock, CheckCircle2, AlertCircle, XCircle, Eye, MoreHorizontal, Info, Sparkles
 } from "lucide-react";
-import { revenueData, weeklyData, categoryData, orders } from "../data/mockData";
+import { revenueData, weeklyData, categoryData, orders } from "../../data/mockData";
 
 const formatCurrency = (value: number) => {
   if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
@@ -35,6 +35,7 @@ const statsCards = [
     bg: '#FFF3E6',
     iconBg: '#F5C088',
     iconColor: '#F58220',
+    hint: 'Tổng giá trị các đơn hàng đã được xác nhận thanh toán trong ngày hôm nay.'
   },
   {
     title: 'Đơn hàng hôm nay',
@@ -45,6 +46,7 @@ const statsCards = [
     bg: '#EFF6FF',
     iconBg: '#BFDBFE',
     iconColor: '#1E40AF',
+    hint: 'Số lượng đơn hàng được tạo tính từ 00:00 sáng đến thời điểm hiện tại.'
   },
   {
     title: 'Khách hàng mới',
@@ -55,6 +57,7 @@ const statsCards = [
     bg: '#FEF9C3',
     iconBg: '#FDE68A',
     iconColor: '#92400E',
+    hint: 'Số lượng tài khoản khách hàng mới đăng ký trong vòng 24 giờ qua.'
   },
   {
     title: 'Chi nhánh hoạt động',
@@ -65,32 +68,195 @@ const statsCards = [
     bg: '#FFF0F3',
     iconBg: '#FCBABD',
     iconColor: '#8B3A4A',
+    hint: 'Tỷ lệ chi nhánh đang mở cửa đón khách so với tổng số chi nhánh trên hệ thống.'
   },
 ];
 
 export function Dashboard() {
   const [chartPeriod, setChartPeriod] = useState<'weekly' | 'monthly'>('monthly');
 
+  // ─── COMPREHENSIVE SIDEBAR TOUR LOGIC (DRIVER.JS) ───
+  const runTour = () => {
+    const windowAny = window as any;
+    if (!windowAny.driver) return;
+
+    const driverObj = windowAny.driver.js.driver({
+      showProgress: true,
+      nextBtnText: 'Tiếp theo',
+      prevBtnText: 'Trước',
+      doneBtnText: 'Hoàn tất',
+      steps: [
+        { 
+          element: '#tour-admin-header', 
+          popover: { 
+            title: '👋 Chào mừng Admin!', 
+            description: 'Hãy để chúng tôi giới thiệu nhanh các phân hệ quản trị trên thanh công cụ bên trái nhé.',
+            side: "bottom", align: 'start' 
+          } 
+        },
+        { 
+            element: '#tour-side-dashboard', 
+            popover: { 
+              title: '📊 Dashboard', 
+              description: 'Trang tổng quan hiển thị các chỉ số kinh doanh, biểu đồ doanh thu và các đơn hàng mới nhất.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-menu', 
+            popover: { 
+              title: '🍔 Quản lý Thực đơn', 
+              description: 'Quản lý danh sách món, giá cả, danh mục và các nhóm Topping đi kèm.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-orders', 
+            popover: { 
+              title: '📋 Quản lý Đơn hàng', 
+              description: 'Theo dõi, xác nhận và cập nhật trạng thái đơn hàng (Chờ xử lý, Đang pha chế, Hoàn thành).',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-customers', 
+            popover: { 
+              title: '👥 Khách hàng', 
+              description: 'Xem danh sách khách hàng, lịch sử đặt hàng và quản lý thông tin thành viên.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-vouchers', 
+            popover: { 
+              title: '🎫 Voucher & Ưu đãi', 
+              description: 'Phát hành mã giảm giá, thiết lập chương trình khuyến mãi và quản lý thời hạn ưu đãi.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-reports', 
+            popover: { 
+              title: '📈 Báo cáo kinh doanh', 
+              description: 'Phân tích doanh thu, lợi nhuận và các báo cáo chi tiết theo ngày/tháng/năm.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-media', 
+            popover: { 
+              title: '🖼️ Thư viện Media', 
+              description: 'Nơi lưu trữ và quản lý hình ảnh sản phẩm, banner quảng cáo của cửa hàng.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-branches', 
+            popover: { 
+              title: '📍 Chi nhánh', 
+              description: 'Quản lý thông tin liên hệ, giờ hoạt động và vị trí của các chi nhánh trên hệ thống.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-staff', 
+            popover: { 
+              title: '👷 Nhân viên', 
+              description: 'Phân quyền tài khoản và quản lý danh sách nhân sự vận hành hệ thống.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-reviews', 
+            popover: { 
+              title: '💬 Đánh giá & Phản hồi', 
+              description: 'Tiếp nhận và phản hồi các đánh giá từ khách hàng để cải thiện chất lượng dịch vụ.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-audit', 
+            popover: { 
+              title: '🛡️ Audit Log', 
+              description: 'Truy vết toàn bộ lịch sử thao tác của các tài khoản trên hệ thống để đảm bảo an ninh.',
+              side: "right", align: 'start' 
+            } 
+        },
+        { 
+            element: '#tour-side-settings', 
+            popover: { 
+              title: '⚙️ Cấu hình hệ thống', 
+              description: 'Thiết lập các tham số chung như thông tin cửa hàng, quy định thanh toán và giao diện.',
+              side: "right", align: 'start' 
+            } 
+        },
+        {
+          popover: {
+            title: '✨ Sẵn sàng khởi đầu!',
+            description: 'Bạn đã nắm rõ các phân hệ của Chips CMS. Hãy bắt đầu quản lý cửa hàng ngay nhé!'
+          }
+        }
+      ]
+    });
+    driverObj.drive();
+  };
+
+  // ─── INITIALIZATION ───
+  useEffect(() => {
+    const windowAny = window as any;
+    
+    if (windowAny.tippy) {
+      windowAny.tippy('[data-tippy-content]', {
+        animation: 'shift-away',
+        allowHTML: true,
+        inertia: true,
+        interactive: true,
+      });
+    }
+
+    const hasSeenTour = localStorage.getItem('hasSeenAdminTour');
+    if (!hasSeenTour) {
+       const timer = setTimeout(runTour, 1500);
+       localStorage.setItem('hasSeenAdminTour', 'true');
+       return () => clearTimeout(timer);
+    }
+  }, []);
+
   const chartData = chartPeriod === 'monthly' ? revenueData : weeklyData;
   const xKey = chartPeriod === 'monthly' ? 'month' : 'day';
 
   return (
-    <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+    <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }} className="pb-10">
       {/* Page header */}
-      <div className="mb-6">
-        <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1A1A1A', fontSize: '22px', fontWeight: 700, marginBottom: '4px' }}>
-          Dashboard
-        </h1>
-        <p style={{ color: '#A0845C', fontSize: '13.5px' }}>Thứ Hai, 20 tháng 04 năm 2026 — Chào mừng trở lại, Admin!</p>
+      <div id="tour-admin-header" className="section-enter mb-6 rounded-[28px] border border-[#F0DCC8] bg-[linear-gradient(135deg,#FFF8F2_0%,#FFFFFF_68%)] p-4 shadow-[0_16px_40px_rgba(93,46,15,0.05)] sm:p-5 flex justify-between items-center">
+        <div>
+           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1A1A1A', fontSize: '22px', fontWeight: 700, marginBottom: '4px' }}>
+             Dashboard
+           </h1>
+           <p style={{ color: '#A0845C', fontSize: '13.5px' }}>Thứ Hai, 20 tháng 04 năm 2026 — Chào mừng trở lại, Admin!</p>
+        </div>
+        <div className="flex gap-2">
+            <button 
+                onClick={runTour}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2D1606] text-white text-[11px] font-black uppercase tracking-wider transition-all hover:bg-orange-600 hover:shadow-xl active:scale-95"
+                data-tippy-content="Chạy lại hướng dẫn các phân hệ Sidebar"
+                data-tippy-theme="chips-premium"
+            >
+                <Sparkles size={14} className="text-orange-400" /> Hướng dẫn chức năng
+            </button>
+        </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div id="tour-stats-grid" className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 sm:gap-4">
         {statsCards.map((card, i) => (
-          <div key={i} className="rounded-xl p-5 transition-all"
-            style={{ background: '#FFFFFF', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <div key={i} className="compact-stat-card hover-lift p-4 sm:p-5 group cursor-help"
+            style={{ boxShadow: '0 10px 24px rgba(93,46,15,0.05)' }}
+            data-tippy-content={`<div class="font-bold text-orange-400 mb-1">${card.title}</div><div class="text-[11px] leading-relaxed">${card.hint}</div>`}
+            data-tippy-theme="chips-premium"
+          >
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: card.iconBg }}>
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110" style={{ background: card.iconBg }}>
                 <card.icon size={20} style={{ color: card.iconColor }} />
               </div>
               <span className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
@@ -103,10 +269,13 @@ export function Dashboard() {
                 {card.sub.split(' ')[0]}
               </span>
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {card.value}
             </div>
-            <div style={{ fontSize: '12.5px', color: '#A0845C', marginTop: '2px' }}>{card.title}</div>
+            <div className="flex items-center gap-1.5 mt-1">
+               <div style={{ fontSize: '12px', color: '#A0845C', lineHeight: 1.45 }}>{card.title}</div>
+               <Info size={12} className="text-orange-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
           </div>
         ))}
       </div>
@@ -114,14 +283,23 @@ export function Dashboard() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 rounded-xl p-5"
+        <div id="tour-revenue-chart" className="lg:col-span-2 rounded-xl p-5"
           style={{ background: '#FFFFFF', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-            <div>
-              <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 600, color: '#1A1A1A' }}>
-                Biểu đồ doanh thu
-              </h2>
-              <p style={{ fontSize: '12px', color: '#A0845C' }}>Theo {chartPeriod === 'monthly' ? 'tháng năm 2025' : 'tuần này'}</p>
+            <div className="flex items-center gap-2">
+              <div>
+                <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 600, color: '#1A1A1A' }}>
+                  Biểu đồ doanh thu
+                </h2>
+                <p style={{ fontSize: '12px', color: '#A0845C' }}>Theo {chartPeriod === 'monthly' ? 'tháng năm 2025' : 'tuần này'}</p>
+              </div>
+              <div 
+                className="p-1.5 rounded-full bg-orange-50 text-orange-500 cursor-help"
+                data-tippy-content="Biểu đồ này giúp bạn so sánh doanh thu thực tế giữa các mốc thời gian."
+                data-tippy-theme="chips-light"
+              >
+                <Info size={14} />
+              </div>
             </div>
             <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: '#F0DCC8' }}>
               {(['weekly', 'monthly'] as const).map((p) => (
@@ -159,7 +337,7 @@ export function Dashboard() {
         </div>
 
         {/* Category Pie */}
-        <div className="rounded-xl p-5"
+        <div id="tour-category-pie" className="rounded-xl p-5"
           style={{ background: '#FFFFFF', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 600, color: '#1A1A1A', marginBottom: '4px' }}>
             Danh mục bán chạy
@@ -178,7 +356,10 @@ export function Dashboard() {
           </ResponsiveContainer>
           <div className="space-y-2 mt-1">
             {categoryData.map((cat, i) => (
-              <div key={i} className="flex items-center justify-between">
+              <div key={i} className="flex items-center justify-between group cursor-help"
+                   data-tippy-content={`Tỷ lệ tiêu thụ của nhóm <b>${cat.name}</b> chiếm ${cat.value}% tổng sản phẩm.`}
+                   data-tippy-theme="chips-premium"
+              >
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: cat.color, border: '1px solid rgba(0,0,0,0.08)' }}></div>
                   <span style={{ fontSize: '12px', color: '#A0845C' }}>{cat.name}</span>
@@ -191,7 +372,7 @@ export function Dashboard() {
       </div>
 
       {/* Recent Orders */}
-      <div className="rounded-xl overflow-hidden"
+      <div id="tour-recent-orders" className="rounded-xl overflow-hidden"
         style={{ background: '#FFFFFF', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
         <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#F0DCC8' }}>
           <div>
@@ -209,16 +390,26 @@ export function Dashboard() {
           <table className="w-full">
             <thead>
               <tr style={{ background: '#FFF3E6' }}>
-                {['Mã đơn', 'Khách hàng', 'Chi nhánh', 'Món', 'Tổng tiền', 'TT Thanh toán', 'Trạng thái', ''].map((h, i) => (
-                  <th key={i} className="text-left px-4 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>
-                    {h}
-                  </th>
-                ))}
+                <th className="text-left px-4 py-3 min-w-[100px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Mã đơn</th>
+                <th className="text-left px-4 py-3 min-w-[160px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Khách hàng</th>
+                <th className="text-left px-4 py-3 min-w-[100px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Loại</th>
+                <th className="text-left px-4 py-3 min-w-[90px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Số món</th>
+                <th className="text-left px-4 py-3 min-w-[110px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Tổng tiền</th>
+                <th className="text-left px-4 py-3 min-w-[110px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Ngày đặt</th>
+                <th className="text-left px-4 py-3 min-w-[130px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Trạng thái</th>
+                <th className="text-left px-4 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}></th>
               </tr>
             </thead>
             <tbody>
               {orders.slice(0, 6).map((order, i) => {
-                const st = statusConfig[order.status];
+                const st = statusConfig[order.status] || {
+                  label: order.status || 'Không rõ',
+                  bg: '#F3F4F6',
+                  color: '#6B7280',
+                  icon: <AlertCircle size={12} />
+                };
+                const typeLabel = order.type === 'delivery' ? 'Giao hàng' : order.type === 'takeaway' ? 'Mang về' : 'Tại quán';
+                const dateStr = new Date(order.createdAt).toLocaleDateString('vi-VN');
                 return (
                   <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors"
                     style={{ borderColor: '#FAF0E6' }}>
@@ -226,23 +417,26 @@ export function Dashboard() {
                       <span style={{ fontSize: '13px', fontWeight: 600, color: '#F58220' }}>{order.id}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <div style={{ fontSize: '13px', color: '#1A1A1A', fontWeight: 500 }}>{order.customer}</div>
-                      <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{order.phone}</div>
+                      <div style={{ fontSize: '13px', color: '#1A1A1A', fontWeight: 500 }}>{order.customerName}</div>
+                      <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{order.customerId}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <span style={{ fontSize: '13px', color: '#A0845C' }}>{order.branch}</span>
+                      <span style={{ fontSize: '12px', color: '#A0845C' }}>{typeLabel}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span style={{ fontSize: '13px', color: '#1A1A1A' }}>{order.items} món</span>
+                      <span style={{ fontSize: '13px', color: '#1A1A1A' }}>{order.items.length} món</span>
                     </td>
                     <td className="px-4 py-3">
                       <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(order.total)}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span style={{ fontSize: '12px', color: '#A0845C' }}>{order.payment}</span>
+                      <span style={{ fontSize: '12px', color: '#A0845C' }}>{dateStr}</span>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
+                    <td className="px-4 py-3"
+                        data-tippy-content={`Đơn hàng này hiện đang ở trạng thái <b>${st.label}</b>.`}
+                        data-tippy-theme="chips-light"
+                    >
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full cursor-help"
                         style={{ background: st.bg, color: st.color, fontSize: '11.5px', fontWeight: 600 }}>
                         {st.icon}
                         {st.label}

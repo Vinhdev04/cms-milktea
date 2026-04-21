@@ -1,14 +1,17 @@
 import { useState, useRef } from "react";
 import { UploadCloud, Image as ImageIcon, Copy, Trash2, Search, Filter, FolderPlus, Download, CheckCircle2, X } from "lucide-react";
-import { products, toppings } from "../data/mockData";
+import { products, toppings } from "../../data/mockData";
+import { showToast } from "../utils/toast";
 
 const initialMedia = [
-  { id: '1', name: 'banner-summer-2026.jpg', type: 'banner', size: '2.4 MB', dimensions: '1920x1080', date: '20/04/2026', url: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=800&q=80' },
-  { id: '2', name: 'tra-sua-tran-chau.png', type: 'product', size: '1.2 MB', dimensions: '800x800', date: '19/04/2026', url: 'https://images.unsplash.com/photo-1558857563-b371034e78b1?w=400&q=80' },
-  { id: '3', name: 'tra-trai-cay-nhiet-doi.png', type: 'product', size: '1.5 MB', dimensions: '800x800', date: '19/04/2026', url: 'https://images.unsplash.com/photo-1582285150550-9f5e3d7f45c8?w=400&q=80' },
-  { id: '4', name: 'icon-sale.svg', type: 'icon', size: '45 KB', dimensions: '128x128', date: '18/04/2026', url: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&q=80' },
-  { id: '5', name: 'banner-khai-truong.jpg', type: 'banner', size: '3.1 MB', dimensions: '1920x1080', date: '15/04/2026', url: 'https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?w=800&q=80' },
-  { id: '6', name: 'ca-phe-sua-da.jpg', type: 'product', size: '1.8 MB', dimensions: '800x800', date: '10/04/2026', url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400&q=80' },
+  { id: '1', name: 'Banner Mùa Hè 2026', type: 'banner', size: '2.4 MB', dimensions: '1920x1080', date: '20/04/2026', url: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=800&q=80' },
+  { id: '2', name: 'Trà Sữa Trân Châu', type: 'product', size: '1.2 MB', dimensions: '800x800', date: '19/04/2026', url: 'https://images.unsplash.com/photo-1599810694-b5ac1ea63fe2?w=800&q=80' },
+  { id: '3', name: 'Trà Trái Cây Nhiệt Đới', type: 'product', size: '1.5 MB', dimensions: '800x800', date: '19/04/2026', url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=800&q=80' },
+  { id: '4', name: 'Icon Sale 50%', type: 'icon', size: '45 KB', dimensions: '128x128', date: '18/04/2026', url: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&q=80' },
+  { id: '5', name: 'Matcha Đá Xay', type: 'product', size: '1.1 MB', dimensions: '800x800', date: '15/04/2026', url: 'https://images.unsplash.com/photo-1579440138250-88c522c4bafc?w=800&q=80' },
+  { id: '6', name: 'Cà Phê Sữa Đá', type: 'product', size: '1.8 MB', dimensions: '800x800', date: '10/04/2026', url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400&q=80' },
+  { id: '7', name: 'Nước Cam Tươi', type: 'product', size: '1.3 MB', dimensions: '800x800', date: '08/04/2026', url: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400&q=80' },
+  { id: '8', name: 'Trà Đào Cam Sả', type: 'product', size: '1.4 MB', dimensions: '800x800', date: '05/04/2026', url: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80' },
 ];
 
 const tabs = [
@@ -20,12 +23,12 @@ const tabs = [
 
 export function MediaLibrary() {
   const dynamicMedia = [
-    ...products.filter(p => p.image).map(p => ({
-      id: `p-${p.id}`, name: `${p.name.replace(/\s+/g, '-').toLowerCase()}.jpg`,
+    ...products.filter(p => p.image && !p.image.includes('placeholder')).map(p => ({
+      id: `p-${p.id}`, name: p.name,
       type: 'product', size: '1.2 MB', dimensions: '800x800', date: '20/04/2026', url: p.image
     })),
-    ...toppings.filter(t => t.image).map(t => ({
-      id: `t-${t.id}`, name: `${t.name.replace(/\s+/g, '-').toLowerCase()}.jpg`,
+    ...toppings.filter(t => t.image && !t.image.includes('placeholder')).map(t => ({
+      id: `t-${t.id}`, name: t.name,
       type: 'product', size: '800 KB', dimensions: '400x400', date: '20/04/2026', url: t.image
     }))
   ];
@@ -55,6 +58,7 @@ export function MediaLibrary() {
         url: URL.createObjectURL(file)
       }));
       setMediaList(prev => [...newItems, ...prev]);
+      showToast.success(`Đã tải lên ${files.length} file thành công!`);
     }
   };
 
@@ -66,6 +70,7 @@ export function MediaLibrary() {
   const copyUrl = (id: string, url: string) => {
     navigator.clipboard.writeText(url);
     setCopiedId(id);
+    showToast.success('Đã sao chép liên kết vào bộ nhớ tạm!');
     setTimeout(() => setCopiedId(null), 2000);
   };
 
@@ -216,7 +221,10 @@ export function MediaLibrary() {
                         <button className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform" title="Tải xuống">
                           <Download size={16} style={{ color: '#1A1A1A' }} />
                         </button>
-                        <button onClick={() => setMediaList(prev => prev.filter(item => item.id !== m.id))} className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform" title="Xóa">
+                        <button onClick={() => {
+                          setMediaList(prev => prev.filter(item => item.id !== m.id));
+                          showToast.error('Đã xóa file khỏi thư viện!');
+                        }} className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform" title="Xóa">
                           <Trash2 size={16} style={{ color: '#991B1B' }} />
                         </button>
                       </div>

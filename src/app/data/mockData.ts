@@ -45,7 +45,7 @@ export const products = [
 ];
 
 export const toppings = [
-  { id: 'T001', name: 'Trân Châu Đen', price: 10000, category: 'Trân Châu', status: 'active', image: 'https://images.unsplash.com/photo-1595981234058-a9302bf97828?auto=format&fit=crop&w=150&q=80', description: 'Hạt trân châu dai giòn truyền thống được nấu kỹ với đường đen thơm lừng.' },
+  { id: 'T001', name: 'Trân Châu Đen', price: 10000, category: 'Trân Châu', status: 'active', image: 'https://dayphache.edu.vn/wp-content/uploads/2020/02/mon-tra-sua-tran-chau.jpg', description: 'Hạt trân châu dai giòn truyền thống được nấu kỹ với đường đen thơm lừng.' },
   { id: 'T002', name: 'Trân Châu Trắng', price: 10000, category: 'Trân Châu', status: 'active', image: 'https://images.unsplash.com/photo-1558857563-b37103fac9eb?auto=format&fit=crop&w=150&q=80', description: 'Trân châu 3Q trắng giòn sần sật, ít béo và có vị ngọt thanh.' },
   { id: 'T003', name: 'Trân Châu Hoàng Kim', price: 12000, category: 'Trân Châu', status: 'active', image: 'https://images.unsplash.com/photo-1585553616435-2dc0a54e271d?auto=format&fit=crop&w=150&q=80', description: 'Phiên bản cao cấp của trân châu đen với màu vàng rực rỡ và độ dai hoàn hảo.' },
   { id: 'T004', name: 'Thạch Dừa', price: 8000, category: 'Thạch', status: 'active', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=150&q=80', description: 'Thạch dừa nguyên chất thanh mát, tốt cho sức khỏe và giải nhiệt cực tốt.' },
@@ -87,7 +87,7 @@ export const customers = [
 ];
 
 export const vouchers = [
-  { id: 'V001', code: 'SMYOU20', name: 'Giảm 20% đơn hàng', type: 'percent', discount: 20, minOrder: 100000, maxDiscount: 50000, used: 234, total: 500, expiry: '30/06/2026', status: 'active' },
+  { id: 'V001', code: 'CHIPS20', name: 'Giảm 20% đơn hàng', type: 'percent', discount: 20, minOrder: 100000, maxDiscount: 50000, used: 234, total: 500, expiry: '30/06/2026', status: 'active' },
   { id: 'V002', code: 'NEWUSER', name: 'Khách hàng mới -30K', type: 'fixed', discount: 30000, minOrder: 80000, maxDiscount: null, used: 89, total: 200, expiry: '31/05/2026', status: 'active' },
   { id: 'V003', code: 'SUMMER50', name: 'Mùa hè giảm 50K', type: 'fixed', discount: 50000, minOrder: 150000, maxDiscount: null, used: 412, total: 400, expiry: '15/04/2026', status: 'expired' },
   { id: 'V004', code: 'BIRTHDAY', name: 'Sinh nhật giảm 15%', type: 'percent', discount: 15, minOrder: 70000, maxDiscount: 35000, used: 156, total: 300, expiry: '31/12/2026', status: 'active' },
@@ -95,11 +95,11 @@ export const vouchers = [
 ];
 
 export const branches = [
-  { id: 'B001', name: 'SMYOU Quận 1', address: '123 Nguyễn Huệ, P. Bến Nghé, Q.1, TP.HCM', phone: '028 1234 5678', manager: 'Trần Thị Ngọc', staff: 8, status: 'open', todayOrders: 87, rating: 4.8 },
-  { id: 'B002', name: 'SMYOU Quận 3', address: '456 Võ Văn Tần, P.5, Q.3, TP.HCM', phone: '028 2345 6789', manager: 'Nguyễn Văn Bình', staff: 6, status: 'open', todayOrders: 64, rating: 4.7 },
-  { id: 'B003', name: 'SMYOU Quận 7', address: '789 Nguyễn Thị Thập, P.Tân Phú, Q.7, TP.HCM', phone: '028 3456 7890', manager: 'Lê Thị Thu', staff: 7, status: 'open', todayOrders: 72, rating: 4.9 },
-  { id: 'B004', name: 'SMYOU Bình Thạnh', address: '321 Đinh Bộ Lĩnh, P.26, Q.Bình Thạnh, TP.HCM', phone: '028 4567 8901', manager: 'Phạm Văn Đức', staff: 5, status: 'maintenance', todayOrders: 0, rating: 4.6 },
-  { id: 'B005', name: 'SMYOU Thủ Đức', address: '654 Võ Văn Ngân, P.Linh Chiểu, TP.Thủ Đức', phone: '028 5678 9012', manager: 'Hoàng Thị Hoa', staff: 9, status: 'open', todayOrders: 95, rating: 4.8 },
+  { id: 'B001', name: 'Chips Quận 1', address: '123 Nguyễn Huệ, P. Bến Nghé, Q.1, TP.HCM', phone: '028 1234 5678', manager: 'Trần Thị Ngọc', staff: 8, status: 'open', todayOrders: 87, rating: 4.8 },
+  { id: 'B002', name: 'Chips Quận 3', address: '456 Võ Văn Tần, P.5, Q.3, TP.HCM', phone: '028 2345 6789', manager: 'Nguyễn Văn Bình', staff: 6, status: 'open', todayOrders: 64, rating: 4.7 },
+  { id: 'B003', name: 'Chips Quận 7', address: '789 Nguyễn Thị Thập, P.Tân Phú, Q.7, TP.HCM', phone: '028 3456 7890', manager: 'Lê Thị Thu', staff: 7, status: 'open', todayOrders: 72, rating: 4.9 },
+  { id: 'B004', name: 'Chips Bình Thạnh', address: '321 Đinh Bộ Lĩnh, P.26, Q.Bình Thạnh, TP.HCM', phone: '028 4567 8901', manager: 'Phạm Văn Đức', staff: 5, status: 'maintenance', todayOrders: 0, rating: 4.6 },
+  { id: 'B005', name: 'Chips Thủ Đức', address: '654 Võ Văn Ngân, P.Linh Chiểu, TP.Thủ Đức', phone: '028 5678 9012', manager: 'Hoàng Thị Hoa', staff: 9, status: 'open', todayOrders: 95, rating: 4.8 },
 ];
 
 export const staff = [

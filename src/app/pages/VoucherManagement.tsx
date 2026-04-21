@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Tag, Copy, X, CheckCircle2, Clock, AlertCircle, Loader2, Ticket, Upload } from "lucide-react";
-import { toast } from "sonner";
-import { vouchers } from "../data/mockData";
+import { showToast } from "../utils/toast";
+import { vouchers } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { useInfiniteScroll } from "../hooks/useDataFetching";
@@ -16,7 +16,7 @@ function VoucherForm({ onClose }: VoucherFormProps) {
   const [discountType, setDiscountType] = useState<'percent' | 'fixed'>('percent');
   const [isBatch, setIsBatch] = useState(false);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.35)' }} onClick={onClose}>
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }} onClick={onClose}>
       <div className="w-full max-w-md rounded-2xl overflow-hidden flex flex-col"
         style={{ background: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxHeight: '90vh' }}
         onClick={(e) => e.stopPropagation()}>
@@ -143,7 +143,7 @@ function VoucherForm({ onClose }: VoucherFormProps) {
             style={{ borderColor: '#F0DCC8', color: '#A0845C', fontFamily: "'Be Vietnam Pro', sans-serif" }}>Hủy</button>
           <button 
             onClick={() => {
-              toast.success('Đã tạo Voucher thành công!');
+              showToast.success('Đã tạo Voucher thành công!');
               onClose();
             }}
             className="flex-1 py-2.5 rounded-xl text-sm transition-all hover:opacity-90"
@@ -172,7 +172,7 @@ export function VoucherManagement() {
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {showForm && <VoucherForm onClose={() => setShowForm(false)} />}
 
-      <div className="flex items-start justify-between mb-6">
+      <div className="section-enter mb-6 flex flex-col gap-4 rounded-[28px] border border-[#F0DCC8] bg-[linear-gradient(135deg,#FFF8F2_0%,#FFFFFF_68%)] p-4 shadow-[0_16px_40px_rgba(93,46,15,0.05)] lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
             Voucher & Ưu đãi
@@ -182,14 +182,14 @@ export function VoucherManagement() {
             Hiện có <strong>{vouchers.filter(v => v.status === 'active').length}</strong> voucher đang hoạt động.
           </p>
         </div>
-        <div className="flex gap-2">
-          <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border transition-all cursor-pointer hover:bg-gray-50"
-            style={{ borderColor: '#F0DCC8', color: '#A0845C', fontWeight: 600, fontSize: '13.5px' }}>
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+          <label className="flex flex-1 min-w-[120px] items-center justify-center gap-2 px-4 py-2.5 rounded-2xl border transition-all cursor-pointer hover:bg-gray-50 sm:flex-none"
+            style={{ borderColor: '#F0DCC8', color: '#A0845C', fontWeight: 600, fontSize: '13px' }}>
             <Upload size={16} /> <span>Nhập File</span>
             <input type="file" className="hidden" accept=".csv" onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
-                toast.loading('Đang xử lý file CSV...');
+                showToast.loading('Đang xử lý file CSV...');
                 const reader = new FileReader();
                 reader.onload = (event) => {
                   try {
@@ -213,15 +213,15 @@ export function VoucherManagement() {
                         }
                       }
                       setTimeout(() => {
-                        toast.dismiss();
-                        toast.success(`Đã nhập thành công ${lines.length - 1} voucher!`);
+                        showToast.dismiss();
+                        showToast.success(`Đã nhập thành công ${lines.length - 1} voucher!`);
                         setCopiedCode('refresh'); setTimeout(() => setCopiedCode(null), 10);
                       }, 1000);
                     } else {
-                      toast.dismiss(); toast.error('File CSV trống hoặc sai định dạng');
+                      showToast.dismiss(); showToast.error('File CSV trống hoặc sai định dạng');
                     }
                   } catch (err) {
-                    toast.dismiss(); toast.error('Lỗi khi đọc file');
+                    showToast.dismiss(); showToast.error('Lỗi khi đọc file');
                   }
                 };
                 reader.readAsText(file);
@@ -230,23 +230,23 @@ export function VoucherManagement() {
             }} />
           </label>
           <button onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl flex-shrink-0"
-            style={{ background: '#F58220', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
-            <Plus size={16} /> Tạo Voucher mới
+            className="flex flex-1 min-w-[160px] items-center justify-center gap-2 px-4 py-2.5 rounded-2xl shadow-[0_14px_28px_rgba(245,130,32,0.22)] sm:flex-none"
+            style={{ background: '#F58220', color: 'white', fontWeight: 600, fontSize: '13px' }}>
+            <Plus size={16} /> <span className="whitespace-nowrap">Tạo Voucher mới</span>
           </button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+      <div className="stats-grid-compact mb-6">
         {[
           { label: 'Đang hoạt động', value: vouchers.filter(v => v.status === 'active').length, icon: <CheckCircle2 size={20} style={{ color: '#9A3412' }} />, bg: '#FFEDD5' },
-          { label: 'Tổng lượt dùng', value: vouchers.reduce((a, v) => a + v.used, 0), icon: <Tag size={20} style={{ color: '#1E40AF' }} />, bg: '#EFF6FF' },
+          { label: 'Tổng lượt dùng', value: vouchers.reduce((a, v) => a + (v.used || (v as any).usage?.current || 0), 0), icon: <Tag size={20} style={{ color: '#1E40AF' }} />, bg: '#EFF6FF' },
           { label: 'Đã hết hạn', value: vouchers.filter(v => v.status === 'expired').length, icon: <Clock size={20} style={{ color: '#92400E' }} />, bg: '#FEF3C7' },
         ].map((s, i) => (
-          <div key={i} className="rounded-xl p-3 md:p-4 flex flex-col xl:flex-row items-center xl:items-start gap-2 md:gap-3 text-center xl:text-left"
-            style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: s.bg }}>
+          <div key={i} className="compact-stat-card p-3 md:p-4 flex flex-col items-center gap-2 text-center"
+            style={{ boxShadow: '0 10px 24px rgba(93,46,15,0.05)' }}>
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: s.bg }}>
               {s.icon}
             </div>
             <div>
@@ -286,7 +286,9 @@ export function VoucherManagement() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {visibleData.map((v) => {
-              const usagePercent = Math.round((v.used / v.total) * 100);
+              const used = v.used || (v as any).usage?.current || 0;
+              const total = v.total || (v as any).usage?.max || 100;
+              const usagePercent = Math.round((used / total) * 100);
               const isExpired = v.status === 'expired';
               return (
                 <div key={v.id} className="relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group"
@@ -340,7 +342,7 @@ export function VoucherManagement() {
                     </div>
                     
                     <div className="flex items-center justify-between mb-2">
-                      <span style={{ fontSize: '12px', color: '#1A1A1A', fontWeight: 600 }}>Đã dùng: {v.used}/{v.total}</span>
+                      <span style={{ fontSize: '12px', color: '#1A1A1A', fontWeight: 600 }}>Đã dùng: {used}/{total}</span>
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider"
                         style={{ background: isExpired ? '#F3F4F6' : '#FFEDD5', color: isExpired ? '#9CA3AF' : '#9A3412' }}>
                         {isExpired ? 'Đã kết thúc' : 'Đang phát hành'}

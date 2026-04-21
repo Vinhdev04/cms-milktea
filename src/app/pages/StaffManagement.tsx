@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, X, ChevronDown, Shield, Users } from "lucide-react";
-import { staff } from "../data/mockData";
+import { staff } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";

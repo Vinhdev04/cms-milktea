@@ -1,27 +1,59 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+﻿import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-// ===================== MOCK ADMIN ACCOUNT =====================
-export const mockAdminUsers = [
+export type AppRole = "admin" | "member";
+
+export const mockAccounts = [
   {
     id: "A001",
     name: "Tài khoản demo",
     email: "admin@smyou.vn",
     password: "admin123",
     role: "Quản trị viên",
+    appRole: "admin" as AppRole,
     avatar: "A",
     branch: "Tất cả chi nhánh",
     phone: "0900000001",
     permissions: ["dashboard", "menu", "orders", "customers", "staff", "vouchers", "reports", "settings", "branches", "toppings", "media", "reviews", "audit-log"],
   },
+  {
+    id: "U001",
+    name: "Nguyễn Thị Lan",
+    email: "member@smyou.vn",
+    password: "member123",
+    role: "Thành viên Gold",
+    appRole: "member" as AppRole,
+    avatar: "NL",
+    branch: "SMYOU Quận 1",
+    phone: "0901234567",
+    customerId: "C001",
+    points: 2450,
+    tier: "Gold",
+    permissions: [],
+  },
+  {
+    id: "U002",
+    name: "Trần Văn Minh",
+    email: "silver@smyou.vn",
+    password: "member123",
+    role: "Thành viên Silver",
+    appRole: "member" as AppRole,
+    avatar: "TM",
+    branch: "SMYOU Quận 3",
+    phone: "0912345678",
+    customerId: "C002",
+    points: 1180,
+    tier: "Silver",
+    permissions: [],
+  },
 ];
 
-export type AdminUser = typeof mockAdminUsers[0];
+export type AuthUser = typeof mockAccounts[number];
 
 interface AuthContextType {
-  user: AdminUser | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: AuthUser }>;
   logout: () => void;
 }
 
@@ -29,11 +61,14 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 const AUTH_KEY = "smyou_auth_user";
 
+export function getDefaultRouteForRole(role?: AppRole) {
+  return role === "member" ? "/app" : "/admin";
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AdminUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restore session on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(AUTH_KEY);
@@ -47,23 +82,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    // Simulate network delay
-    await new Promise(r => setTimeout(r, 800));
-    
-    const found = mockAdminUsers.find(
-      u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; user?: AuthUser }> => {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    const found = mockAccounts.find(
+      (account) => account.email.toLowerCase() === email.toLowerCase() && account.password === password
     );
-    
-    if (found) {
-      const { password: _pw, ...safeUser } = found as typeof found;
-      void _pw;
-      setUser(found);
-      localStorage.setItem(AUTH_KEY, JSON.stringify(found));
-      return { success: true };
+
+    if (!found) {
+      return { success: false, error: "Email hoặc mật khẩu không đúng." };
     }
-    
-    return { success: false, error: "Email hoặc mật khẩu không đúng." };
+
+    setUser(found);
+    localStorage.setItem(AUTH_KEY, JSON.stringify(found));
+    return { success: true, user: found };
   };
 
   const logout = () => {
@@ -79,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
 }
