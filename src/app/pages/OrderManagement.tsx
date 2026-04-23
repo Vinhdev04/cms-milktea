@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer, PackageX } from "lucide-react";
 import { showToast } from "../utils/toast";
 import { Logo } from "../components/Logo";
-import { orders } from "../../data/mockData";
+import { orders as initialMockOrders } from "../../data/mockData";
 import { Skeleton } from "../components/ui/skeleton";
+import { OrderService } from "../services/OrderService";
+import { useEffect } from "react";
 import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
 import {
@@ -196,12 +198,25 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
 }
 
 export function OrderManagement() {
-  // ── State declarations (must come before use) ──
+  const [orders, setOrders] = useState<Order[]>(OrderService.getAllOrders());
   const [activeTab, setActiveTab] = useState('Tất cả');
   const [search, setSearch] = useState('');
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isBulkPrinting, setIsBulkPrinting] = useState(false);
+
+  // Listen for real-time updates from User app
+  useEffect(() => {
+    const handleRefresh = () => {
+      setOrders(OrderService.getAllOrders());
+    };
+    window.addEventListener('storage', handleRefresh);
+    const interval = setInterval(handleRefresh, 3000); // Poll every 3s as fallback
+    return () => {
+      window.removeEventListener('storage', handleRefresh);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Derived data (uses state values above)
   const filtered = orders.filter(o => {

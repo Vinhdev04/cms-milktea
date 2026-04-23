@@ -23,9 +23,8 @@ const TIER_CONFIG: Record<string, { color: string; bg: string; badge: string; gr
 
 const QUICK_STATS = [
   { label: 'Đơn hàng', value: '26', icon: ShoppingBag, color: 'text-blue-500', bg: 'bg-blue-50' },
-  { label: 'Voucher', value: '3', icon: Gift, color: 'text-orange-500', bg: 'bg-orange-50' },
   { label: 'Yêu thích', value: '8', icon: Heart, color: 'text-red-500', bg: 'bg-red-50' },
-  { label: 'Điểm', value: '2.4K', icon: Award, color: 'text-amber-500', bg: 'bg-amber-50' },
+  { label: 'Đã tiết kiệm', value: '150K', icon: Zap, color: 'text-emerald-500', bg: 'bg-emerald-50' },
 ];
 
 export function UserProfile() {
@@ -92,28 +91,19 @@ export function UserProfile() {
 
       <main className="relative z-10 mx-auto -mt-16 max-w-2xl px-4">
         {/* ─── TIER PROGRESS CARD ─── */}
-        <section className={`overflow-hidden rounded-[32px] bg-gradient-to-r ${tier.gradient} p-5 text-white shadow-xl ${tier.glow} anim-fade-up sm:p-6`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70 block">Hạng thành viên</span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-black sm:text-3xl">{profile.points.toLocaleString()}</span>
-                <span className="text-xs font-bold opacity-60">điểm</span>
+        {/* ─── TIER PROGRESS CARD (BRIEF) ─── */}
+        <section className={`relative overflow-hidden rounded-[32px] bg-[#2D1606] p-5 text-white shadow-xl anim-fade-up`}>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/20 text-orange-500">
+                <Crown className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black tracking-tight">Đặc quyền Thành viên</h3>
+                <p className="text-[10px] font-medium text-white/40">Tính năng đang được làm mới • Sắp ra mắt</p>
               </div>
             </div>
-            <div className="h-12 w-12 rounded-2xl bg-white/20 text-2xl flex items-center justify-center backdrop-blur-md sm:h-14 sm:w-14 sm:text-3xl anim-float-badge">
-              {tier.badge}
-            </div>
-          </div>
-          <div className="mt-5">
-            <div className="flex justify-between text-[9px] font-black uppercase tracking-wider mb-1.5 opacity-70">
-              <span>{profile.tier}</span>
-              <span>{progress}%</span>
-            </div>
-            <div className="h-2 rounded-full bg-white/20 overflow-hidden">
-              <div className="h-full rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)] progress-fill" style={{ '--progress': `${progress}%` } as React.CSSProperties} />
-            </div>
-            <p className="mt-2.5 text-[11px] font-bold opacity-80">Còn {(profile.nextTierTarget - profile.points).toLocaleString()} điểm để lên hạng tiếp theo</p>
+            <Award className="h-6 w-6 text-orange-500/40" />
           </div>
         </section>
 
@@ -220,29 +210,28 @@ export function UserProfile() {
 // ─── HELPER COMPONENTS ───
 
 function WalletInfo() {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   return (
     <div className="mt-4 overflow-hidden rounded-[28px] bg-[#2D1606] p-5 text-white shadow-xl relative card-interactive sm:p-6">
        <div className="absolute top-0 right-0 p-4 opacity-5">
-          <CreditCard className="h-20 w-20" />
+          <ShieldCheck className="h-20 w-20" />
        </div>
        <div className="flex items-center justify-between mb-5">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] opacity-50">Ví SMYOU & MOMO</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] opacity-50">Tài khoản thanh toán</div>
           <button onClick={() => setShow(!show)} className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all active:scale-90">
              {show ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
           </button>
        </div>
        <div className="space-y-3">
           <div className="flex items-center justify-between">
-             <div className="text-[11px] font-bold opacity-60">Số dư ví SM</div>
-             <div className="text-lg font-black sm:text-xl">{show ? '1.250.000đ' : '•••••••••'}</div>
+             <div className="text-[11px] font-bold opacity-60">MB Bank (VietQR)</div>
+             <div className="text-sm font-black sm:text-base">{show ? '0296 9904 0112 10' : '•••• •••• •••• ••'}</div>
           </div>
           <div className="flex items-center justify-between">
              <div className="flex items-center gap-2">
-                <div className="h-5 w-5 rounded bg-pink-500 flex items-center justify-center text-[8px] font-black">M</div>
-                <span className="text-[11px] font-bold opacity-60">Ví MOMO</span>
+                <span className="text-[11px] font-bold opacity-60">Chủ tài khoản</span>
              </div>
-             <div className="text-sm font-black">{show ? '090****567' : '•••••••••'}</div>
+             <div className="text-[11px] font-black uppercase tracking-wider">{show ? 'PHAM CONG VINH' : '•••• •••• ••••'}</div>
           </div>
        </div>
     </div>

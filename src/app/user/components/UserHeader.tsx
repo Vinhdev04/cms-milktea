@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import {
   Bell, ChevronDown, Clock3, Gift, LogOut, MapPin,
@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useUserAuth } from '../../context/UserAuthContext';
 import { userPreviewNotifications } from '../data/userPreviewData';
+import { showToast } from '../../utils/toast';
 
 export function UserHeader() {
   const { user, cart, logout } = useUserAuth();
@@ -14,9 +15,49 @@ export function UserHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserDropdown, setIsUserDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [notifications, setNotifications] = useState(userPreviewNotifications);
+
+  useEffect(() => {
+    const handleNotification = () => {
+      const lastNtfStr = localStorage.getItem('milktea_last_notification');
+      if (!lastNtfStr) return;
+      try {
+        const ntf = JSON.parse(lastNtfStr);
+        // Only show if it belongs to current user or is guest demo
+        if (user && ntf.customerId !== user.id) return;
+
+        const statusMap: Record<string, string> = {
+          confirmed: 'Đã xác nhận',
+          preparing: 'Đang pha chế',
+          ready: 'Đang giao hàng',
+          completed: 'Đã giao thành công',
+          cancelled: 'Đã bị hủy',
+        };
+
+        const statusLabel = statusMap[ntf.status] || 'Cập nhật trạng thái';
+        
+        showToast.success(`Cập nhật đơn hàng #${ntf.orderId}`, {
+          description: `Đơn hàng của bạn hiện tại: ${statusLabel}`,
+        });
+
+        const newNtf = {
+          id: ntf.id,
+          title: `Đơn #${ntf.orderId}: ${statusLabel}`,
+          time: 'Vừa xong',
+          unread: true,
+          type: 'order' as const
+        };
+        setNotifications(prev => [newNtf, ...prev]);
+        // Note: In real app we'd clear last_notification but Admin side already does it
+      } catch (e) { console.error(e); }
+    };
+
+    window.addEventListener('storage', handleNotification);
+    return () => window.removeEventListener('storage', handleNotification);
+  }, [user]);
 
   const cartItemCount = useMemo(() => cart.reduce((total, item) => total + item.quantity, 0), [cart]);
-  const unreadCount = userPreviewNotifications.filter((item) => item.unread).length;
+  const unreadCount = notifications.filter((item) => item.unread).length;
 
   const navigation = [
     { name: 'Trang chủ', href: '/app' },

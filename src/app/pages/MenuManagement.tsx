@@ -388,11 +388,7 @@ export function MenuManagement() {
             <input type="file" className="hidden" accept=".csv" />
           </label>
           <button onClick={() => { 
-              if (activeTab === 'toppings') {
-                setEditTopping(null); setShowToppingForm(true);
-              } else {
                 setEditProduct(null); setShowForm(true);
-              }
             }}
             className="flex flex-1 min-w-[140px] items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-orange-200 sm:flex-none"
             style={{ background: '#F58220', color: 'white', fontWeight: 600, fontSize: '13px' }}>
@@ -421,7 +417,6 @@ export function MenuManagement() {
       <div className="chip-scroller mb-2 border-b pb-3" style={{ borderColor: '#F0DCC8' }}>
         {[
           { id: 'products', label: 'Sản phẩm', icon: <Package size={18} /> },
-          { id: 'toppings', label: 'Topping', icon: <Box size={18} /> },
           { id: 'categories', label: 'Danh mục', icon: <List size={18} /> },
           { id: 'attributes', label: 'Thuộc tính', icon: <Settings2 size={18} /> },
         ].map(t => (

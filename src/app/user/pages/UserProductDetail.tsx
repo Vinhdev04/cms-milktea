@@ -36,7 +36,7 @@ export function UserProductDetail() {
   const [size, setSize] = useState<'S' | 'M' | 'L'>('M');
   const [sugar, setSugar] = useState('50%');
   const [ice, setIce] = useState('50%');
-  const [toppings, setToppings] = useState<string[]>([]);
+
   const [note, setNote] = useState('');
   const [discountCode, setDiscountCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
@@ -64,19 +64,12 @@ export function UserProductDetail() {
   }
 
   const sizeModifier = SIZE_OPTIONS.find((s) => s.value === size)?.priceModifier ?? 0;
-  const toppingTotal = toppings.reduce((sum, id) => {
-    const t = TOPPINGS.find((t) => t.id === id);
-    return sum + (t?.price ?? 0);
-  }, 0);
-
-  const unitPrice = product.price + sizeModifier + toppingTotal;
+  const unitPrice = product.price + sizeModifier;
   const subtotal = unitPrice * quantity;
   const totalPrice = Math.max(0, subtotal - discountAmount);
   const favorited = isFavorite(product.id);
 
-  const toggleTopping = (id: string) => {
-    setToppings((prev) => (prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]));
-  };
+
 
   const handleAddToCart = () => {
     addToCart({
@@ -88,7 +81,7 @@ export function UserProductDetail() {
       size,
       sugar,
       ice,
-      toppings,
+      toppings: [],
     });
     navigate('/app/cart');
   };
@@ -115,7 +108,7 @@ export function UserProductDetail() {
       </div>
 
       {/* ─── HERO IMAGE ─── */}
-      <div className="relative h-[45vh] w-full overflow-hidden">
+      <div className="relative h-[35vh] sm:h-[45vh] w-full overflow-hidden">
         <img src={product.image} className="h-full w-full object-cover" alt="" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="absolute bottom-8 left-6 right-6 text-white">
@@ -133,7 +126,7 @@ export function UserProductDetail() {
 
       <main className="mx-auto -mt-6 max-w-2xl px-4">
         {/* ─── INFO CARD ─── */}
-        <section className="relative overflow-hidden rounded-[40px] bg-white p-8 shadow-xl">
+        <section className="relative overflow-hidden rounded-[40px] bg-white p-6 sm:p-8 shadow-xl">
            <div className="flex items-center justify-between">
               <div>
                  <div className="flex items-center gap-3">
@@ -184,7 +177,7 @@ export function UserProductDetail() {
         {/* ─── CUSTOMIZATIONS ─── */}
         <div className="mt-6 space-y-6">
            {/* Size Selector */}
-           <section className="rounded-[40px] bg-white p-8 border border-gray-50 shadow-sm">
+           <section className="rounded-[40px] bg-white p-6 sm:p-8 border border-gray-50 shadow-sm">
               <div className="mb-6 flex items-center justify-between">
                  <h3 className="font-heading text-xl font-bold text-[#2D1606]">Kích cỡ đề xuất</h3>
                  <span className="rounded-lg bg-[#2D1606] px-2 py-1 text-[10px] font-black text-white">BẮT BUỘC</span>
@@ -194,19 +187,19 @@ export function UserProductDetail() {
                     <button
                        key={opt.value}
                        onClick={() => setSize(opt.value as any)}
-                       className={`relative flex h-24 flex-col items-center justify-center rounded-[32px] transition-all border-2 ${
+                       className={`relative flex h-20 flex-col items-center justify-center rounded-[28px] transition-all border-2 ${
                           size === opt.value 
-                          ? 'border-orange-500 bg-orange-50/50 shadow-inner' 
+                          ? 'border-orange-500 bg-orange-50/50 shadow-sm' 
                           : 'border-gray-100 hover:border-orange-200'
                        }`}
                     >
-                       <span className={`text-xl font-black ${size === opt.value ? 'text-orange-600' : 'text-gray-300'}`}>
+                       <span className={`text-lg font-black ${size === opt.value ? 'text-orange-600' : 'text-gray-300'}`}>
                           {opt.value}
                        </span>
-                       <span className="text-[10px] font-bold text-gray-500 uppercase">{opt.label}</span>
+                       <span className="text-[9px] font-bold text-gray-500 uppercase">{opt.label}</span>
                        <span className="text-[9px] font-black text-orange-400">{opt.priceModifier > 0 ? `+${opt.priceModifier/1000}k` : opt.priceModifier < 0 ? `${opt.priceModifier/1000}k` : 'Gốc'}</span>
                        {size === opt.value && (
-                          <div className="absolute -right-1 -top-1 rounded-full bg-orange-600 p-1 text-white ring-4 ring-white">
+                          <div className="absolute -right-1 -top-1 rounded-full bg-orange-600 p-1 text-white ring-2 ring-white">
                              <CheckCircle2 className="h-3 w-3" />
                           </div>
                        )}
@@ -216,15 +209,15 @@ export function UserProductDetail() {
            </section>
 
            {/* Sweetness */}
-           <section className="rounded-[40px] bg-white p-8 border border-gray-50 shadow-sm">
+           <section className="rounded-[40px] bg-white p-6 sm:p-8 border border-gray-50 shadow-sm">
               <h3 className="mb-6 font-heading text-xl font-bold text-[#2D1606]">Bao nhiêu đường?</h3>
-              <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-2">
+              <div className="flex flex-wrap gap-2">
                  {SUGAR_OPTIONS.map(lvl => (
                     <button
                        key={lvl}
                        onClick={() => setSugar(lvl)}
-                       className={`flex h-12 min-w-[70px] flex-shrink-0 items-center justify-center rounded-2xl text-xs font-black transition-all ${
-                          sugar === lvl ? 'bg-[#2D1606] text-white shadow-lg' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                       className={`flex h-10 flex-1 min-w-[60px] items-center justify-center rounded-xl text-xs font-black transition-all ${
+                          sugar === lvl ? 'bg-[#2D1606] text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                        }`}
                     >
                        {lvl}
@@ -234,15 +227,15 @@ export function UserProductDetail() {
            </section>
 
            {/* Ice */}
-           <section className="rounded-[40px] bg-white p-8 border border-gray-50 shadow-sm">
+           <section className="rounded-[40px] bg-white p-6 sm:p-8 border border-gray-50 shadow-sm">
               <h3 className="mb-6 font-heading text-xl font-bold text-[#2D1606]">Lượng đá thì sao?</h3>
-              <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-2">
+              <div className="flex flex-wrap gap-2">
                  {ICE_OPTIONS.map(lvl => (
                     <button
                        key={lvl}
                        onClick={() => setIce(lvl)}
-                       className={`flex h-12 min-w-[100px] flex-shrink-0 items-center justify-center rounded-2xl text-xs font-black transition-all ${
-                          ice === lvl ? 'bg-orange-500 text-white shadow-lg' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                       className={`flex h-10 flex-1 min-w-[80px] items-center justify-center rounded-xl text-xs font-black transition-all ${
+                          ice === lvl ? 'bg-orange-500 text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                        }`}
                     >
                        {lvl}
@@ -251,48 +244,16 @@ export function UserProductDetail() {
               </div>
            </section>
 
-           {/* Toppings Grid */}
-           <section className="rounded-[40px] bg-white p-8 border border-gray-50 shadow-sm">
-              <div className="mb-6 flex items-center justify-between">
-                 <h3 className="font-heading text-xl font-bold text-[#2D1606]">Thêm Topping không?</h3>
-                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white border border-gray-100 text-gray-400">
-                    <Info className="h-5 w-5" />
-                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                 {TOPPINGS.map(tp => (
-                    <button
-                       key={tp.id}
-                       onClick={() => toggleTopping(tp.id)}
-                       className={`flex items-center justify-between rounded-3xl p-4 transition-all border-2 ${
-                          toppings.includes(tp.id) ? 'border-orange-500 bg-orange-50' : 'border-gray-50 bg-[#FAFAFA]'
-                       }`}
-                    >
-                       <div className="flex items-center gap-3">
-                          <span className="text-xl">{tp.emoji}</span>
-                          <div className="text-left">
-                             <div className="text-xs font-black text-[#2D1606] leading-tight">{tp.label}</div>
-                             <div className="text-[10px] font-bold text-orange-600">+{tp.price.toLocaleString('vi-VN')}đ</div>
-                          </div>
-                       </div>
-                       <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                          toppings.includes(tp.id) ? 'border-orange-500 bg-orange-500' : 'border-gray-200 bg-white'
-                       }`}>
-                          {toppings.includes(tp.id) && <CheckCircle2 className="h-4 w-4 text-white" />}
-                       </div>
-                    </button>
-                 ))}
-              </div>
-           </section>
+
 
            {/* Note */}
-           <section className="rounded-[40px] bg-white p-8 border border-gray-50 shadow-sm">
+           <section className="rounded-[32px] bg-white p-5 sm:p-8 border border-gray-50 shadow-sm">
               <h3 className="mb-4 font-heading text-xl font-bold text-[#2D1606]">Dặn dò Chips</h3>
               <textarea
                  value={note}
                  onChange={(e) => setNote(e.target.value)}
                  placeholder="Ghi chú về dị ứng, hương vị..."
-                 className="h-32 w-full rounded-[32px] bg-gray-50 p-6 text-sm font-bold text-[#2D1606] outline-none border-none focus:ring-4 focus:ring-orange-500/10 transition-all placeholder:text-gray-300"
+                 className="h-24 sm:h-32 w-full rounded-[24px] bg-gray-50 p-4 sm:p-6 text-sm font-bold text-[#2D1606] outline-none border-none focus:ring-4 focus:ring-orange-500/10 transition-all placeholder:text-gray-300"
               />
            </section>
         </div>

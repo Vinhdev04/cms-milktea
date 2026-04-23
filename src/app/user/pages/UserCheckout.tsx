@@ -8,6 +8,7 @@ import {
 import { useUserAuth } from '../../context/UserAuthContext';
 import { userPreviewBranches, userPreviewOffers } from '../data/userPreviewData';
 import { showToast } from '../../utils/toast';
+import { OrderService } from '../../services/OrderService';
 
 const STEPS = ['Địa chỉ', 'Vận chuyển', 'Thanh toán'];
 
@@ -18,20 +19,48 @@ export function UserCheckout() {
   const [selectedBranch, setSelectedBranch] = useState(userPreviewBranches[0].id);
   const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('delivery');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'wallet'>('cash');
-  const [appliedVoucher, setAppliedVoucher] = useState<string | null>(null);
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const shippingFee = orderType === 'delivery' ? 15000 : 0;
-  const discount = appliedVoucher ? 20000 : (subtotal >= 99000 ? 10000 : 0);
-  const total = subtotal + shippingFee - discount;
+  const total = subtotal + shippingFee;
 
   const selectedBranchData = userPreviewBranches.find((b) => b.id === selectedBranch) || userPreviewBranches[0];
 
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
+    
+    // Create actual order object
+    const newOrder = {
+      id: `CHIPS-${Math.floor(Math.random() * 90000 + 10000)}`,
+      customerId: user?.id || 'guest',
+      customerName: user?.name || 'Khách vãng lai',
+      total: total,
+      status: 'pending' as const,
+      type: orderType,
+      createdAt: new Date().toISOString(),
+      items: cart.map(item => ({
+        productId: item.productId,
+        productName: item.name,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      customer: user?.name || 'Khách vãng lai',
+      phone: user?.phone || '—',
+      branch: selectedBranchData.name,
+      payment: paymentMethod === 'cash' ? 'Tiền mặt' : (paymentMethod === 'wallet' ? 'VietQR' : 'Thẻ'),
+      time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+      date: new Date().toLocaleDateString('vi-VN'),
+      customerType: user ? 'member' as const : 'guest' as const,
+    };
+
     await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    // Save order via service
+    OrderService.saveOrder(newOrder);
+    
     showToast.success('Đặt hàng thành công! Cảm ơn bạn đã ủng hộ.');
     clearCart();
     setOrderSuccess(true);
@@ -175,13 +204,28 @@ export function UserCheckout() {
 
                       {/* Payment Details Sub-forms */}
                       {paymentMethod === m.id && m.id === 'wallet' && (
-                        <div className="mt-4 p-6 rounded-[32px] bg-white border-2 border-pink-100 flex flex-col items-center animate-in zoom-in-95 duration-300">
-                          <div className="bg-white p-3 rounded-2xl shadow-xl mb-4 border border-gray-100">
-                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=CHIPS-PAYMENT" className="w-32 h-32" alt="QR Payment" />
+                        <div className="mt-4 p-6 rounded-[32px] bg-white border-2 border-pink-100 flex flex-col items-center animate-in zoom-in-95 duration-500 overflow-hidden relative">
+                          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500"></div>
+                          <div className="bg-white p-4 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] mb-5 border border-gray-50 relative group">
+                             <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-[32px] opacity-20 blur group-hover:opacity-40 transition-opacity"></div>
+                             <img 
+                                src={`https://img.vietqr.io/image/MB-02969904011210-compact.png?amount=${total}&addInfo=CHIPS%20${Math.floor(Math.random()*10000)}&accountName=PHAM%20CONG%20VINH`} 
+                                className="w-48 h-48 relative rounded-2xl" 
+                                alt="VietQR Payment" 
+                             />
                           </div>
                           <div className="text-center">
-                             <div className="text-xs font-black text-[#2D1606] uppercase tracking-widest mb-1">Quét để thanh toán</div>
-                             <p className="text-[10px] font-medium text-gray-400">Vui lòng quét mã MoMo/ZaloPay để hoàn tất đơn hàng</p>
+                             <div className="text-[10px] font-black text-pink-600 uppercase tracking-[0.2em] mb-2 flex items-center justify-center gap-2">
+                                <span className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-pulse"></span>
+                                Quét mã chuyển khoản nhanh
+                             </div>
+                             <div className="space-y-1 mb-4">
+                                <div className="text-sm font-black text-[#2D1606]">PHAM CONG VINH</div>
+                                <div className="text-xs font-bold text-gray-500">02969904011210 • MB Bank</div>
+                             </div>
+                             <p className="text-[10px] font-medium text-gray-400 leading-relaxed max-w-[200px] mx-auto">
+                                Vui lòng quét mã VietQR để hoàn tất thanh toán. Đơn hàng sẽ được tự động xác nhận.
+                             </p>
                           </div>
                         </div>
                       )}
@@ -235,20 +279,7 @@ export function UserCheckout() {
                    ))}
                 </div>
 
-                {/* Voucher box */}
-                <div className="relative mb-8 overflow-hidden rounded-[24px] bg-orange-50 p-4">
-                   <div className="flex items-center gap-3 text-[11px] font-black text-orange-600 uppercase tracking-widest">
-                      <TicketPercent className="h-4 w-4" /> Có mã giảm giá?
-                   </div>
-                   <div className="mt-3 flex gap-2">
-                      <input 
-                        type="text" 
-                        placeholder="Nhập mã..." 
-                        className="flex-1 rounded-xl bg-white border-none px-4 py-2 text-xs font-black text-[#2D1606] outline-none"
-                      />
-                      <button className="rounded-xl bg-[#2D1606] px-4 py-2 text-[10px] font-black text-white">DÙNG</button>
-                   </div>
-                </div>
+
 
                 <div className="space-y-3 border-t border-gray-100 pt-6">
                    <div className="flex justify-between text-xs font-bold text-gray-500">
@@ -259,12 +290,7 @@ export function UserCheckout() {
                       <span>Phí giao hàng</span>
                       <span>{shippingFee.toLocaleString('vi-VN')}đ</span>
                    </div>
-                   {discount > 0 && (
-                      <div className="flex justify-between text-xs font-bold text-emerald-500">
-                         <span>Giảm giá Chips</span>
-                         <span>-{discount.toLocaleString('vi-VN')}đ</span>
-                      </div>
-                   )}
+
                    <div className="flex justify-between items-baseline pt-4">
                       <span className="text-sm font-black text-[#2D1606]">Tổng cộng</span>
                       <span className="text-3xl font-black text-orange-600 tracking-tighter">{total.toLocaleString('vi-VN')}đ</span>

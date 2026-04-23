@@ -4,9 +4,10 @@ import {
   LayoutDashboard, ShoppingBag, ClipboardList, Users,
   Tag, BarChart3, MapPin, UserCheck, Settings, Menu, X, Bell,
   ChevronDown, LogOut, Search, ShieldAlert, Image, MessageSquare, User, Eye,
-  Home, Package
+  Home, Package, Timer
 } from "lucide-react";
 import { Toaster } from "sonner";
+import { showToast } from "../utils/toast";
 import { Logo } from "./Logo";
 import { useAuth } from "../context/AuthContext";
 import { LoadingSpinner } from "./ui/LoadingSpinner";
@@ -16,12 +17,12 @@ const navItems = [
   { path: "/admin/menu", label: "Quản lý Menu", icon: ShoppingBag, id: "tour-side-menu" },
   { path: "/admin/orders", label: "Quản lý Đơn hàng", icon: ClipboardList, id: "tour-side-orders" },
   { path: "/admin/customers", label: "Khách hàng", icon: Users, id: "tour-side-customers" },
-  { path: "/admin/vouchers", label: "Voucher & Ưu đãi", icon: Tag, id: "tour-side-vouchers" },
+  { path: "/admin/vouchers", label: "Voucher & Ưu đãi", icon: Tag, id: "tour-side-vouchers", comingSoon: true },
   { path: "/admin/reports", label: "Báo cáo", icon: BarChart3, id: "tour-side-reports" },
-  { path: "/admin/media", label: "Thư viện Media", icon: Image, id: "tour-side-media" },
-  { path: "/admin/branches", label: "Chi nhánh", icon: MapPin, id: "tour-side-branches" },
+  { path: "/admin/media", label: "Thư viện Media", icon: Image, id: "tour-side-media", comingSoon: true },
+  { path: "/admin/branches", label: "Chi nhánh", icon: MapPin, id: "tour-side-branches", comingSoon: true },
   { path: "/admin/staff", label: "Nhân viên", icon: UserCheck, id: "tour-side-staff" },
-  { path: "/admin/reviews", label: "Đánh giá & Phản hồi", icon: MessageSquare, id: "tour-side-reviews" },
+  { path: "/admin/reviews", label: "Đánh giá & Phản hồi", icon: MessageSquare, id: "tour-side-reviews", comingSoon: true },
   { path: "/admin/audit-log", label: "Audit Log", icon: ShieldAlert, id: "tour-side-audit" },
   { path: "/admin/settings", label: "Cấu hình hệ thống", icon: Settings, id: "tour-side-settings" },
 ];
@@ -69,21 +70,46 @@ export function Layout() {
     return navItems.find((item) => item.path === location.pathname)?.label ?? "Dashboard";
   }, [location.pathname]);
 
-  const notifications = [
-    { id: "NTF-01", title: "5 đánh giá mới đang chờ duyệt", meta: "Review Center", time: "2 phút trước", tone: "#FFF3E6", color: "#F58220" },
-    { id: "NTF-02", title: "Chi nhánh Quận 3 vừa cập nhật giờ mở cửa", meta: "Chi nhánh", time: "15 phút trước", tone: "#EFF6FF", color: "#2563EB" },
-    { id: "NTF-03", title: "Phát hiện 1 cảnh báo đăng nhập thất bại", meta: "Audit Log", time: "34 phút trước", tone: "#FEE2E2", color: "#991B1B" },
-  ];
-  const notificationItems = notifications.map((item, index) => ({
-    ...item,
-    route: index === 0 ? "/admin/reviews" : index === 1 ? "/admin/branches" : "/admin/audit-log",
-    preview:
-      index === 0
-        ? "Pháº£n há»“i má»›i tá»« khÃ¡ch hÃ ng Ä‘ang cáº§n duyá»‡t trong báº£ng preview."
-        : index === 1
-          ? "Kiá»ƒm tra thay Ä‘á»•i giá» hoáº¡t Ä‘á»™ng vÃ  nhÃ¢n sá»± ca lÃ m táº¡i dashboard chi nhÃ¡nh."
-          : "Má»™t IP lạ Ä‘Ã£ thá»­ Ä‘Äƒng nháº­p nhiá»u láº§n. Cáº§n xem chi tiáº¿t trong Audit Log.",
-  }));
+  const [notifications, setNotifications] = useState<any[]>([
+    { id: "NTF-01", title: "5 đánh giá mới đang chờ duyệt", meta: "Review Center", time: "2 phút trước", tone: "#FFF3E6", color: "#F58220", preview: "Phản hồi mới từ khách hàng đang cần duyệt trong bảng preview.", route: "/admin/reviews" },
+    { id: "NTF-02", title: "Chi nhánh Quận 3 vừa cập nhật giờ mở cửa", meta: "Chi nhánh", time: "15 phút trước", tone: "#EFF6FF", color: "#2563EB", preview: "Kiểm tra thay đổi giờ hoạt động và nhân sự ca làm tại dashboard chi nhánh.", route: "/admin/branches" },
+    { id: "NTF-03", title: "Phát hiện 1 cảnh báo đăng nhập thất bại", meta: "Audit Log", time: "34 phút trước", tone: "#FEE2E2", color: "#991B1B", preview: "Một IP lạ đã thử đăng nhập nhiều lần. Cần xem chi tiết trong Audit Log.", route: "/admin/audit-log" },
+  ]);
+
+  useEffect(() => {
+    const handleNotification = () => {
+      const lastNtfStr = localStorage.getItem('milktea_last_notification');
+      if (!lastNtfStr) return;
+      try {
+        const ntf = JSON.parse(lastNtfStr);
+        const statusMap: Record<string, any> = {
+          confirmed: { label: 'Xác nhận đơn', tone: '#FFF3E6', color: '#F58220' },
+          preparing: { label: 'Đang pha chế', tone: '#EFF6FF', color: '#3B82F6' },
+          ready: { label: 'Giao hàng', tone: '#EEF2FF', color: '#6366F1' },
+          completed: { label: 'Hoàn tất đơn', tone: '#ECFDF5', color: '#10B981' },
+          cancelled: { label: 'Hủy đơn', tone: '#FEF2F2', color: '#EF4444' },
+        };
+        const cfg = statusMap[ntf.status] || { label: 'Cập nhật đơn', tone: '#F3F4F6', color: '#6B7280' };
+        const newNtf = {
+          id: ntf.id,
+          title: `Đơn hàng #${ntf.orderId}: ${cfg.label}`,
+          meta: "Đơn hàng",
+          time: "Vừa xong",
+          tone: cfg.tone,
+          color: cfg.color,
+          preview: `Trạng thái đơn hàng #${ntf.orderId} đã được chuyển sang ${ntf.status.toUpperCase()}.`,
+          route: "/admin/orders"
+        };
+        setNotifications(prev => [newNtf, ...prev.slice(0, 9)]);
+        showToast.success(`[Real-time] Đơn #${ntf.orderId}`, { description: `Trạng thái mới: ${cfg.label}` });
+        localStorage.removeItem('milktea_last_notification');
+      } catch (e) { console.error(e); }
+    };
+    window.addEventListener('storage', handleNotification);
+    return () => window.removeEventListener('storage', handleNotification);
+  }, []);
+
+  const notificationItems = notifications;
 
   if (bootLoading) {
     return <LoadingSpinner fullScreen text="Đang tải giao diện quản trị..." />;
@@ -127,28 +153,51 @@ export function Layout() {
           {navItems.map((item) => (
             <NavLink
               key={item.path}
-              to={item.path}
+              to={item.comingSoon ? "#" : item.path}
               id={item.id}
+              onClick={(e) => {
+                if (item.comingSoon) {
+                  e.preventDefault();
+                  showToast.info("Chức năng đang được phát triển!", {
+                    description: "Vui lòng quay lại sau khi chúng tôi hoàn thiện hệ thống.",
+                    duration: 3000,
+                  });
+                }
+              }}
               end={item.exact}
               className={({ isActive }) =>
-                `mb-1.5 flex items-center gap-3 rounded-2xl px-3.5 py-3 transition-all duration-200 ${isActive ? "shadow-[0_12px_24px_rgba(245,192,136,0.15)]" : ""}`
+                `mb-1.5 flex items-center gap-3 rounded-2xl px-3.5 py-3 transition-all duration-200 ${
+                  isActive && !item.comingSoon ? "shadow-[0_12px_24px_rgba(245,192,136,0.15)]" : ""
+                } ${item.comingSoon ? "opacity-60 cursor-not-allowed group/soon" : ""}`
               }
               style={({ isActive }) => ({
-                background: isActive ? "linear-gradient(135deg, #F5C088 0%, #FFDDB3 100%)" : "transparent",
-                color: isActive ? "#5D2E0F" : "#F8DAB7",
+                background: isActive && !item.comingSoon ? "linear-gradient(135deg, #F5C088 0%, #FFDDB3 100%)" : "transparent",
+                color: isActive && !item.comingSoon ? "#5D2E0F" : "#F8DAB7",
               })}
             >
               {({ isActive }) => (
                 <>
                   <div
-                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl"
-                    style={{ background: isActive ? "rgba(93,46,15,0.10)" : "rgba(255,255,255,0.06)" }}
+                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl relative"
+                    style={{ background: isActive && !item.comingSoon ? "rgba(93,46,15,0.10)" : "rgba(255,255,255,0.06)" }}
                   >
                     <item.icon size={17} />
+                    {item.comingSoon && (
+                      <div className="absolute -top-1 -right-1 bg-orange-500 rounded-full p-0.5 shadow-sm border border-white/20">
+                        <Timer size={8} className="text-white" />
+                      </div>
+                    )}
                   </div>
-                  <span style={{ fontSize: "13.5px", fontWeight: isActive ? 700 : 500 }}>
-                    {item.label}
-                  </span>
+                  <div className="flex flex-1 items-center justify-between min-w-0">
+                    <span style={{ fontSize: "13.5px", fontWeight: isActive && !item.comingSoon ? 700 : 500 }} className="truncate">
+                      {item.label}
+                    </span>
+                    {item.comingSoon && (
+                      <span className="text-[9px] font-bold tracking-tighter text-orange-200 uppercase opacity-0 group-hover/soon:opacity-100 transition-opacity ml-1">
+                        Soon
+                      </span>
+                    )}
+                  </div>
                 </>
               )}
             </NavLink>

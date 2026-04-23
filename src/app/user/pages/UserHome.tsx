@@ -46,17 +46,14 @@ export function UserHome() {
                 </div>
                 <h1 className="mt-4 font-heading text-2xl font-black leading-[1.1] text-white sm:mt-6 sm:text-4xl md:text-6xl lg:text-7xl anim-fade-up anim-fade-up-delay-2">
                   Hương vị trà <br /> 
-                  <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">Độc bản từ 2024</span>
+                  <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">Độc bản từ 2026</span>
                 </h1>
                 <p className="mt-3 max-w-xl text-xs leading-relaxed text-white/70 line-clamp-2 sm:mt-6 sm:text-base sm:line-clamp-none anim-fade-up anim-fade-up-delay-3">
-                  Kết tinh từ trà Shan Tuyết cổ thụ và công thức topping thủ công. Chips mang đến trải nghiệm thưởng trà đẳng cấp App-First.
+                  Kết tinh từ trà Shan Tuyết cổ thụ. Chips mang đến trải nghiệm thưởng trà đẳng cấp App-First.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2.5 sm:mt-10 sm:gap-4 anim-fade-up anim-fade-up-delay-4">
                   <Link to="/app/menu" className="flex h-11 items-center justify-center rounded-2xl bg-white px-6 text-xs font-black text-[#2D1606] shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-orange-50 hover:shadow-2xl active:scale-95 sm:h-14 sm:px-10 sm:text-sm anim-pulse-glow">
                     Đặt món ngay <ChevronRight className="ml-1.5 h-3.5 w-3.5 sm:ml-2 sm:h-4 sm:w-4" />
-                  </Link>
-                  <Link to="/app/offers" className="flex h-11 items-center justify-center rounded-2xl border-2 border-white/20 bg-white/10 px-5 text-xs font-black text-white backdrop-blur-md transition-all duration-300 hover:bg-white/20 hover:border-white/30 active:scale-95 sm:h-14 sm:px-8 sm:text-sm">
-                    Ưu đãi -50%
                   </Link>
                 </div>
               </div>
@@ -123,11 +120,9 @@ export function UserHome() {
               <div key={i} className="flex items-center gap-8">
                 <span className="flex items-center gap-2 text-sm font-black text-white"><Zap className="h-4 w-4" /> Flash Sale hôm nay</span>
                 <span className="text-white/30">•</span>
-                <span className="flex items-center gap-2 text-sm font-black text-white/80"><TicketPercent className="h-4 w-4" /> Mã CHIPS20 giảm 20K</span>
-                <span className="text-white/30">•</span>
                 <span className="flex items-center gap-2 text-sm font-black text-white"><Truck className="h-4 w-4" /> Freeship đơn 120K</span>
                 <span className="text-white/30">•</span>
-                <span className="flex items-center gap-2 text-sm font-black text-white/80"><Gift className="h-4 w-4" /> Tích điểm đổi quà</span>
+                <span className="flex items-center gap-2 text-sm font-black text-white"><Sparkles className="h-4 w-4" /> Đồ uống Organic</span>
                 <span className="text-white/30">•</span>
               </div>
             ))}
@@ -164,40 +159,7 @@ export function UserHome() {
       </section>
 
       {/* ─── PROMOTION CARDS ─── */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-        <div className="grid gap-6 lg:grid-cols-2 stagger-children">
-          {/* Member promo card */}
-          <div className="relative flex min-h-[300px] flex-col justify-center overflow-hidden rounded-[40px] bg-[#2D1606] p-8 text-white group sm:p-12 card-interactive">
-            <div className="absolute right-0 top-0 p-8 opacity-10 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6">
-              <Gift className="h-48 w-48 rotate-12" />
-            </div>
-            <div className="relative z-10">
-              <div className="inline-block rounded-full bg-white/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest ring-1 ring-white/20 anim-shimmer">Member Exclusive</div>
-              <h3 className="mt-6 font-heading text-4xl font-extrabold leading-tight">Đăng ký thành viên <br /><span className="text-orange-500">nhận ngay 3 Voucher 50%</span></h3>
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/70 italic">Ưu đãi dành riêng cho khách hàng mới trong tháng này.</p>
-              <button className="mt-10 h-14 rounded-2xl bg-orange-500 px-8 text-sm font-black shadow-[0_12px_24px_rgba(249,115,22,0.3)] transition-all duration-300 hover:scale-105 hover:bg-orange-400 hover:shadow-[0_16px_32px_rgba(249,115,22,0.4)] active:scale-95">Trải nghiệm ngay</button>
-            </div>
-          </div>
-          
-          {/* Voucher card */}
-          <div className="relative flex min-h-[300px] flex-col items-center justify-center overflow-hidden rounded-[40px] bg-white p-8 text-center border-2 border-orange-100 group sm:p-12 card-interactive">
-             <div className="absolute -bottom-10 -right-10 opacity-5 transition-transform duration-700 group-hover:-translate-x-4 group-hover:rotate-12">
-                <TicketPercent className="h-64 w-64 rotate-[-15deg]" />
-             </div>
-             <div className="relative z-10">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[20px] bg-orange-50 anim-float-badge">
-                  <TicketPercent className="h-8 w-8 text-orange-500" />
-                </div>
-                <h3 className="mt-6 font-heading text-3xl font-black text-[#2D1606]">Nhập mã "CHIPS20" <br />Giảm 20K đơn 1</h3>
-                <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[#8A552A]">Mã áp dụng cho toàn bộ Menu</p>
-                <div className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-orange-50 px-6 py-3 border border-orange-100 transition-colors hover:bg-orange-100/50">
-                   <code className="text-lg font-black text-orange-600">CHIPS20</code>
-                   <button className="text-xs font-black text-orange-700 hover:underline transition-all">Sao chép</button>
-                </div>
-             </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* ─── NEW ARRIVALS & TRENDING LISTS ─── */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">

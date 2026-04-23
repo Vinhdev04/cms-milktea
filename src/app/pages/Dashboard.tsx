@@ -3,11 +3,10 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
-import {
-  TrendingUp, ShoppingBag, Users, Store, ArrowUpRight, ArrowDownRight,
-  Clock, CheckCircle2, AlertCircle, XCircle, Eye, MoreHorizontal, Info, Sparkles
-} from "lucide-react";
-import { revenueData, weeklyData, categoryData, orders } from "../../data/mockData";
+import { TrendingUp, ShoppingBag, Users, Store, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, AlertCircle, XCircle, Eye, MoreHorizontal, Info, Sparkles } from "lucide-react";
+import { revenueData, weeklyData, categoryData, orders as initialOrders } from "../../data/mockData";
+import { OrderService } from "../services/OrderService";
+import { showToast } from "../utils/toast";
 
 const formatCurrency = (value: number) => {
   if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
@@ -68,12 +67,76 @@ const statsCards = [
     bg: '#FFF0F3',
     iconBg: '#FCBABD',
     iconColor: '#8B3A4A',
-    hint: 'Tỷ lệ chi nhánh đang mở cửa đón khách so với tổng số chi nhánh trên hệ thống.'
+    hint: 'Tỷ lệ chi nhánh đang hoạt động. Hiện tại hệ thống đang sử dụng cấu hình chi nhánh mặc định.'
   },
 ];
 
 export function Dashboard() {
+  const [orders, setOrders] = useState(OrderService.getAllOrders());
   const [chartPeriod, setChartPeriod] = useState<'weekly' | 'monthly'>('monthly');
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      setOrders(OrderService.getAllOrders());
+    };
+    window.addEventListener('storage', handleRefresh);
+    const interval = setInterval(handleRefresh, 3000);
+    return () => {
+      window.removeEventListener('storage', handleRefresh);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const todayStr = new Date().toLocaleDateString('vi-VN');
+  const todayOrders = orders.filter(o => o.date === todayStr || o.createdAt.includes(new Date().toISOString().split('T')[0]));
+  const todayRevenue = todayOrders.reduce((sum, o) => sum + o.total, 0);
+
+  const dynamicStatsCards = [
+    {
+      title: 'Doanh thu hôm nay',
+      value: formatVND(todayRevenue),
+      sub: `Từ ${todayOrders.length} đơn hàng`,
+      trend: 'up',
+      icon: TrendingUp,
+      bg: '#FFF3E6',
+      iconBg: '#F5C088',
+      iconColor: '#F58220',
+      hint: 'Tổng giá trị các đơn hàng được tạo trong ngày hôm nay.'
+    },
+    {
+      title: 'Đơn hàng hôm nay',
+      value: todayOrders.length.toString(),
+      sub: 'Cập nhật thời gian thực',
+      trend: 'up',
+      icon: ShoppingBag,
+      bg: '#EFF6FF',
+      iconBg: '#BFDBFE',
+      iconColor: '#1E40AF',
+      hint: 'Số lượng đơn hàng được tạo tính từ 00:00 sáng đến thời điểm hiện tại.'
+    },
+    {
+      title: 'Khách hàng mới',
+      value: '24',
+      sub: 'Tăng trưởng ổn định',
+      trend: 'up',
+      icon: Users,
+      bg: '#FEF9C3',
+      iconBg: '#FDE68A',
+      iconColor: '#92400E',
+      hint: 'Số lượng tài khoản khách hàng mới đăng ký trong vòng 24 giờ qua.'
+    },
+    {
+      title: 'Chi nhánh hoạt động',
+      value: '3/3',
+      sub: 'Tất cả sẵn sàng',
+      trend: 'neutral',
+      icon: Store,
+      bg: '#FFF0F3',
+      iconBg: '#FCBABD',
+      iconColor: '#8B3A4A',
+      hint: 'Tỷ lệ chi nhánh đang hoạt động.'
+    },
+  ];
 
   // ─── COMPREHENSIVE SIDEBAR TOUR LOGIC (DRIVER.JS) ───
   const runTour = () => {
@@ -106,7 +169,7 @@ export function Dashboard() {
             element: '#tour-side-menu', 
             popover: { 
               title: '🍔 Quản lý Thực đơn', 
-              description: 'Quản lý danh sách món, giá cả, danh mục và các nhóm Topping đi kèm.',
+              description: 'Quản lý danh sách món, giá cả và các danh mục sản phẩm.',
               side: "right", align: 'start' 
             } 
         },
@@ -129,8 +192,8 @@ export function Dashboard() {
         { 
             element: '#tour-side-vouchers', 
             popover: { 
-              title: '🎫 Voucher & Ưu đãi', 
-              description: 'Phát hành mã giảm giá, thiết lập chương trình khuyến mãi và quản lý thời hạn ưu đãi.',
+              title: '🎫 Voucher & Ưu đãi (Soon)', 
+              description: 'Chức năng phát hành mã giảm giá đang được phát triển.',
               side: "right", align: 'start' 
             } 
         },
@@ -145,16 +208,16 @@ export function Dashboard() {
         { 
             element: '#tour-side-media', 
             popover: { 
-              title: '🖼️ Thư viện Media', 
-              description: 'Nơi lưu trữ và quản lý hình ảnh sản phẩm, banner quảng cáo của cửa hàng.',
+              title: '🖼️ Thư viện Media (Soon)', 
+              description: 'Nơi quản lý hình ảnh sản phẩm đang được phát triển.',
               side: "right", align: 'start' 
             } 
         },
         { 
             element: '#tour-side-branches', 
             popover: { 
-              title: '📍 Chi nhánh', 
-              description: 'Quản lý thông tin liên hệ, giờ hoạt động và vị trí của các chi nhánh trên hệ thống.',
+              title: '📍 Chi nhánh (Soon)', 
+              description: 'Chức năng quản lý các chi nhánh đang được phát triển.',
               side: "right", align: 'start' 
             } 
         },
@@ -169,8 +232,8 @@ export function Dashboard() {
         { 
             element: '#tour-side-reviews', 
             popover: { 
-              title: '💬 Đánh giá & Phản hồi', 
-              description: 'Tiếp nhận và phản hồi các đánh giá từ khách hàng để cải thiện chất lượng dịch vụ.',
+              title: '💬 Đánh giá & Phản hồi (Soon)', 
+              description: 'Chức năng tiếp nhận phản hồi khách hàng đang được phát triển.',
               side: "right", align: 'start' 
             } 
         },
@@ -249,7 +312,7 @@ export function Dashboard() {
 
       {/* Stats Grid */}
       <div id="tour-stats-grid" className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 sm:gap-4">
-        {statsCards.map((card, i) => (
+        {dynamicStatsCards.map((card, i) => (
           <div key={i} className="compact-stat-card hover-lift p-4 sm:p-5 group cursor-help"
             style={{ boxShadow: '0 10px 24px rgba(93,46,15,0.05)' }}
             data-tippy-content={`<div class="font-bold text-orange-400 mb-1">${card.title}</div><div class="text-[11px] leading-relaxed">${card.hint}</div>`}
@@ -401,7 +464,7 @@ export function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {orders.slice(0, 6).map((order, i) => {
+              {orders.slice(0, 10).map((order, i) => {
                 const st = statusConfig[order.status] || {
                   label: order.status || 'Không rõ',
                   bg: '#F3F4F6',
@@ -410,6 +473,14 @@ export function Dashboard() {
                 };
                 const typeLabel = order.type === 'delivery' ? 'Giao hàng' : order.type === 'takeaway' ? 'Mang về' : 'Tại quán';
                 const dateStr = new Date(order.createdAt).toLocaleDateString('vi-VN');
+
+                const handleStatusUpdate = (newStatus: any) => {
+                  OrderService.updateOrderStatus(order.id, newStatus);
+                  showToast.success(`Cập nhật đơn #${order.id}`, {
+                    description: `Đã chuyển sang trạng thái: ${statusConfig[newStatus]?.label || newStatus}`
+                  });
+                };
+
                 return (
                   <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors"
                     style={{ borderColor: '#FAF0E6' }}>
@@ -432,20 +503,60 @@ export function Dashboard() {
                     <td className="px-4 py-3">
                       <span style={{ fontSize: '12px', color: '#A0845C' }}>{dateStr}</span>
                     </td>
-                    <td className="px-4 py-3"
-                        data-tippy-content={`Đơn hàng này hiện đang ở trạng thái <b>${st.label}</b>.`}
-                        data-tippy-theme="chips-light"
-                    >
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full cursor-help"
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
                         style={{ background: st.bg, color: st.color, fontSize: '11.5px', fontWeight: 600 }}>
                         {st.icon}
                         {st.label}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                        <MoreHorizontal size={16} style={{ color: '#9CA3AF' }} />
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        {order.status === 'pending' && (
+                          <button 
+                            onClick={() => handleStatusUpdate('confirmed')}
+                            className="px-3 py-1.5 bg-orange-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-orange-600 transition-all active:scale-95"
+                          >
+                            Xác nhận
+                          </button>
+                        )}
+                        {order.status === 'confirmed' && (
+                          <button 
+                            onClick={() => handleStatusUpdate('preparing')}
+                            className="px-3 py-1.5 bg-blue-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-blue-600 transition-all active:scale-95"
+                          >
+                            Pha chế
+                          </button>
+                        )}
+                        {order.status === 'preparing' && (
+                          <button 
+                            onClick={() => handleStatusUpdate('ready')}
+                            className="px-3 py-1.5 bg-indigo-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-indigo-600 transition-all active:scale-95"
+                          >
+                            Giao hàng
+                          </button>
+                        )}
+                        {order.status === 'ready' && (
+                          <button 
+                            onClick={() => handleStatusUpdate('completed')}
+                            className="px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-emerald-600 transition-all active:scale-95"
+                          >
+                            Hoàn tất
+                          </button>
+                        )}
+                        {['pending', 'confirmed'].includes(order.status) && (
+                          <button 
+                            onClick={() => handleStatusUpdate('cancelled')}
+                            className="p-1.5 bg-rose-50 text-rose-500 rounded-lg hover:bg-rose-100 transition-colors"
+                            title="Hủy đơn"
+                          >
+                            <XCircle size={14} />
+                          </button>
+                        )}
+                        <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                          <MoreHorizontal size={16} style={{ color: '#9CA3AF' }} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
