@@ -3,6 +3,7 @@ import {
   Search, Filter, FileText, CheckCircle2, AlertTriangle,
   XCircle, Activity, SearchX, Shield, ChevronDown
 } from "lucide-react";
+import { showToast } from "../utils/toast";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { usePagination } from "../hooks/useDataFetching";
@@ -49,6 +50,16 @@ const statusLabels: Record<string, string> = {
 export function AuditLog() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = () => {
+    setIsExporting(true);
+    showToast.loading("Đang chuẩn bị dữ liệu xuất...");
+    setTimeout(() => {
+      setIsExporting(false);
+      showToast.success("Xuất CSV thành công", { description: "File audit_log_2026.csv đã được tải xuống." });
+    }, 1500);
+  };
 
   const filtered = useMemo(
     () =>
@@ -132,9 +143,13 @@ export function AuditLog() {
               </select>
             </div>
 
-            <button className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-[#F0DCC8] px-4 text-sm font-semibold text-[#1A1A1A] transition-colors hover:bg-[#FFF8F1]">
-              <FileText size={15} />
-              Xuất CSV
+            <button 
+              onClick={handleExport}
+              disabled={isExporting}
+              className={`flex h-12 items-center justify-center gap-2 rounded-2xl border border-[#F0DCC8] px-4 text-sm font-semibold transition-colors ${isExporting ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'text-[#1A1A1A] hover:bg-[#FFF8F1]'}`}
+            >
+              <FileText size={15} className={isExporting ? 'animate-pulse' : ''} />
+              {isExporting ? 'Đang xuất...' : 'Xuất CSV'}
             </button>
           </div>
         </div>

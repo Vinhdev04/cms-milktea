@@ -20,16 +20,77 @@ export function UserHome() {
   const [selectedBranch, setSelectedBranch] = useState(userPreviewBranches[0].id);
   const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('delivery');
 
-  const activeBranch = userPreviewBranches.find((branch) => branch.id === selectedBranch) ?? userPreviewBranches[0];
-  const bestSellerProducts = userPreviewProducts.filter((item) => item.badge === 'Bán chạy' || item.sold > 700).slice(0, 4);
-  const newProducts = userPreviewProducts.slice(0, 6);
-  const trendingProducts = userPreviewProducts.filter(p => !p.isFeatured).slice(0, 6);
+  const activeBranch = useMemo(() => userPreviewBranches.find((branch) => branch.id === selectedBranch) ?? userPreviewBranches[0], [selectedBranch]);
+  const bestSellerProducts = useMemo(() => userPreviewProducts.filter((item) => item.badge === 'Bán chạy' || item.sold > 700).slice(0, 4), []);
+  const newProducts = useMemo(() => userPreviewProducts.slice(0, 6), []);
+  const trendingProducts = useMemo(() => userPreviewProducts.filter(p => !p.isFeatured).slice(0, 6), []);
+
+  const runOrderTutorial = () => {
+    const windowAny = window as any;
+    if (!windowAny.driver) return;
+
+    const driverObj = windowAny.driver.js.driver({
+      showProgress: true,
+      nextBtnText: 'Tiếp theo',
+      prevBtnText: 'Trước',
+      doneBtnText: 'Hoàn tất',
+      steps: [
+        { 
+          element: '#tour-hero-welcome', 
+          popover: { 
+            title: '👋 Chào mừng bạn đến với Chips!', 
+            description: 'Hãy để chúng mình hướng dẫn bạn cách đặt một ly trà sữa thơm ngon chỉ trong vài bước nhé.',
+            side: "bottom", align: 'start' 
+          } 
+        },
+        { 
+          element: '#tour-categories', 
+          popover: { 
+            title: '1. Chọn loại đồ uống', 
+            description: 'Đầu tiên, hãy chọn danh mục đồ uống bạn yêu thích: Trà sữa, Trà trái cây hay Cà phê.',
+            side: "bottom", align: 'center' 
+          } 
+        },
+        { 
+          element: '#tour-best-sellers', 
+          popover: { 
+            title: '2. Khám phá món bán chạy', 
+            description: 'Nếu bạn phân vân, hãy thử ngay những món "Best Seller" được cộng đồng Chips yêu thích nhất.',
+            side: "top", align: 'center' 
+          } 
+        },
+        { 
+          element: '#tour-hero-action', 
+          popover: { 
+            title: '3. Bắt đầu đặt hàng', 
+            description: 'Nhấn vào đây để xem toàn bộ thực đơn và bắt đầu tùy chỉnh ly trà sữa của riêng bạn.',
+            side: "right", align: 'center' 
+          } 
+        },
+        { 
+          popover: { 
+            title: '✨ Sẵn sàng chưa?', 
+            description: 'Sau khi chọn món, bạn có thể tùy chỉnh Đá, Đường và Topping theo ý thích trong trang chi tiết món nhé!',
+          } 
+        }
+      ]
+    });
+    driverObj.drive();
+  };
+
+  useMemo(() => {
+    const hasSeenTour = localStorage.getItem('hasSeenUserTour');
+    if (!hasSeenTour) {
+       setTimeout(runOrderTutorial, 2000);
+       localStorage.setItem('hasSeenUserTour', 'true');
+    }
+  }, []);
 
   return (
     <div className="pb-24">
       {/* ─── PREMIUM HERO BANNER ─── */}
       <section className="relative mx-auto max-w-7xl px-4 pt-4 sm:px-6 sm:pt-6 anim-fade-up">
-        <div className="relative h-[360px] w-full overflow-hidden rounded-[28px] shadow-2xl sm:h-[480px] sm:rounded-[40px] lg:h-[540px]">
+        <div id="tour-hero-welcome" className="relative h-[360px] w-full overflow-hidden rounded-[28px] shadow-2xl sm:h-[480px] sm:rounded-[40px] lg:h-[540px]">
           <img
             src="https://images.unsplash.com/photo-1576092762791-dd9e2220abd1?auto=format&fit=crop&w=1600&q=80"
             alt="Hero Banner"
@@ -52,9 +113,12 @@ export function UserHome() {
                   Kết tinh từ trà Shan Tuyết cổ thụ. Chips mang đến trải nghiệm thưởng trà đẳng cấp App-First.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2.5 sm:mt-10 sm:gap-4 anim-fade-up anim-fade-up-delay-4">
-                  <Link to="/app/menu" className="flex h-11 items-center justify-center rounded-2xl bg-white px-6 text-xs font-black text-[#2D1606] shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-orange-50 hover:shadow-2xl active:scale-95 sm:h-14 sm:px-10 sm:text-sm anim-pulse-glow">
+                  <Link id="tour-hero-action" to="/app/menu" className="flex h-11 items-center justify-center rounded-2xl bg-white px-6 text-xs font-black text-[#2D1606] shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-orange-50 hover:shadow-2xl active:scale-95 sm:h-14 sm:px-10 sm:text-sm anim-pulse-glow">
                     Đặt món ngay <ChevronRight className="ml-1.5 h-3.5 w-3.5 sm:ml-2 sm:h-4 sm:w-4" />
                   </Link>
+                  <button onClick={runOrderTutorial} className="flex h-11 items-center justify-center rounded-2xl border border-white/30 bg-white/10 px-6 text-xs font-black text-white backdrop-blur-md transition-all hover:bg-white/20 sm:h-14 sm:px-8 sm:text-sm">
+                    Hướng dẫn đặt hàng
+                  </button>
                 </div>
               </div>
 
@@ -88,7 +152,7 @@ export function UserHome() {
       </section>
 
       {/* ─── CATEGORY QUICK GRID ─── */}
-      <section className="mx-auto max-w-7xl px-4 pt-12 sm:px-6">
+      <section id="tour-categories" className="mx-auto max-w-7xl px-4 pt-12 sm:px-6">
         <div className="grid grid-cols-4 gap-4 sm:grid-cols-4 lg:grid-cols-4 lg:gap-8 stagger-children">
           {[
             { id: 'milk-tea', name: 'Trà Sữa', icon: '🧋', bg: 'bg-gradient-to-br from-[#FFF3E7] to-[#FFE8D0]', ring: 'ring-orange-100' },
@@ -131,7 +195,7 @@ export function UserHome() {
       </section>
 
       {/* ─── BESTSELLER SECTION ─── */}
-      <section className="mx-auto max-w-7xl px-4 pt-16 sm:px-6">
+      <section id="tour-best-sellers" className="mx-auto max-w-7xl px-4 pt-16 sm:px-6">
         <div className="mb-10 flex items-end justify-between anim-fade-up">
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-orange-600">

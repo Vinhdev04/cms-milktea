@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { Download, Calendar, TrendingUp, ShoppingBag, Users, ChevronDown, DollarSign } from "lucide-react";
+import { showToast } from "../utils/toast";
 
 export function Reports() {
   const [timeRange, setTimeRange] = useState('Tháng này');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = () => {
+    setIsExporting(true);
+    showToast.loading("Đang tổng hợp dữ liệu báo cáo...");
+    setTimeout(() => {
+      setIsExporting(false);
+      showToast.success("Xuất File thành công", { description: "Báo cáo doanh thu và tổng quan đã được tải." });
+    }, 1500);
+  };
 
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
@@ -26,9 +37,14 @@ export function Reports() {
           </div>
 
           {/* Export Button */}
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all"
-            style={{ background: '#F58220', color: 'white', fontWeight: 600, fontSize: '13.5px' }}>
-            <Download size={16} /> Xuất File
+          <button 
+            onClick={handleExport}
+            disabled={isExporting}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${isExporting ? 'bg-orange-400 cursor-not-allowed opacity-80' : 'hover:shadow-lg hover:-translate-y-0.5'}`}
+            style={{ background: '#F58220', color: 'white', fontWeight: 600, fontSize: '13.5px' }}
+          >
+            <Download size={16} className={isExporting ? 'animate-bounce' : ''} /> 
+            {isExporting ? 'Đang xuất...' : 'Xuất File'}
           </button>
         </div>
       </div>

@@ -18,6 +18,17 @@ export const OrderService = {
     // Prepend new order
     const updated = [order, ...orders];
     localStorage.setItem(ORDERS_KEY, JSON.stringify(updated));
+    
+    // Set a notification payload for the Header/Layout to pick up (new order)
+    const notification = {
+      id: `NTF-${Date.now()}`,
+      orderId: order.id,
+      customerId: order.customerId || 'guest',
+      status: 'pending',
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('milktea_last_notification', JSON.stringify(notification));
+
     // Dispatch event to notify other parts of the app
     window.dispatchEvent(new Event('storage'));
   },

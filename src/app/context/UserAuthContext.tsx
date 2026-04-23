@@ -72,7 +72,6 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) { console.error('Failed to load user:', error); }
       }
     }
-    // ... cart/favorites logic same as before
 
     const savedCart = localStorage.getItem('milkteaCart');
     if (savedCart) {
@@ -149,6 +148,9 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
     document.cookie = `milktea_auth_token=${newUser.id}; path=/; max-age=${7 * 24 * 60 * 60}`;
     localStorage.setItem('milkteaUser', JSON.stringify(userWithoutPassword));
     
+    // Dispatch storage event so admin dashboard (customers) updates in real-time
+    window.dispatchEvent(new Event('storage'));
+
     return { success: true };
   };
 

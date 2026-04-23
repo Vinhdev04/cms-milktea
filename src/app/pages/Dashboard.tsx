@@ -485,7 +485,14 @@ export function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {orders.slice(0, 10).map((order, i) => {
+              {filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-20 text-center text-gray-400 text-sm italic">
+                    Không có đơn hàng nào trong mục này.
+                  </td>
+                </tr>
+              ) : (
+                filteredOrders.slice(0, 20).map((order) => {
                   const st = statusConfig[order.status] || {
                     label: order.status || 'Không rõ',
                     bg: '#F3F4F6',
@@ -569,6 +576,15 @@ export function Dashboard() {
                               title="Hủy đơn"
                             >
                               <XCircle size={14} />
+                            </button>
+                          )}
+                          {order.status === 'completed' && (
+                            <button 
+                              onClick={() => window.print()}
+                              className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+                              title="In hóa đơn"
+                            >
+                              <Eye size={14} />
                             </button>
                           )}
                           <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">

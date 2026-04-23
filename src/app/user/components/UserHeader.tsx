@@ -18,9 +18,12 @@ export function UserHeader() {
   const [notifications, setNotifications] = useState(userPreviewNotifications);
 
   useEffect(() => {
-    const handleNotification = () => {
-      const lastNtfStr = localStorage.getItem('milktea_last_notification');
+    const handleNotification = (e?: any) => {
+      if (e && e.key && e.key !== 'milktea_last_notification') return;
+      
+      const lastNtfStr = (e && e.newValue) ? e.newValue : localStorage.getItem('milktea_last_notification');
       if (!lastNtfStr) return;
+      
       try {
         const ntf = JSON.parse(lastNtfStr);
         // Only show if it belongs to current user or is guest demo
@@ -48,7 +51,7 @@ export function UserHeader() {
           type: 'order' as const
         };
         setNotifications(prev => [newNtf, ...prev]);
-        // Note: In real app we'd clear last_notification but Admin side already does it
+        // Note: We don't clear last_notification to avoid race conditions with Admin tab
       } catch (e) { console.error(e); }
     };
 

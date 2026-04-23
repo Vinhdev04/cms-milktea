@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Eye, X, Award, ShoppingBag, TrendingUp, Users, Lock, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 import { customers } from "../../data/mockData";
@@ -154,9 +154,38 @@ export function CustomerManagement() {
   const [search, setSearch] = useState('');
   const [activeTier, setActiveTier] = useState('Tất cả');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [allCustomers, setAllCustomers] = useState<Customer[]>(customers);
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      const stored = JSON.parse(localStorage.getItem('milktea_all_users') || '[]');
+      // Map stored users to Customer format
+      const mappedStored = stored.map((u: any) => ({
+        id: u.id,
+        name: u.name,
+        phone: u.phone,
+        email: u.email,
+        tier: u.tier || 'Member',
+        points: u.loyaltyPoints || 0,
+        totalOrders: 0,
+        totalSpent: 0,
+        joinDate: new Date().toLocaleDateString('vi-VN'),
+        lastOrder: 'Chưa có',
+      }));
+      // Merge preventing duplicates by email
+      const merged = [...mappedStored, ...customers].filter((c, i, self) => 
+        i === self.findIndex((t) => t.email === c.email)
+      );
+      setAllCustomers(merged);
+    };
+
+    handleRefresh();
+    window.addEventListener('storage', handleRefresh);
+    return () => window.removeEventListener('storage', handleRefresh);
+  }, []);
 
   const tiers = ['Tất cả', 'Gold', 'Silver', 'Member', 'Blacklist'];
-  const filtered = customers.filter(c =>
+  const filtered = allCustomers.filter(c =>
     (activeTier === 'Tất cả' || c.tier === activeTier) &&
     (c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search))
   );
@@ -171,16 +200,16 @@ export function CustomerManagement() {
         <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
           Quản lý Khách hàng
         </h1>
-        <p style={{ fontSize: '13.5px', color: '#A0845C' }}>{customers.length} khách hàng đã đăng ký</p>
+        <p style={{ fontSize: '13.5px', color: '#A0845C' }}>{allCustomers.length} khách hàng đã đăng ký</p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6">
         {[
-          { label: 'Gold Member', count: customers.filter(c => c.tier === 'Gold').length, bg: '#FEF9C3', color: '#854D0E' },
-          { label: 'Silver Member', count: customers.filter(c => c.tier === 'Silver').length, bg: '#F3F4F6', color: '#374151' },
-          { label: 'Member', count: customers.filter(c => c.tier === 'Member').length, bg: '#FFF3E6', color: '#F58220' },
-          { label: 'Blacklist', count: customers.filter(c => c.tier === 'Blacklist').length, bg: '#FEE2E2', color: '#991B1B' },
+          { label: 'Gold Member', count: allCustomers.filter(c => c.tier === 'Gold').length, bg: '#FEF9C3', color: '#854D0E' },
+          { label: 'Silver Member', count: allCustomers.filter(c => c.tier === 'Silver').length, bg: '#F3F4F6', color: '#374151' },
+          { label: 'Member', count: allCustomers.filter(c => c.tier === 'Member' || c.tier === 'Bronze').length, bg: '#FFF3E6', color: '#F58220' },
+          { label: 'Blacklist', count: allCustomers.filter(c => c.tier === 'Blacklist').length, bg: '#FEE2E2', color: '#991B1B' },
         ].map((card) => (
           <div key={card.label} className="rounded-xl p-3 md:p-4 flex flex-col xl:flex-row items-center xl:items-start gap-2 md:gap-3 text-center xl:text-left"
             style={{ background: 'white', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>

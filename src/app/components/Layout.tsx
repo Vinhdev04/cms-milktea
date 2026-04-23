@@ -21,7 +21,7 @@ const navItems = [
   { path: "/admin/reports", label: "Báo cáo", icon: BarChart3, id: "tour-side-reports" },
   { path: "/admin/media", label: "Thư viện Media", icon: Image, id: "tour-side-media", comingSoon: true },
   { path: "/admin/branches", label: "Chi nhánh", icon: MapPin, id: "tour-side-branches", comingSoon: true },
-  { path: "/admin/staff", label: "Nhân viên", icon: UserCheck, id: "tour-side-staff" },
+  { path: "/admin/crm", label: "CRM Khách hàng", icon: UserCheck, id: "tour-side-crm" },
   { path: "/admin/reviews", label: "Đánh giá & Phản hồi", icon: MessageSquare, id: "tour-side-reviews", comingSoon: true },
   { path: "/admin/audit-log", label: "Audit Log", icon: ShieldAlert, id: "tour-side-audit" },
   { path: "/admin/settings", label: "Cấu hình hệ thống", icon: Settings, id: "tour-side-settings" },
@@ -76,33 +76,39 @@ export function Layout() {
     { id: "NTF-03", title: "Phát hiện 1 cảnh báo đăng nhập thất bại", meta: "Audit Log", time: "34 phút trước", tone: "#FEE2E2", color: "#991B1B", preview: "Một IP lạ đã thử đăng nhập nhiều lần. Cần xem chi tiết trong Audit Log.", route: "/admin/audit-log" },
   ]);
 
-  useEffect(() => {
-    const handleNotification = () => {
-      const lastNtfStr = localStorage.getItem('milktea_last_notification');
+    useEffect(() => {
+    const handleNotification = (e?: any) => {
+      if (e && e.key && e.key !== 'milktea_last_notification') return;
+      
+      const lastNtfStr = (e && e.newValue) ? e.newValue : localStorage.getItem('milktea_last_notification');
       if (!lastNtfStr) return;
+      
       try {
         const ntf = JSON.parse(lastNtfStr);
+        // Only process notifications intended for admin or general orders
+        // Don't show toast if admin is the one who triggered it (optional, but good for UX)
+        // Here we just show it.
         const statusMap: Record<string, any> = {
-          confirmed: { label: 'Xác nhận đơn', tone: '#FFF3E6', color: '#F58220' },
-          preparing: { label: 'Đang pha chế', tone: '#EFF6FF', color: '#3B82F6' },
-          ready: { label: 'Giao hàng', tone: '#EEF2FF', color: '#6366F1' },
-          completed: { label: 'Hoàn tất đơn', tone: '#ECFDF5', color: '#10B981' },
-          cancelled: { label: 'Hủy đơn', tone: '#FEF2F2', color: '#EF4444' },
+          pending: { label: 'Đơn hàng mới', tone: '#FEF2F2', color: '#EF4444', meta: 'Order Mới' }, // Added pending
+          confirmed: { label: 'Xác nhận đơn', tone: '#FFF3E6', color: '#F58220', meta: 'Cập nhật' },
+          preparing: { label: 'Đang pha chế', tone: '#EFF6FF', color: '#3B82F6', meta: 'Cập nhật' },
+          ready: { label: 'Giao hàng', tone: '#EEF2FF', color: '#6366F1', meta: 'Cập nhật' },
+          completed: { label: 'Hoàn tất đơn', tone: '#ECFDF5', color: '#10B981', meta: 'Cập nhật' },
+          cancelled: { label: 'Hủy đơn', tone: '#FEF2F2', color: '#EF4444', meta: 'Cập nhật' },
         };
-        const cfg = statusMap[ntf.status] || { label: 'Cập nhật đơn', tone: '#F3F4F6', color: '#6B7280' };
+        const cfg = statusMap[ntf.status] || { label: 'Cập nhật đơn', tone: '#F3F4F6', color: '#6B7280', meta: 'Hệ thống' };
         const newNtf = {
           id: ntf.id,
           title: `Đơn hàng #${ntf.orderId}: ${cfg.label}`,
-          meta: "Đơn hàng",
+          meta: cfg.meta,
           time: "Vừa xong",
           tone: cfg.tone,
           color: cfg.color,
-          preview: `Trạng thái đơn hàng #${ntf.orderId} đã được chuyển sang ${ntf.status.toUpperCase()}.`,
+          preview: ntf.status === 'pending' ? `Khách hàng vừa đặt một đơn mới. Vui lòng xác nhận.` : `Trạng thái đơn hàng #${ntf.orderId} đã được chuyển sang ${ntf.status.toUpperCase()}.`,
           route: "/admin/orders"
         };
         setNotifications(prev => [newNtf, ...prev.slice(0, 9)]);
         showToast.success(`[Real-time] Đơn #${ntf.orderId}`, { description: `Trạng thái mới: ${cfg.label}` });
-        localStorage.removeItem('milktea_last_notification');
       } catch (e) { console.error(e); }
     };
     window.addEventListener('storage', handleNotification);

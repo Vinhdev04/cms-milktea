@@ -33,6 +33,12 @@ export function UserLayout() {
   const location = useLocation();
   const isAuthPage = location.pathname === '/app/auth';
 
+  // Hide bottom nav on pages that have their own sticky bottom action bars
+  const hideBottomNav = [
+    '/app/cart',
+    '/app/checkout',
+  ].includes(location.pathname) || location.pathname.match(/^\/app\/menu\/[^/]+$/);
+
   if (isAuthPage) {
     return (
       <div className="h-screen w-screen overflow-hidden bg-[#FFFAF5]">
@@ -46,14 +52,14 @@ export function UserLayout() {
       <div className="pointer-events-none fixed inset-x-0 top-0 h-[30rem] z-0 bg-[radial-gradient(circle_at_top_left,rgba(255,138,31,0.14),transparent_34%),radial-gradient(circle_at_top_right,rgba(229,106,0,0.12),transparent_32%),radial-gradient(circle_at_center,rgba(245,192,136,0.16),transparent_42%)]" />
       <UserHeader />
       <div className="overflow-x-hidden">
-        <main className="relative z-10 flex-1 page-shell pb-24 lg:pb-0">
+        <main className={`relative z-10 flex-1 page-shell lg:pb-0 ${hideBottomNav ? 'pb-8' : 'pb-24'}`}>
           <Outlet />
         </main>
         <div className="hidden lg:block">
           <UserFooter />
         </div>
       </div>
-      <MobileBottomNav />
+      {!hideBottomNav && <MobileBottomNav />}
       <BackToTop />
     </div>
   );

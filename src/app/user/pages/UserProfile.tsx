@@ -120,8 +120,6 @@ export function UserProfile() {
           ))}
         </section>
 
-        <WalletInfo />
-
         {/* ─── ACTION LISTS ─── */}
         <section className="mt-6 space-y-3 stagger-children">
            <ProfileGroup title="Hoạt động">
@@ -208,35 +206,6 @@ export function UserProfile() {
 }
 
 // ─── HELPER COMPONENTS ───
-
-function WalletInfo() {
-  const [show, setShow] = useState(true);
-  return (
-    <div className="mt-4 overflow-hidden rounded-[28px] bg-[#2D1606] p-5 text-white shadow-xl relative card-interactive sm:p-6">
-       <div className="absolute top-0 right-0 p-4 opacity-5">
-          <ShieldCheck className="h-20 w-20" />
-       </div>
-       <div className="flex items-center justify-between mb-5">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] opacity-50">Tài khoản thanh toán</div>
-          <button onClick={() => setShow(!show)} className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all active:scale-90">
-             {show ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-          </button>
-       </div>
-       <div className="space-y-3">
-          <div className="flex items-center justify-between">
-             <div className="text-[11px] font-bold opacity-60">MB Bank (VietQR)</div>
-             <div className="text-sm font-black sm:text-base">{show ? '0296 9904 0112 10' : '•••• •••• •••• ••'}</div>
-          </div>
-          <div className="flex items-center justify-between">
-             <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold opacity-60">Chủ tài khoản</span>
-             </div>
-             <div className="text-[11px] font-black uppercase tracking-wider">{show ? 'PHAM CONG VINH' : '•••• •••• ••••'}</div>
-          </div>
-       </div>
-    </div>
-  );
-}
 
 function ProfileGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (

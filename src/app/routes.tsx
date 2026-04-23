@@ -11,7 +11,7 @@ import { CustomerManagement } from "./pages/CustomerManagement";
 import { VoucherManagement } from "./pages/VoucherManagement";
 import { Reports } from "./pages/Reports";
 import { BranchManagement } from "./pages/BranchManagement";
-import { StaffManagement } from "./pages/StaffManagement";
+import { CustomerCRM } from "./pages/CustomerCRM";
 import { SystemSettings } from "./pages/SystemSettings";
 import { AuditLog } from "./pages/AuditLog";
 import { Auth } from "./pages/Auth";
@@ -73,7 +73,7 @@ export const router = createBrowserRouter([
       { path: "reports", Component: Reports },
       { path: "media", Component: MediaLibrary },
       { path: "branches", Component: BranchManagement },
-      { path: "staff", Component: StaffManagement },
+      { path: "crm", Component: CustomerCRM },
       { path: "reviews", Component: ReviewManagement },
       { path: "profile", Component: Profile },
       { path: "settings", Component: SystemSettings },
