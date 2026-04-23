@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer, PackageX } from "lucide-react";
+import { Search, Filter, Eye, X, Clock, CheckCircle2, AlertCircle, XCircle, Package, Printer, PackageX, RotateCcw } from "lucide-react";
 import { showToast } from "../utils/toast";
 import { Logo } from "../components/Logo";
 import { orders as initialMockOrders } from "../../data/mockData";
@@ -36,12 +36,23 @@ const statusMap: Record<string, string> = {
   'Hoàn thành': 'completed', 'Đã hủy': 'cancelled'
 };
 
+const extendedStatusTabs = ['Tất cả', 'Chờ xử lý', 'Đã xác nhận', 'Đang pha chế', 'Sẵn sàng', 'Hoàn thành', 'Đã hủy'];
+const extendedStatusMap: Record<string, string> = {
+  'Tất cả': 'all',
+  'Chờ xử lý': 'pending',
+  'Đã xác nhận': 'confirmed',
+  'Đang pha chế': 'preparing',
+  'Sẵn sàng': 'ready',
+  'Hoàn thành': 'completed',
+  'Đã hủy': 'cancelled'
+};
+
 interface OrderDetailProps {
   order: Order;
   onClose: () => void;
 }
 
-function OrderDetail({ order, onClose }: OrderDetailProps) {
+function OrderDetailDrawer({ order, onClose, onUpdateStatus }: { order: Order; onClose: () => void; onUpdateStatus: (id: string, status: Order['status']) => void }) {
   const st = statusConfig[order.status];
   const fakeItems = order.items.length > 0 ? order.items.map(item => ({
     name: item.productName,
@@ -57,8 +68,8 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
 
   const timeline = [
     { label: 'Đặt hàng thành công', time: order.time, done: true },
-    { label: 'Xác nhận đơn hàng', time: `${parseInt(order.time.split(':')[0])}:${String(parseInt(order.time.split(':')[1]) + 3).padStart(2, '0')}`, done: ['preparing', 'ready', 'completed'].includes(order.status) },
-    { label: 'Đang pha chế', time: '', done: ['ready', 'completed'].includes(order.status) },
+    { label: 'Xác nhận đơn hàng', time: `${parseInt(order.time.split(':')[0])}:${String(parseInt(order.time.split(':')[1]) + 3).padStart(2, '0')}`, done: ['confirmed', 'preparing', 'ready', 'completed'].includes(order.status) },
+    { label: 'Đang pha chế', time: '', done: ['preparing', 'ready', 'completed'].includes(order.status) },
     { label: 'Hoàn thành', time: '', done: order.status === 'completed' },
   ];
 
@@ -173,6 +184,7 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
           <div className="px-5 py-4 border-t flex gap-3 no-print" style={{ borderColor: '#F0DCC8' }}>
             <button 
               onClick={() => {
+                onUpdateStatus(order.id, 'cancelled');
                 showToast.error(`Đã hủy đơn hàng ${order.id}`);
                 onClose();
               }}
@@ -182,12 +194,70 @@ function OrderDetail({ order, onClose }: OrderDetailProps) {
             </button>
             <button 
               onClick={() => {
+                onUpdateStatus(order.id, 'confirmed');
                 showToast.success(`Xác nhận đơn hàng ${order.id} thành công!`);
                 onClose();
               }}
               className="flex-1 py-2.5 rounded-xl text-sm"
               style={{ background: '#F58220', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
               Xác nhận
+            </button>
+          </div>
+        )}
+
+        {order.status === 'confirmed' && (
+          <div className="px-5 py-4 border-t flex gap-3 no-print" style={{ borderColor: '#F0DCC8' }}>
+            <button
+              onClick={() => {
+                onUpdateStatus(order.id, 'cancelled');
+                showToast.error(`Đã hủy đơn hàng ${order.id}`);
+                onClose();
+              }}
+              className="flex-1 py-2.5 rounded-xl border text-sm font-semibold"
+              style={{ borderColor: '#FCBABD', color: '#8B3A4A', fontFamily: "'Be Vietnam Pro', sans-serif" }}
+            >
+              Hủy đơn
+            </button>
+            <button
+              onClick={() => {
+                onUpdateStatus(order.id, 'preparing');
+                showToast.success(`Đơn hàng ${order.id} đã chuyển sang pha chế!`);
+                onClose();
+              }}
+              className="flex-1 py-2.5 rounded-xl text-sm"
+              style={{ background: '#2563EB', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}
+            >
+              Bắt đầu pha chế
+            </button>
+          </div>
+        )}
+
+        {order.status === 'preparing' && (
+          <div className="px-5 py-4 border-t flex gap-3 no-print" style={{ borderColor: '#F0DCC8' }}>
+            <button 
+              onClick={() => {
+                onUpdateStatus(order.id, 'ready');
+                showToast.success(`Đơn hàng ${order.id} đã pha chế xong!`);
+                onClose();
+              }}
+              className="w-full py-2.5 rounded-xl text-sm"
+              style={{ background: '#2563EB', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
+              Sẵn sàng giao
+            </button>
+          </div>
+        )}
+
+        {order.status === 'ready' && (
+          <div className="px-5 py-4 border-t flex gap-3 no-print" style={{ borderColor: '#F0DCC8' }}>
+            <button 
+              onClick={() => {
+                onUpdateStatus(order.id, 'completed');
+                showToast.success(`Đơn hàng ${order.id} đã hoàn thành!`);
+                onClose();
+              }}
+              className="w-full py-2.5 rounded-xl text-sm"
+              style={{ background: '#059669', color: 'white', fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 600 }}>
+              Hoàn thành đơn
             </button>
           </div>
         )}
@@ -220,7 +290,7 @@ export function OrderManagement() {
 
   // Derived data (uses state values above)
   const filtered = orders.filter(o => {
-    const matchStatus = activeTab === 'Tất cả' || o.status === statusMap[activeTab];
+    const matchStatus = activeTab === 'Tất cả' || o.status === extendedStatusMap[activeTab];
     const matchSearch = o.id.toLowerCase().includes(search.toLowerCase()) ||
       o.customer.toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchSearch;
@@ -228,7 +298,17 @@ export function OrderManagement() {
 
   const { currentPage, setCurrentPage, totalPages, paginatedData, isLoading } = usePagination(filtered, 5);
 
-  const countByStatus = (s: string) => s === 'Tất cả' ? orders.length : orders.filter(o => o.status === statusMap[s]).length;
+  const countByStatus = (s: string) => s === 'Tất cả' ? orders.length : orders.filter(o => o.status === extendedStatusMap[s]).length;
+
+  const handleUpdateStatus = (id: string, status: Order['status']) => {
+    const result = OrderService.updateOrderStatus(id, status);
+    if (!result.success) {
+      showToast.error(result.error || 'Không thể cập nhật trạng thái đơn hàng.');
+      return;
+    }
+    setOrders(OrderService.getAllOrders());
+    setSelectedOrder(result.order || null);
+  };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -320,7 +400,13 @@ export function OrderManagement() {
         }
         .print-title { display: none; }
       `}</style>
-      {selectedOrder && <OrderDetail order={selectedOrder} onClose={() => setSelectedOrder(null)} />}
+      {selectedOrder && (
+        <OrderDetailDrawer 
+          order={selectedOrder} 
+          onClose={() => setSelectedOrder(null)} 
+          onUpdateStatus={handleUpdateStatus}
+        />
+      )}
       
       {/* Bulk Print Area (Hidden unless printing) */}
       {isBulkPrinting && (
@@ -377,16 +463,29 @@ export function OrderManagement() {
         </div>
       )}
 
-      <div className="mb-6">
-        <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
-          Quản lý Đơn hàng
-        </h1>
-        <p style={{ fontSize: '13.5px', color: '#A0845C' }}>{orders.length} đơn hàng hôm nay · 20/04/2026</p>
-      </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '22px', fontWeight: 700, color: '#1A1A1A' }}>
+              Quản lý Đơn hàng
+            </h1>
+            <p style={{ fontSize: '13.5px', color: '#A0845C' }}>{orders.length} đơn hàng hôm nay · {new Date().toLocaleDateString('vi-VN')}</p>
+          </div>
+          <button 
+            onClick={() => {
+              setOrders(OrderService.getAllOrders());
+              showToast.success('Dữ liệu đã được đồng bộ!');
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all hover:bg-gray-50"
+            style={{ borderColor: '#F0DCC8', color: '#F58220', background: 'white' }}
+          >
+            <RotateCcw size={16} />
+            Làm mới
+          </button>
+        </div>
 
       {/* Status Tabs */}
       <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-        {statusTabs.map(tab => (
+        {extendedStatusTabs.map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm whitespace-nowrap transition-all"
             style={{
@@ -603,3 +702,4 @@ export function OrderManagement() {
     </div>
   );
 }
+

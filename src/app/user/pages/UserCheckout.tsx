@@ -1,42 +1,32 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { 
-  AlertCircle, ArrowLeft, Banknote, CheckCircle2, 
-  CreditCard, MapPin, Phone, RotateCcw, TicketPercent, 
-  Truck, Wallet, ChevronRight, ShoppingBag, Clock3, ShieldCheck
+  ArrowLeft, CheckCircle2, MapPin, 
 } from 'lucide-react';
 import { useUserAuth } from '../../context/UserAuthContext';
-import { userPreviewBranches, userPreviewOffers } from '../data/userPreviewData';
 import { showToast } from '../../utils/toast';
 import { OrderService } from '../../services/OrderService';
-
-const STEPS = ['Địa chỉ', 'Vận chuyển', 'Thanh toán'];
 
 export function UserCheckout() {
   const { user, cart, clearCart } = useUserAuth();
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
-  const [selectedBranch, setSelectedBranch] = useState(userPreviewBranches[0].id);
   const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('delivery');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'wallet'>('cash');
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [lastOrderId, setLastOrderId] = useState('');
 
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const shippingFee = orderType === 'delivery' ? 15000 : 0;
   const total = subtotal + shippingFee;
 
-  const selectedBranchData = userPreviewBranches.find((b) => b.id === selectedBranch) || userPreviewBranches[0];
-
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
-    
-    // Create actual order object
     const newOrder = {
       id: `CHIPS-${Math.floor(Math.random() * 90000 + 10000)}`,
       customerId: user?.id || 'guest',
-      customerName: user?.name || 'Khách vãng lai',
+      customerName: user?.name || 'Khách',
       total: total,
       status: 'pending' as const,
       type: orderType,
@@ -47,21 +37,17 @@ export function UserCheckout() {
         quantity: item.quantity,
         price: item.price
       })),
-      customer: user?.name || 'Khách vãng lai',
       phone: user?.phone || '—',
-      branch: selectedBranchData.name,
-      payment: paymentMethod === 'cash' ? 'Tiền mặt' : (paymentMethod === 'wallet' ? 'VietQR' : 'Thẻ'),
-      time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+      payment: paymentMethod,
+      time: new Date().toLocaleTimeString('vi-VN'),
       date: new Date().toLocaleDateString('vi-VN'),
       customerType: user ? 'member' as const : 'guest' as const,
     };
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    // Save order via service
+    await new Promise(r => setTimeout(r, 1500));
     OrderService.saveOrder(newOrder);
-    
-    showToast.success('Đặt hàng thành công! Cảm ơn bạn đã ủng hộ.');
+    setLastOrderId(newOrder.id);
+    showToast.success('Đặt hàng thành công');
     clearCart();
     setOrderSuccess(true);
     setIsProcessing(false);
@@ -69,253 +55,90 @@ export function UserCheckout() {
 
   if (orderSuccess) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-6 py-12 text-center">
-        <div className="relative mb-10 h-32 w-32">
-           <div className="absolute inset-0 animate-ping rounded-full bg-emerald-50" />
-           <div className="relative flex h-full w-full items-center justify-center rounded-full bg-emerald-500 text-white shadow-[0_20px_50px_rgba(16,185,129,0.3)]">
-              <CheckCircle2 className="h-16 w-16" strokeWidth={3} />
-           </div>
-        </div>
-        
-        <h1 className="font-heading text-4xl font-black text-[#2D1606]">Tuyệt vời!</h1>
-        <p className="mt-4 text-base font-medium text-gray-500 max-w-sm">
-           Đơn hàng <span className="font-black text-orange-600">#CHIPS-{Math.floor(Math.random()*90000 + 10000)}</span> đã được gửi tới chi nhánh. Chúng tôi đang bắt đầu pha chế.
-        </p>
-
-        <div className="mt-10 w-full max-w-sm space-y-3">
-           <Link to="/app/orders" className="flex w-full items-center justify-center gap-3 rounded-[24px] bg-[#2D1606] py-5 text-sm font-black uppercase tracking-widest text-white shadow-2xl active:scale-95 transition-all">
-              Theo dõi đơn hàng <ChevronRight className="h-5 w-5" />
-           </Link>
-           <Link to="/app/menu" className="flex w-full items-center justify-center gap-3 rounded-[24px] bg-gray-50 py-5 text-sm font-black text-[#2D1606] active:scale-95 transition-all">
-              Tiếp tục mua sắm
-           </Link>
+      <div className="flex h-screen flex-col items-center justify-center bg-white px-6 text-center">
+        <CheckCircle2 className="h-16 w-16 text-emerald-500 mb-6" />
+        <h1 className="text-2xl font-bold text-gray-900">Đặt hàng thành công!</h1>
+        <p className="mt-2 text-sm text-gray-500">Mã đơn hàng: <span className="font-bold">#{lastOrderId}</span></p>
+        <div className="mt-10 space-y-3 w-full max-w-xs">
+           <Link to="/app/orders" className="block w-full bg-gray-900 text-white py-4 rounded-xl text-sm font-bold">Theo dõi đơn hàng</Link>
+           <Link to="/app/menu" className="block w-full bg-gray-50 text-gray-900 py-4 rounded-xl text-sm font-bold">Quay lại menu</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-40">
-      {/* ─── MINI HEADER ─── */}
-      <header className="sticky top-0 z-40 bg-white/80 p-4 backdrop-blur-xl border-b border-gray-100">
-         <div className="mx-auto flex max-w-6xl items-center justify-between">
-            <button onClick={() => navigate(-1)} className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-50 text-[#2D1606]">
-               <ArrowLeft className="h-5 w-5" />
-            </button>
-            <h1 className="text-sm font-black uppercase tracking-widest text-[#2D1606]">Thanh toán đơn hàng</h1>
-            <div className="w-10" />
-         </div>
+    <div className="bg-gray-50 font-sans">
+      <header className="bg-white p-4 border-b border-gray-100 flex items-center gap-4">
+         <button onClick={() => navigate(-1)} className="text-gray-900"><ArrowLeft className="h-5 w-5" /></button>
+         <h1 className="text-sm font-bold">Thanh toán</h1>
       </header>
 
-      <main className="mx-auto mt-8 max-w-6xl px-4">
-        <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
-          {/* ─── LEFT: FLOW ─── */}
-          <div className="space-y-6">
-            {/* Delivery Address & Type */}
-            <section className="rounded-[40px] bg-white p-8 shadow-sm border border-gray-50">
-               <div className="flex items-center gap-4 mb-8">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
-                     <MapPin className="h-6 w-6" />
-                  </div>
-                  <h2 className="text-xl font-black text-[#2D1606]">Địa chỉ nhận hàng</h2>
-               </div>
+      <div className="p-4">
+        <div className="mx-auto max-w-2xl space-y-4">
+           {/* Address */}
+           <section className="bg-white rounded-2xl p-6 shadow-sm">
+              <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Địa chỉ nhận hàng</h2>
+              <div className="flex gap-2 mb-6">
+                 <button onClick={() => setOrderType('delivery')} className={`flex-1 py-3 rounded-xl border text-xs font-bold transition-all ${orderType === 'delivery' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-gray-100 text-gray-500'}`}>Giao hàng</button>
+                 <button onClick={() => setOrderType('pickup')} className={`flex-1 py-3 rounded-xl border text-xs font-bold transition-all ${orderType === 'pickup' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-gray-100 text-gray-500'}`}>Lấy tại quán</button>
+              </div>
+              <div className="flex items-center gap-3">
+                 <MapPin className="h-5 w-5 text-gray-400" />
+                 <div>
+                    <div className="text-sm font-bold text-gray-900">Nhà của tôi</div>
+                    <p className="text-xs text-gray-500">Chips Building, 123 Nguyễn Huệ, Quận 1</p>
+                 </div>
+              </div>
+           </section>
 
-               <div className="grid grid-cols-2 gap-4 mb-6">
-                  <button 
-                    onClick={() => setOrderType('delivery')}
-                    className={`flex flex-col items-center gap-3 rounded-3xl p-6 transition-all border-2 ${
-                       orderType === 'delivery' ? 'border-orange-500 bg-orange-50/50' : 'border-gray-50 bg-gray-50/30'
-                    }`}
-                  >
-                     <Truck className={`h-8 w-8 ${orderType === 'delivery' ? 'text-orange-600' : 'text-gray-300'}`} />
-                     <span className={`text-[10px] font-black uppercase tracking-widest ${orderType === 'delivery' ? 'text-orange-600' : 'text-gray-400'}`}>Giao hàng</span>
-                  </button>
-                  <button 
-                    onClick={() => setOrderType('pickup')}
-                    className={`flex flex-col items-center gap-3 rounded-3xl p-6 transition-all border-2 ${
-                       orderType === 'pickup' ? 'border-orange-500 bg-orange-50/50' : 'border-gray-50 bg-gray-50/30'
-                    }`}
-                  >
-                     <ShoppingBag className={`h-8 w-8 ${orderType === 'pickup' ? 'text-orange-600' : 'text-gray-300'}`} />
-                     <span className={`text-[10px] font-black uppercase tracking-widest ${orderType === 'pickup' ? 'text-orange-600' : 'text-gray-400'}`}>Tự đến lấy</span>
-                  </button>
-               </div>
-
-               <div className="rounded-[32px] bg-[#FAFAFA] p-6 border border-gray-100">
-                  <div className="flex items-center justify-between mb-4">
-                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">ĐỊA CHỈ SMART</span>
-                     <button className="text-[10px] font-black text-orange-600 uppercase">THAY ĐỔI</button>
-                  </div>
-                  <div className="flex items-start gap-4">
-                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-gray-100 uppercase font-black text-[10px]">
-                        HM
-                     </div>
-                     <div>
-                        <div className="text-sm font-black text-[#2D1606]">Nhà của tôi</div>
-                        <p className="mt-1 text-xs font-medium text-gray-500 leading-relaxed">
-                           Chips Building, 123 Nguyễn Huệ, Quận 1, Hồ Chí Minh
-                        </p>
-                        <div className="mt-3 flex items-center gap-4 text-[11px] font-bold text-gray-400">
-                           <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> 0901 234 567</span>
-                           <span className="flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5" /> 15-25 phút</span>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            </section>
-
-            {/* Payment Method */}
-            <section className="rounded-[40px] bg-white p-8 shadow-sm border border-gray-100">
-               <div className="flex items-center gap-4 mb-8">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-                     <CreditCard className="h-6 w-6" />
-                  </div>
-                  <h2 className="text-xl font-black text-[#2D1606]">Thanh toán</h2>
-               </div>
-
-                <div className="space-y-3">
-                  {[
-                    { id: 'cash', label: 'Tiền mặt', icon: Banknote, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-                    { id: 'wallet', label: 'Ví MoMo / ZaloPay', icon: Wallet, color: 'text-pink-500', bg: 'bg-pink-50' },
-                    { id: 'card', label: 'Thẻ ATM / Visa', icon: CreditCard, color: 'text-blue-500', bg: 'bg-blue-50' }
-                  ].map(m => (
-                    <div key={m.id}>
-                      <button 
-                        onClick={() => {
-                          setPaymentMethod(m.id as any);
-                          showToast.success('Đã chọn ' + m.label);
-                        }}
-                        className={`flex w-full items-center justify-between rounded-[28px] p-5 transition-all border-2 ${
-                          paymentMethod === m.id ? 'border-[#2D1606] bg-[#2D1606] text-white' : 'border-gray-50 bg-[#FAFAFA] hover:border-gray-100'
-                        }`}
-                      >
-                         <div className="flex items-center gap-4">
-                            <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${paymentMethod === m.id ? 'bg-white/10' : m.bg + ' ' + m.color}`}>
-                               <m.icon className="h-5 w-5" />
-                            </div>
-                            <span className="text-sm font-black">{m.label}</span>
-                         </div>
-                         <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${
-                            paymentMethod === m.id ? 'border-orange-500 bg-orange-500' : 'border-gray-200'
-                         }`}>
-                            {paymentMethod === m.id && <CheckCircle2 className="h-4 w-4 text-white" />}
-                         </div>
-                      </button>
-
-                      {/* Payment Details Sub-forms */}
-                      {paymentMethod === m.id && m.id === 'wallet' && (
-                        <div className="mt-4 p-6 rounded-[32px] bg-white border-2 border-pink-100 flex flex-col items-center animate-in zoom-in-95 duration-500 overflow-hidden relative">
-                          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500"></div>
-                          <div className="bg-white p-4 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] mb-5 border border-gray-50 relative group">
-                             <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-[32px] opacity-20 blur group-hover:opacity-40 transition-opacity"></div>
-                             <img 
-                                src={`https://img.vietqr.io/image/MB-02969904011210-compact.png?amount=${total}&addInfo=CHIPS%20${Math.floor(Math.random()*10000)}&accountName=PHAM%20CONG%20VINH`} 
-                                className="w-48 h-48 relative rounded-2xl" 
-                                alt="VietQR Payment" 
-                             />
-                          </div>
-                          <div className="text-center">
-                             <div className="text-[10px] font-black text-pink-600 uppercase tracking-[0.2em] mb-2 flex items-center justify-center gap-2">
-                                <span className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-pulse"></span>
-                                Quét mã chuyển khoản nhanh
-                             </div>
-                             <div className="space-y-1 mb-4">
-                                <div className="text-sm font-black text-[#2D1606]">PHAM CONG VINH</div>
-                                <div className="text-xs font-bold text-gray-500">02969904011210 • MB Bank</div>
-                             </div>
-                             <p className="text-[10px] font-medium text-gray-400 leading-relaxed max-w-[200px] mx-auto">
-                                Vui lòng quét mã VietQR để hoàn tất thanh toán. Đơn hàng sẽ được tự động xác nhận.
-                             </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {paymentMethod === m.id && m.id === 'card' && (
-                        <div className="mt-4 p-6 rounded-[32px] bg-white border-2 border-blue-100 space-y-4 animate-in slide-in-from-top-4 duration-300">
-                           <div className="flex justify-between items-center mb-2">
-                              <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Thông tin thẻ</span>
-                              <div className="flex gap-2">
-                                 <div className="h-6 w-10 bg-gray-100 rounded-md"></div>
-                                 <div className="h-6 w-10 bg-gray-100 rounded-md"></div>
-                              </div>
-                           </div>
-                           <input placeholder="Số thẻ (xxxx xxxx xxxx xxxx)" className="w-full bg-gray-50 rounded-2xl px-5 py-4 text-xs font-bold outline-none border border-transparent focus:border-blue-400 transition-all" />
-                           <div className="grid grid-cols-2 gap-3">
-                              <input placeholder="MM/YY" className="bg-gray-50 rounded-2xl px-5 py-4 text-xs font-bold outline-none border border-transparent focus:border-blue-400 transition-all" />
-                              <input placeholder="CVC" className="bg-gray-50 rounded-2xl px-5 py-4 text-xs font-bold outline-none border border-transparent focus:border-blue-400 transition-all" />
-                           </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-               </div>
-            </section>
-          </div>
-
-          {/* ─── RIGHT: SUMMARY ─── */}
-          <aside className="lg:sticky lg:top-28">
-             <div className="rounded-[40px] bg-white p-8 shadow-2xl border border-orange-50 relative overflow-hidden">
-                {/* Decoration */}
-                <div className="absolute top-0 right-0 p-6 opacity-5">
-                   <ShoppingBag className="h-32 w-32" />
-                </div>
-
-                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-gray-400 mb-8">Tóm tắt đơn hàng</h3>
-                
-                <div className="space-y-6 mb-8 max-h-[300px] overflow-y-auto no-scrollbar">
-                   {cart.map(item => (
-                      <div key={`${item.productId}-${item.size}`} className="flex gap-4">
-                         <img src={item.image} className="h-14 w-14 rounded-2xl object-cover" alt="" />
-                         <div className="flex-1 min-w-0">
-                            <h4 className="text-xs font-black text-[#2D1606] truncate">{item.name}</h4>
-                            <div className="mt-1 text-[10px] font-bold text-gray-400">
-                               x{item.quantity} • Size {item.size} • {item.sugar} Sugar
-                            </div>
-                         </div>
-                         <div className="text-xs font-black text-orange-600">
-                            {(item.price * item.quantity).toLocaleString('vi-VN')}đ
-                         </div>
-                      </div>
-                   ))}
-                </div>
-
-
-
-                <div className="space-y-3 border-t border-gray-100 pt-6">
-                   <div className="flex justify-between text-xs font-bold text-gray-500">
-                      <span>Tạm tính</span>
-                      <span>{subtotal.toLocaleString('vi-VN')}đ</span>
-                   </div>
-                   <div className="flex justify-between text-xs font-bold text-gray-500">
-                      <span>Phí giao hàng</span>
-                      <span>{shippingFee.toLocaleString('vi-VN')}đ</span>
-                   </div>
-
-                   <div className="flex justify-between items-baseline pt-4">
-                      <span className="text-sm font-black text-[#2D1606]">Tổng cộng</span>
-                      <span className="text-3xl font-black text-orange-600 tracking-tighter">{total.toLocaleString('vi-VN')}đ</span>
-                   </div>
-                </div>
-
-                <div className="mt-10 space-y-4">
-                   <button 
-                    onClick={handlePlaceOrder}
-                    disabled={isProcessing}
-                    className="group relative w-full overflow-hidden rounded-[24px] bg-[#2D1606] py-5 text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95 disabled:opacity-70"
-                   >
-                      <div className="relative z-10 flex items-center justify-center gap-3">
-                         {isProcessing ? 'Đang xác nhận...' : 'Xác nhận đặt hàng'} <ChevronRight className="h-5 w-5" />
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-orange-600 opacity-0 group-hover:opacity-100 transition-all" />
+           {/* Payment */}
+           <section className="bg-white rounded-2xl p-6 shadow-sm">
+              <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Thanh toán</h2>
+              <div className="space-y-2">
+                 {[
+                   { id: 'cash', label: 'Tiền mặt' },
+                   { id: 'wallet', label: 'Ví điện tử' },
+                   { id: 'card', label: 'Thẻ ngân hàng' }
+                 ].map(m => (
+                   <button key={m.id} onClick={() => setPaymentMethod(m.id as any)} className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${paymentMethod === m.id ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-100 text-gray-500 hover:bg-gray-50'}`}>
+                      <span className="text-xs font-bold">{m.label}</span>
+                      {paymentMethod === m.id && <CheckCircle2 className="h-4 w-4 text-orange-500" />}
                    </button>
-                   <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400">
-                      <ShieldCheck className="h-3 w-3" /> Thanh toán an toàn theo chuẩn Chips
+                 ))}
+              </div>
+           </section>
+
+           {/* Summary */}
+           <section className="bg-white rounded-2xl p-6 shadow-sm mb-24">
+              <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Đơn hàng</h2>
+              <div className="space-y-3 mb-4">
+                 {cart.map(item => (
+                   <div key={item.productId} className="flex justify-between items-center text-xs">
+                      <span className="text-gray-500">{item.name} x{item.quantity}</span>
+                      <span className="font-bold text-gray-900">{(item.price * item.quantity).toLocaleString('vi-VN')}đ</span>
                    </div>
-                </div>
-             </div>
-          </aside>
+                 ))}
+              </div>
+              <div className="border-t border-gray-50 pt-4 space-y-2">
+                 <div className="flex justify-between text-xs text-gray-400">
+                    <span>Phí giao hàng</span>
+                    <span>{shippingFee.toLocaleString('vi-VN')}đ</span>
+                 </div>
+                 <div className="flex justify-between text-base font-bold text-gray-900">
+                    <span>Tổng cộng</span>
+                    <span className="text-orange-500">{total.toLocaleString('vi-VN')}đ</span>
+                 </div>
+              </div>
+           </section>
         </div>
-      </main>
+      </div>
+
+      <footer className="flex-none p-4 bg-white border-t border-gray-100">
+         <button onClick={handlePlaceOrder} disabled={isProcessing} className="w-full max-w-2xl mx-auto block bg-gray-900 text-white py-4 rounded-xl text-sm font-bold shadow-lg shadow-black/10 active:scale-95 disabled:opacity-50">
+            {isProcessing ? 'Đang xử lý...' : 'Xác nhận đặt hàng'}
+         </button>
+      </footer>
     </div>
   );
 }

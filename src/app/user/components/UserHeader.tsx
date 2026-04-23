@@ -14,6 +14,7 @@ export function UserHeader() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserDropdown, setIsUserDropdown] = useState(false);
+  const [isNotificationDropdown, setIsNotificationDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [notifications, setNotifications] = useState(userPreviewNotifications);
 
@@ -28,6 +29,7 @@ export function UserHeader() {
         const ntf = JSON.parse(lastNtfStr);
         // Only show if it belongs to current user or is guest demo
         if (user && ntf.customerId !== user.id) return;
+        if (ntf.status === 'pending' && ntf.actor === 'user') return;
 
         const statusMap: Record<string, string> = {
           confirmed: 'Đã xác nhận',
@@ -37,10 +39,15 @@ export function UserHeader() {
           cancelled: 'Đã bị hủy',
         };
 
-        const statusLabel = statusMap[ntf.status] || 'Cập nhật trạng thái';
+        const statusLabel = statusMap[ntf.status] || 'Đã có cập nhật mới';
         
-        showToast.success(`Cập nhật đơn hàng #${ntf.orderId}`, {
-          description: `Đơn hàng của bạn hiện tại: ${statusLabel}`,
+        // Play notification sound
+        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+
+        showToast.success(`Trạng thái đơn hàng #${ntf.orderId}`, {
+          description: `Đơn hàng của bạn đã được chuyển sang: ${statusLabel}`,
         });
 
         const newNtf = {
@@ -54,6 +61,9 @@ export function UserHeader() {
         // Note: We don't clear last_notification to avoid race conditions with Admin tab
       } catch (e) { console.error(e); }
     };
+
+    // Check for missed notification on mount
+    handleNotification();
 
     window.addEventListener('storage', handleNotification);
     return () => window.removeEventListener('storage', handleNotification);
@@ -124,15 +134,53 @@ export function UserHeader() {
               <span>25 phút</span>
             </div>
 
-            {/* Bell */}
-            <button className="relative hidden h-10 w-10 items-center justify-center rounded-xl border border-[#F0CBA8] bg-white text-[#7A451A] transition-all hover:bg-[#FFF0E2] hover:text-[#E56A00] sm:inline-flex">
-              <Bell className="h-4 w-4" />
-              {unreadCount > 0 && (
-                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF8A1F] px-0.5 text-[9px] font-bold text-white">
-                  {unreadCount}
-                </span>
+            <div className="relative">
+              <button 
+                onClick={() => setIsNotificationDropdown(prev => !prev)}
+                className="relative hidden h-10 w-10 items-center justify-center rounded-xl border border-[#F0CBA8] bg-white text-[#7A451A] transition-all hover:bg-[#FFF0E2] hover:text-[#E56A00] sm:inline-flex"
+              >
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF8A1F] px-0.5 text-[9px] font-bold text-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {isNotificationDropdown && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsNotificationDropdown(false)} />
+                  <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-[22px] border border-[#F0CBA8] bg-white shadow-[0_16px_50px_rgba(122,69,26,0.18)] overflow-hidden">
+                    <div className="bg-gradient-to-r from-[#FFF8F0] to-[#FFF0E2] px-4 py-3.5 border-b border-[#F0CBA8] flex items-center justify-between">
+                      <h3 className="font-bold text-[#2D1606] text-sm">Thông báo</h3>
+                      <button 
+                        onClick={() => setNotifications(prev => prev.map(n => ({...n, unread: false})))}
+                        className="text-[11px] font-bold text-[#FF8A1F] hover:underline"
+                      >
+                        Đánh dấu đã đọc
+                      </button>
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-6 text-center text-sm text-gray-400">Không có thông báo nào.</div>
+                      ) : (
+                        notifications.map(n => (
+                          <div key={n.id} className={`px-4 py-3 border-b border-[#F0CBA8]/30 last:border-0 hover:bg-[#FFF5EB] transition-colors cursor-pointer ${n.unread ? 'bg-[#FFF8F0]' : ''}`}>
+                            <div className="flex gap-3">
+                              <div className="mt-1 h-2 w-2 rounded-full bg-[#FF8A1F] flex-shrink-0" style={{ opacity: n.unread ? 1 : 0 }} />
+                              <div>
+                                <p className="text-sm font-semibold text-[#2D1606]">{n.title}</p>
+                                <p className="text-[11px] text-[#A05A22] mt-0.5">{n.time}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
-            </button>
+            </div>
 
             {/* Cart */}
             <Link

@@ -19,8 +19,18 @@ export function CustomerCRM() {
   // Load data
   useEffect(() => {
     const handleRefresh = () => {
-      const storedUsers = JSON.parse(localStorage.getItem('milktea_all_users') || '[]');
-      setCustomers(storedUsers);
+      const storedUsers = JSON.parse(localStorage.getItem('milktea_users_clean') || '[]');
+      // Map stored users to standard format
+      const mappedStored = storedUsers.map((u: any) => ({
+        id: u.id,
+        name: u.name,
+        phone: u.phone,
+        email: u.email,
+        tier: u.tier || 'Member',
+        points: u.loyaltyPoints || 0,
+        createdAt: u.createdAt || new Date().toISOString()
+      }));
+      setCustomers(mappedStored);
       setOrders(OrderService.getAllOrders());
     };
     handleRefresh();

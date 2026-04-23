@@ -33,6 +33,7 @@ interface UserAuthContextType {
   addToCart: (item: CartItem) => void;
   removeFromCart: (productId: string) => void;
   updateCartItem: (productId: string, quantity: number) => void;
+  updateCartItemOptions: (productId: string, options: Partial<CartItem>) => void;
   clearCart: () => void;
   toggleFavorite: (productId: string) => void;
   isFavorite: (productId: string) => boolean;
@@ -47,12 +48,10 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Initialize demo users if empty
-    const allUsers = localStorage.getItem('milktea_all_users');
+    // Initialize empty users list if not exists
+    const allUsers = localStorage.getItem('milktea_users_clean');
     if (!allUsers) {
-      localStorage.setItem('milktea_all_users', JSON.stringify([
-        { id: 'user1', name: 'Nguyễn Văn A', email: 'user1@example.com', phone: '0901234567', loyaltyPoints: 250, tier: 'Silver' as const, password: 'password123' },
-      ]));
+      localStorage.setItem('milktea_users_clean', JSON.stringify([]));
     }
 
     // Check for auth cookie
@@ -95,9 +94,9 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Load registered users from local storage
-    const allUsers = JSON.parse(localStorage.getItem('milktea_all_users') || '[]');
+    const allUsers = JSON.parse(localStorage.getItem('milktea_users_clean') || '[]');
     const mockUsers = [
-      { id: 'admin-001', name: 'Admin Demo', email: 'admin@smyou.vn', phone: '0900000001', loyaltyPoints: 9999, tier: 'Platinum' as const, password: 'admin123' },
+      { id: 'admin-001', name: 'Admin Demo', email: 'admin@chips.vn', phone: '0900000001', loyaltyPoints: 9999, tier: 'System' as const, password: 'admin', role: 'admin' },
       ...allUsers
     ];
 
@@ -115,7 +114,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       document.cookie = `milktea_auth_token=${userWithoutPassword.id}; path=/; max-age=${7 * 24 * 60 * 60}`;
       localStorage.setItem('milkteaUser', JSON.stringify(userWithoutPassword));
       
-      return { success: true };
+      return { success: true, user: userWithoutPassword };
     }
 
     setLoginAttempts(prev => ({ ...prev, [email]: (prev[email] || 0) + 1 }));
@@ -123,7 +122,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signup = async (data: { name: string; email: string; phone: string; dateOfBirth?: string; password: string }) => {
-    const allUsers = JSON.parse(localStorage.getItem('milktea_all_users') || '[]');
+    const allUsers = JSON.parse(localStorage.getItem('milktea_users_clean') || '[]');
     
     if (allUsers.some((u: any) => u.email.toLowerCase() === data.email.toLowerCase())) {
       return { success: false, error: 'Email này đã được đăng ký.' };
@@ -137,10 +136,11 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       password: data.password,
       loyaltyPoints: 0,
       tier: 'Bronze' as const,
+      createdAt: new Date().toISOString()
     };
 
     allUsers.push(newUser);
-    localStorage.setItem('milktea_all_users', JSON.stringify(allUsers));
+    localStorage.setItem('milktea_users_clean', JSON.stringify(allUsers));
 
     const { password: _, ...userWithoutPassword } = newUser;
     setUser(userWithoutPassword);
@@ -214,6 +214,16 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
     setCart([]);
   };
 
+  const updateCartItemOptions = (productId: string, options: Partial<CartItem>) => {
+    setCart((previous) => previous.map((item) => {
+      // For now, we match by productId. In a real app, we'd use a unique row ID.
+      if (item.productId === productId) {
+        return { ...item, ...options };
+      }
+      return item;
+    }));
+  };
+
   return (
     <UserAuthContext.Provider
       value={{
@@ -227,6 +237,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
         addToCart,
         removeFromCart,
         updateCartItem,
+        updateCartItemOptions,
         clearCart,
         toggleFavorite,
         isFavorite,

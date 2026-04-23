@@ -1,5 +1,5 @@
-import { Construction, Timer, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { Construction, Timer, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router";
 
 interface UnderDevelopmentProps {
   title?: string;
@@ -7,10 +7,10 @@ interface UnderDevelopmentProps {
   showBackButton?: boolean;
 }
 
-export function UnderDevelopment({ 
-  title = "Chức năng đang phát triển", 
+export function UnderDevelopment({
+  title = "Chức năng đang phát triển",
   description = "Chúng tôi đang nỗ lực hoàn thiện tính năng này để mang lại trải nghiệm tốt nhất cho bạn. Vui lòng quay lại sau!",
-  showBackButton = true
+  showBackButton = true,
 }: UnderDevelopmentProps) {
   const navigate = useNavigate();
 

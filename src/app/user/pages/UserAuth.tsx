@@ -64,7 +64,7 @@ export function UserAuth() {
         }
 
         // Check for Admin login redirect
-        if (formData.email.toLowerCase() === 'admin@smyou.vn') {
+        if (formData.email.toLowerCase() === 'admin@chips.vn') {
           const adminResult = await adminLogin(formData.email, formData.password);
           if (adminResult.success) {
             navigate('/admin', { replace: true });
@@ -285,31 +285,7 @@ export function UserAuth() {
                 </button>
               </form>
 
-              {isLogin && (
-                <div className="mt-6 rounded-2xl border border-[#F0DCC8] bg-[#FFF3E6] p-4">
-                  <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-[#A0845C]">
-                    🔑 Tài khoản demo — click để điền
-                  </p>
-                  <div className="grid grid-cols-1 gap-2">
-                    {[
-                      { name: 'Admin Demo', email: 'admin@smyou.vn', pass: 'admin123', role: 'Admin' },
-                      { name: 'Member Demo', email: 'user1@example.com', pass: 'password123', role: 'Member' }
-                    ].map((acc) => (
-                      <button
-                        key={acc.email}
-                        onClick={() => fillDemo(acc.email, acc.pass)}
-                        className="flex items-center justify-between rounded-xl border border-[#F0DCC8] bg-white px-3 py-2 text-left transition-all hover:border-[#F58220] hover:bg-orange-50"
-                      >
-                        <div>
-                          <div className="text-[13px] font-bold text-slate-900 leading-none">{acc.name}</div>
-                          <div className="mt-1 text-[10px] text-slate-500">{acc.role} · {acc.email}</div>
-                        </div>
-                        <span className="rounded-lg bg-[#F58220] px-2 py-0.5 text-[9px] font-bold uppercase text-white">Dùng</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+
 
               <div className="mt-5 text-center text-sm text-slate-500 pb-2">
                 {isLogin ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}{' '}

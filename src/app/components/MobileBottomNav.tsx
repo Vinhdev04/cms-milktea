@@ -23,7 +23,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden pointer-events-none">
+    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden pointer-events-none">
       {/* Safe area padding for iOS */}
       <div className="pointer-events-auto mx-auto w-full max-w-lg px-4 pb-[max(12px,env(safe-area-inset-bottom))]">
         <nav

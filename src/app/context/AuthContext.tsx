@@ -1,13 +1,13 @@
-﻿import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 export type AppRole = "admin" | "member";
 
 export const mockAccounts = [
   {
     id: "A001",
-    name: "Tài khoản demo",
-    email: "admin@smyou.vn",
-    password: "admin123",
+    name: "Admin Chips",
+    email: "admin@chips.vn",
+    password: "admin",
     role: "Quản trị viên",
     appRole: "admin" as AppRole,
     avatar: "A",

@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router";
+import { createBrowserRouter, Navigate, useParams } from "react-router";
 import { useAuth } from "./context/AuthContext";
 import { useUserAuth } from "./context/UserAuthContext";
 import { Layout } from "./components/Layout";
@@ -21,6 +21,7 @@ import { Profile } from "./pages/Profile";
 import { UserLayout } from "./user/UserLayout";
 import { UserAuth } from "./user/pages/UserAuth";
 import { UserBranches } from "./user/pages/UserBranches";
+import { UserBranchDetail } from "./user/pages/UserBranchDetail";
 import { UserCart } from "./user/pages/UserCart";
 import { UserHome } from "./user/pages/UserHome";
 import { UserMenu } from "./user/pages/UserMenu";
@@ -29,7 +30,12 @@ import { UserOrders } from "./user/pages/UserOrders";
 import { UserProfile } from "./user/pages/UserProfile";
 import { UserFavorites } from "./user/pages/UserFavorites";
 import { UserCheckout } from "./user/pages/UserCheckout";
-import { UserProductDetail } from "./user/pages/UserProductDetail";
+
+function ProductDetailRedirect() {
+  const { productId } = useParams();
+  return <Navigate to={`/app/menu?p=${productId}`} replace />;
+}
+
 
 function ProtectedAdminLayout() {
   return (
@@ -68,12 +74,11 @@ export const router = createBrowserRouter([
       { index: true, Component: Dashboard },
       { path: "menu", Component: MenuManagement },
       { path: "orders", Component: OrderManagement },
-      { path: "customers", Component: CustomerManagement },
+      { path: "customers", Component: CustomerCRM },
       { path: "vouchers", Component: VoucherManagement },
       { path: "reports", Component: Reports },
       { path: "media", Component: MediaLibrary },
       { path: "branches", Component: BranchManagement },
-      { path: "crm", Component: CustomerCRM },
       { path: "reviews", Component: ReviewManagement },
       { path: "profile", Component: Profile },
       { path: "settings", Component: SystemSettings },
@@ -87,13 +92,14 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: UserHome },
       { path: "menu", Component: UserMenu },
-      { path: "menu/:productId", Component: UserProductDetail },
+      { path: "menu/:productId", element: <ProductDetailRedirect /> },
       { path: "cart", Component: UserCart },
       { path: "checkout", Component: UserCheckout },
       { path: "favorites", Component: UserFavorites },
       { path: "orders", Component: UserOrders },
       { path: "offers", Component: UserOffers },
       { path: "branches", Component: UserBranches },
+      { path: "branches/:branchId", Component: UserBranchDetail },
       { path: "profile", Component: UserProfile },
     ],
   },

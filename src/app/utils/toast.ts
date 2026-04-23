@@ -10,16 +10,16 @@ const playSound = (url: string) => {
 };
 
 export const showToast = {
-  success: (message: string) => {
+  success: (message: string, options?: any) => {
     playSound(successSound);
-    toast.success(message);
+    return toast.success(message, options);
   },
-  error: (message: string) => {
+  error: (message: string, options?: any) => {
     playSound(errorSound);
-    toast.error(message);
+    return toast.error(message, options);
   },
-  loading: (message: string) => {
-    toast.loading(message);
+  loading: (message: string, options?: any) => {
+    return toast.loading(message, options);
   },
   dismiss: () => {
     toast.dismiss();

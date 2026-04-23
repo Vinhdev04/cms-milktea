@@ -16,12 +16,11 @@ const navItems = [
   { path: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true, id: "tour-side-dashboard" },
   { path: "/admin/menu", label: "Quản lý Menu", icon: ShoppingBag, id: "tour-side-menu" },
   { path: "/admin/orders", label: "Quản lý Đơn hàng", icon: ClipboardList, id: "tour-side-orders" },
-  { path: "/admin/customers", label: "Khách hàng", icon: Users, id: "tour-side-customers" },
+  { path: "/admin/customers", label: "CRM Khách hàng", icon: UserCheck, id: "tour-side-customers" },
   { path: "/admin/vouchers", label: "Voucher & Ưu đãi", icon: Tag, id: "tour-side-vouchers", comingSoon: true },
   { path: "/admin/reports", label: "Báo cáo", icon: BarChart3, id: "tour-side-reports" },
   { path: "/admin/media", label: "Thư viện Media", icon: Image, id: "tour-side-media", comingSoon: true },
   { path: "/admin/branches", label: "Chi nhánh", icon: MapPin, id: "tour-side-branches", comingSoon: true },
-  { path: "/admin/crm", label: "CRM Khách hàng", icon: UserCheck, id: "tour-side-crm" },
   { path: "/admin/reviews", label: "Đánh giá & Phản hồi", icon: MessageSquare, id: "tour-side-reviews", comingSoon: true },
   { path: "/admin/audit-log", label: "Audit Log", icon: ShieldAlert, id: "tour-side-audit" },
   { path: "/admin/settings", label: "Cấu hình hệ thống", icon: Settings, id: "tour-side-settings" },
@@ -70,11 +69,7 @@ export function Layout() {
     return navItems.find((item) => item.path === location.pathname)?.label ?? "Dashboard";
   }, [location.pathname]);
 
-  const [notifications, setNotifications] = useState<any[]>([
-    { id: "NTF-01", title: "5 đánh giá mới đang chờ duyệt", meta: "Review Center", time: "2 phút trước", tone: "#FFF3E6", color: "#F58220", preview: "Phản hồi mới từ khách hàng đang cần duyệt trong bảng preview.", route: "/admin/reviews" },
-    { id: "NTF-02", title: "Chi nhánh Quận 3 vừa cập nhật giờ mở cửa", meta: "Chi nhánh", time: "15 phút trước", tone: "#EFF6FF", color: "#2563EB", preview: "Kiểm tra thay đổi giờ hoạt động và nhân sự ca làm tại dashboard chi nhánh.", route: "/admin/branches" },
-    { id: "NTF-03", title: "Phát hiện 1 cảnh báo đăng nhập thất bại", meta: "Audit Log", time: "34 phút trước", tone: "#FEE2E2", color: "#991B1B", preview: "Một IP lạ đã thử đăng nhập nhiều lần. Cần xem chi tiết trong Audit Log.", route: "/admin/audit-log" },
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
     useEffect(() => {
     const handleNotification = (e?: any) => {
@@ -111,6 +106,10 @@ export function Layout() {
         showToast.success(`[Real-time] Đơn #${ntf.orderId}`, { description: `Trạng thái mới: ${cfg.label}` });
       } catch (e) { console.error(e); }
     };
+    
+    // Check for missed notification on mount
+    handleNotification();
+    
     window.addEventListener('storage', handleNotification);
     return () => window.removeEventListener('storage', handleNotification);
   }, []);

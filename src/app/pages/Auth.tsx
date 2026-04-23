@@ -181,7 +181,7 @@ export function Auth() {
                       setEmail(event.target.value);
                       setError("");
                     }}
-                    placeholder="admin@smyou.vn"
+                    placeholder="admin@chips.vn"
                     className="input-field"
                     autoComplete="email"
                     disabled={isSubmitting || success}
@@ -239,32 +239,7 @@ export function Auth() {
             </form>
           </div>
 
-          <div className="mt-5 rounded-2xl border border-[#F0DCC8] bg-[#FFF3E6] p-5">
-            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-[#A0845C]" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
-              🔑 Tài khoản demo — click để điền tự động
-            </p>
-            <div className="space-y-2">
-              {mockAccounts.map((account) => (
-                <button
-                  key={account.id}
-                  onClick={() => fillDemo(account)}
-                  disabled={isSubmitting || success}
-                  className="flex w-full items-center gap-3 rounded-xl border border-[#F0DCC8] px-3 py-2.5 text-left transition-all hover:bg-white"
-                >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F5C088] text-sm font-bold text-[#5D2E0F]">
-                    {account.avatar}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13px] font-semibold text-[#1A1A1A]" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
-                      {account.name}
-                    </div>
-                    <div className="truncate text-[11px] text-[#A0845C]">{account.role} · {account.email}</div>
-                  </div>
-                  <span className="rounded-lg bg-[#F58220] px-2 py-0.5 text-[10px] font-bold uppercase text-white">Dùng</span>
-                </button>
-              ))}
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

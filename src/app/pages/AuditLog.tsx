@@ -57,7 +57,18 @@ export function AuditLog() {
     showToast.loading("Đang chuẩn bị dữ liệu xuất...");
     setTimeout(() => {
       setIsExporting(false);
+      showToast.dismiss();
       showToast.success("Xuất CSV thành công", { description: "File audit_log_2026.csv đã được tải xuống." });
+      
+      const blob = new Blob(["id,user,role,action,target,time,ip,status\nLOG-001,Admin Chips,Super Admin,CREATE,Product,10:25:34 20/04/2026,192.168.1.45,success"], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'audit_log_2026.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }, 1500);
   };
 
