@@ -74,6 +74,7 @@ const statsCards = [
 export function Dashboard() {
   const [orders, setOrders] = useState(OrderService.getAllOrders());
   const [chartPeriod, setChartPeriod] = useState<'weekly' | 'monthly'>('monthly');
+  const [orderFilter, setOrderFilter] = useState<'active' | 'completed' | 'cancelled'>('active');
 
   useEffect(() => {
     const handleRefresh = () => {
@@ -88,53 +89,59 @@ export function Dashboard() {
   }, []);
 
   const todayStr = new Date().toLocaleDateString('vi-VN');
-  const todayOrders = orders.filter(o => o.date === todayStr || o.createdAt.includes(new Date().toISOString().split('T')[0]));
-  const todayRevenue = todayOrders.reduce((sum, o) => sum + o.total, 0);
+  const todayOrders = orders.filter(o => o.date === todayStr || (o.createdAt && o.createdAt.includes(new Date().toISOString().split('T')[0])));
+  const todayRevenue = todayOrders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.total, 0);
+
+  const completedOrders = orders.filter(o => o.status === 'completed');
+  const activeOrders = orders.filter(o => !['completed', 'cancelled'].includes(o.status));
+  const cancelledOrders = orders.filter(o => o.status === 'cancelled');
+
+  const filteredOrders = orderFilter === 'active' ? activeOrders : (orderFilter === 'completed' ? completedOrders : cancelledOrders);
 
   const dynamicStatsCards = [
     {
       title: 'Doanh thu hôm nay',
       value: formatVND(todayRevenue),
-      sub: `Từ ${todayOrders.length} đơn hàng`,
+      sub: `Từ ${todayOrders.filter(o => o.status === 'completed').length} đơn thành công`,
       trend: 'up',
       icon: TrendingUp,
       bg: '#FFF3E6',
       iconBg: '#F5C088',
       iconColor: '#F58220',
-      hint: 'Tổng giá trị các đơn hàng được tạo trong ngày hôm nay.'
+      hint: 'Tổng giá trị các đơn hàng đã HOÀN THÀNH trong ngày hôm nay.'
     },
     {
-      title: 'Đơn hàng hôm nay',
-      value: todayOrders.length.toString(),
-      sub: 'Cập nhật thời gian thực',
-      trend: 'up',
+      title: 'Đơn đang xử lý',
+      value: activeOrders.length.toString(),
+      sub: 'Cần xử lý ngay',
+      trend: activeOrders.length > 5 ? 'down' : 'up',
       icon: ShoppingBag,
       bg: '#EFF6FF',
       iconBg: '#BFDBFE',
       iconColor: '#1E40AF',
-      hint: 'Số lượng đơn hàng được tạo tính từ 00:00 sáng đến thời điểm hiện tại.'
+      hint: 'Số lượng đơn hàng chưa hoàn tất hoặc chưa hủy.'
     },
     {
-      title: 'Khách hàng mới',
-      value: '24',
-      sub: 'Tăng trưởng ổn định',
+      title: 'Tỷ lệ thành công',
+      value: `${((completedOrders.length / (orders.length || 1)) * 100).toFixed(1)}%`,
+      sub: `${completedOrders.length} / ${orders.length} đơn`,
       trend: 'up',
-      icon: Users,
-      bg: '#FEF9C3',
-      iconBg: '#FDE68A',
-      iconColor: '#92400E',
-      hint: 'Số lượng tài khoản khách hàng mới đăng ký trong vòng 24 giờ qua.'
+      icon: CheckCircle2,
+      bg: '#ECFDF5',
+      iconBg: '#A7F3D0',
+      iconColor: '#059669',
+      hint: 'Tỷ lệ đơn hàng hoàn thành so với tổng số đơn.'
     },
     {
-      title: 'Chi nhánh hoạt động',
-      value: '3/3',
-      sub: 'Tất cả sẵn sàng',
-      trend: 'neutral',
-      icon: Store,
-      bg: '#FFF0F3',
-      iconBg: '#FCBABD',
-      iconColor: '#8B3A4A',
-      hint: 'Tỷ lệ chi nhánh đang hoạt động.'
+      title: 'Đơn đã hủy',
+      value: cancelledOrders.length.toString(),
+      sub: 'Cần tối ưu vận hành',
+      trend: 'down',
+      icon: XCircle,
+      bg: '#FEF2F2',
+      iconBg: '#FECACA',
+      iconColor: '#DC2626',
+      hint: 'Số lượng đơn hàng bị khách hoặc admin hủy.'
     },
   ];
 
@@ -434,21 +441,36 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Orders */}
+      {/* Recent Orders Section */}
       <div id="tour-recent-orders" className="rounded-xl overflow-hidden"
         style={{ background: '#FFFFFF', border: '0.5px solid #F0DCC8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: '#F0DCC8' }}>
+        <div className="flex flex-col sm:flex-row items-center justify-between px-5 py-4 border-b gap-4" style={{ borderColor: '#F0DCC8' }}>
           <div>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 600, color: '#1A1A1A' }}>
-              Đơn hàng gần đây
+              Quản lý Đơn hàng
             </h2>
-            <p style={{ fontSize: '12px', color: '#A0845C' }}>Hôm nay, 20/04/2026</p>
+            <p style={{ fontSize: '12px', color: '#A0845C' }}>Lịch sử giao dịch thời gian thực</p>
           </div>
-          <a href="/orders" style={{ fontSize: '13px', color: '#F58220', fontWeight: 600, textDecoration: 'none' }}
-            className="flex items-center gap-1 hover:underline">
-            Xem tất cả <Eye size={14} />
-          </a>
+          
+          <div className="flex bg-[#F9FAFB] p-1 rounded-xl border border-gray-100">
+             {[
+               { id: 'active', label: 'Đang xử lý', count: activeOrders.length, color: 'text-blue-600' },
+               { id: 'completed', label: 'Thành công', count: completedOrders.length, color: 'text-emerald-600' },
+               { id: 'cancelled', label: 'Đã hủy', count: cancelledOrders.length, color: 'text-rose-600' }
+             ].map(t => (
+               <button 
+                key={t.id}
+                onClick={() => setOrderFilter(t.id as any)}
+                className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                  orderFilter === t.id ? 'bg-white shadow-sm text-[#2D1606]' : 'text-gray-400 hover:text-gray-600'
+                }`}
+               >
+                 {t.label} <span className={`ml-1 opacity-60 ${orderFilter === t.id ? t.color : ''}`}>({t.count})</span>
+               </button>
+             ))}
+          </div>
         </div>
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -456,111 +478,108 @@ export function Dashboard() {
                 <th className="text-left px-4 py-3 min-w-[100px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Mã đơn</th>
                 <th className="text-left px-4 py-3 min-w-[160px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Khách hàng</th>
                 <th className="text-left px-4 py-3 min-w-[100px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Loại</th>
-                <th className="text-left px-4 py-3 min-w-[90px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Số món</th>
                 <th className="text-left px-4 py-3 min-w-[110px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Tổng tiền</th>
                 <th className="text-left px-4 py-3 min-w-[110px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Ngày đặt</th>
                 <th className="text-left px-4 py-3 min-w-[130px]" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Trạng thái</th>
-                <th className="text-left px-4 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}></th>
+                <th className="text-left px-4 py-3" style={{ fontSize: '12px', fontWeight: 600, color: '#F58220', whiteSpace: 'nowrap' }}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {orders.slice(0, 10).map((order, i) => {
-                const st = statusConfig[order.status] || {
-                  label: order.status || 'Không rõ',
-                  bg: '#F3F4F6',
-                  color: '#6B7280',
-                  icon: <AlertCircle size={12} />
-                };
-                const typeLabel = order.type === 'delivery' ? 'Giao hàng' : order.type === 'takeaway' ? 'Mang về' : 'Tại quán';
-                const dateStr = new Date(order.createdAt).toLocaleDateString('vi-VN');
+                  const st = statusConfig[order.status] || {
+                    label: order.status || 'Không rõ',
+                    bg: '#F3F4F6',
+                    color: '#6B7280',
+                    icon: <AlertCircle size={12} />
+                  };
+                  const typeLabel = order.type === 'delivery' ? 'Giao hàng' : order.type === 'takeaway' ? 'Mang về' : 'Tại quán';
+                  const dateStr = new Date(order.createdAt).toLocaleDateString('vi-VN');
 
-                const handleStatusUpdate = (newStatus: any) => {
-                  OrderService.updateOrderStatus(order.id, newStatus);
-                  showToast.success(`Cập nhật đơn #${order.id}`, {
-                    description: `Đã chuyển sang trạng thái: ${statusConfig[newStatus]?.label || newStatus}`
-                  });
-                };
+                  const handleStatusUpdate = (newStatus: any) => {
+                    OrderService.updateOrderStatus(order.id, newStatus);
+                    showToast.success(`Cập nhật đơn #${order.id}`, {
+                      description: `Đã chuyển sang trạng thái: ${statusConfig[newStatus]?.label || newStatus}`
+                    });
+                  };
 
-                return (
-                  <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors"
-                    style={{ borderColor: '#FAF0E6' }}>
-                    <td className="px-4 py-3">
-                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#F58220' }}>{order.id}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div style={{ fontSize: '13px', color: '#1A1A1A', fontWeight: 500 }}>{order.customerName}</div>
-                      <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{order.customerId}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span style={{ fontSize: '12px', color: '#A0845C' }}>{typeLabel}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span style={{ fontSize: '13px', color: '#1A1A1A' }}>{order.items.length} món</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(order.total)}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span style={{ fontSize: '12px', color: '#A0845C' }}>{dateStr}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
-                        style={{ background: st.bg, color: st.color, fontSize: '11.5px', fontWeight: 600 }}>
-                        {st.icon}
-                        {st.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5">
-                        {order.status === 'pending' && (
-                          <button 
-                            onClick={() => handleStatusUpdate('confirmed')}
-                            className="px-3 py-1.5 bg-orange-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-orange-600 transition-all active:scale-95"
-                          >
-                            Xác nhận
+                  return (
+                    <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors"
+                      style={{ borderColor: '#FAF0E6' }}>
+                      <td className="px-4 py-3">
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#F58220' }}>{order.id}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div style={{ fontSize: '13px', color: '#1A1A1A', fontWeight: 500 }}>{order.customerName}</div>
+                        <div style={{ fontSize: '11.5px', color: '#9CA3AF' }}>{order.customerId}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span style={{ fontSize: '12px', color: '#A0845C' }}>{typeLabel}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A' }}>{formatVND(order.total)}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span style={{ fontSize: '12px', color: '#A0845C' }}>{dateStr}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full"
+                          style={{ background: st.bg, color: st.color, fontSize: '11.5px', fontWeight: 600 }}>
+                          {st.icon}
+                          {st.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5">
+                          {order.status === 'pending' && (
+                            <button 
+                              onClick={() => handleStatusUpdate('confirmed')}
+                              className="px-3 py-1.5 bg-orange-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-orange-600 transition-all active:scale-95"
+                            >
+                              Xác nhận
+                            </button>
+                          )}
+                          {order.status === 'confirmed' && (
+                            <button 
+                              onClick={() => handleStatusUpdate('preparing')}
+                              className="px-3 py-1.5 bg-blue-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-blue-600 transition-all active:scale-95"
+                            >
+                              Pha chế
+                            </button>
+                          )}
+                          {order.status === 'preparing' && (
+                            <button 
+                              onClick={() => handleStatusUpdate('ready')}
+                              className="px-3 py-1.5 bg-indigo-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-indigo-600 transition-all active:scale-95"
+                            >
+                              Giao hàng
+                            </button>
+                          )}
+                          {order.status === 'ready' && (
+                            <button 
+                              onClick={() => handleStatusUpdate('completed')}
+                              className="px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-emerald-600 transition-all active:scale-95"
+                            >
+                              Hoàn tất
+                            </button>
+                          )}
+                          {['pending', 'confirmed'].includes(order.status) && (
+                            <button 
+                              onClick={() => handleStatusUpdate('cancelled')}
+                              className="p-1.5 bg-rose-50 text-rose-500 rounded-lg hover:bg-rose-100 transition-colors"
+                              title="Hủy đơn"
+                            >
+                              <XCircle size={14} />
+                            </button>
+                          )}
+                          <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                            <MoreHorizontal size={16} style={{ color: '#9CA3AF' }} />
                           </button>
-                        )}
-                        {order.status === 'confirmed' && (
-                          <button 
-                            onClick={() => handleStatusUpdate('preparing')}
-                            className="px-3 py-1.5 bg-blue-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-blue-600 transition-all active:scale-95"
-                          >
-                            Pha chế
-                          </button>
-                        )}
-                        {order.status === 'preparing' && (
-                          <button 
-                            onClick={() => handleStatusUpdate('ready')}
-                            className="px-3 py-1.5 bg-indigo-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-indigo-600 transition-all active:scale-95"
-                          >
-                            Giao hàng
-                          </button>
-                        )}
-                        {order.status === 'ready' && (
-                          <button 
-                            onClick={() => handleStatusUpdate('completed')}
-                            className="px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-black uppercase rounded-lg hover:bg-emerald-600 transition-all active:scale-95"
-                          >
-                            Hoàn tất
-                          </button>
-                        )}
-                        {['pending', 'confirmed'].includes(order.status) && (
-                          <button 
-                            onClick={() => handleStatusUpdate('cancelled')}
-                            className="p-1.5 bg-rose-50 text-rose-500 rounded-lg hover:bg-rose-100 transition-colors"
-                            title="Hủy đơn"
-                          >
-                            <XCircle size={14} />
-                          </button>
-                        )}
-                        <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                          <MoreHorizontal size={16} style={{ color: '#9CA3AF' }} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

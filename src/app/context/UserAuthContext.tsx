@@ -47,6 +47,14 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // Initialize demo users if empty
+    const allUsers = localStorage.getItem('milktea_all_users');
+    if (!allUsers) {
+      localStorage.setItem('milktea_all_users', JSON.stringify([
+        { id: 'user1', name: 'Nguyễn Văn A', email: 'user1@example.com', phone: '0901234567', loyaltyPoints: 250, tier: 'Silver' as const, password: 'password123' },
+      ]));
+    }
+
     // Check for auth cookie
     const getCookie = (name: string) => {
       const value = `; ${document.cookie}`;
@@ -64,6 +72,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) { console.error('Failed to load user:', error); }
       }
     }
+    // ... cart/favorites logic same as before
 
     const savedCart = localStorage.getItem('milkteaCart');
     if (savedCart) {
